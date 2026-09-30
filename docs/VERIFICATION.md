@@ -1,35 +1,39 @@
-# Verification — 2026-09-29
+# Verification — 2026-09-30
 
-Current scope: growing-map revision 0.2 using v15 components. Not a designer
-rules-completeness or balance certification. No public hosted release is claimed.
+Current scope: space-check revision 0.3 on the growing-map prototype. This is
+ready for designer testing, not a balance or rules-completeness certification.
+No public hosted release is claimed.
 
 ## Local evidence
 
-- `npm test`: 34 passing tests, including 36 complete seeded 2/3/4-player legal
-  action simulations plus 24 complete games with the playable basic bots. Tests cover deterministic setup, rejection atomicity,
-  undo/replay, private projections, component conservation, memory sharing and
-  return cost, foreshadowing, submarine overflow, character activation/collection,
-  combat-card reshuffling, cleanup, token scoring and Act transitions; hex publication legality, single-step movement, book conservation and bot information boundaries.
-- `npm run build`: TypeScript check and production build pass.
-- `npm run smoke`: a GUI-only game from setup through six conflicts and all
-  three Acts and all six publications. Direct protagonist dragging, piece menus, map zoom/pan, card clicks, memory-row clicks, undo, save, handoff, spectator mode and a real bot turn included.
-  Desktop viewport 1600×1100, tablet viewport 820×1180. No browser console or
-  page errors. No WCAG A/AA violations reported by the included axe checks.
-- `python print/source/build.py` and `python print/check.py`: 16 vector PDF pages,
-  40 cards, nine books, four player boards, 48 memory hexes, 15 conflict fronts
-  and mirrored backs. Cut bounds, terminology, counts and physical sizes pass.
-- The inherited dev tools were updated to Vite 7.3.6 and Vitest 4.1.11. npm audit
-  reported zero known vulnerabilities after the patch update.
+- `npm run verify` passed: 50 tests, production build and browser journey.
+- Tests include 36 seeded 2/3/4-player legal-action simulations and 24 complete
+  basic-bot games, alongside deterministic replay, privacy and conservation checks.
+- Sixteen focused new tests cover mandatory movement, invalid return-to-origin,
+  direct placement/upgrading, middle-space rewards, memory-only spaces, immediate
+  interruption of multi-placement actions, repeated left-to-right opportunities,
+  future occupant changes, extra-card limits and Agamemnon's exception.
+- Browser journey: 189 choices, six conflicts, all nine books and all three Acts.
+  Actual pointer dragging, direct empty-space placement, clicking an owned Inkling
+  to upgrade, visible levels for all four tracks, current conflict-space highlight,
+  card choices, save/undo, privacy handoff, zoom/pan and a real bot turn verified.
+  Desktop 1600x1100 and tablet 820x1180. No console/page errors; included axe
+  checks reported no accessibility violations.
+- `python print/source/build.py` and `python print/check.py` passed: 16 vector
+  pages, 40 cards, nine books, four player boards, 48 memory hexes, 15 conflict
+  fronts and mirrored backs. Current rule wording, cut bounds and physical sizes
+  are checked. All cards remain inside their cut boundaries.
 
 ## Visual inspection
 
-Opened and inspected `artifacts/table-desktop.png`, `table-tablet.png`, and
-`bot-game.png`. The colored books, two-page separation, memory/Inkling
-spaces, resource counts, legal-action panel and final score were readable, with
-no overlap or horizontal tablet overflow. Tablet places the map first, then the rewards, choices and hand. The map uses its own zoomable camera.
+Inspected desktop upgrade tracks and conflict scan, plus tablet layout. Current
+levels, covered memory tokens, middle-space Twist icons and current space are
+visible. The table has its own zoom/pan camera and no horizontal tablet overflow.
 
-Opened and inspected `artifacts/print/page-01.png` after adding three-book setup and post-conflict publication to the shared rules. The basic rules still fit one page at 9.5 pt, followed by the existing icon legend and component sheets. All 16 pages and component/cut bounds pass the print checks.
+Inspected PDF rules, legend, books, adapted Twists, Agamemnon and Horse powers.
+Basic rules fit one page at 9.5 pt; the icon legend occupies the next page.
+Four rotated books per sheet retain 2 mm margins and middle-space Twist symbols.
+Revised card text fits without clipping. Historical v15 snapshot is unchanged.
 
-Screenshots and reports are generated, ignored artifacts. CI uploads browser
-evidence so future reviews can inspect the exact changed build. Human tests and
-unfamiliar-player validation remain the next maturity gate.
+Screenshots/reports are generated under ignored `artifacts/`; CI stores browser
+evidence for review. Human playtesting remains necessary for feel and balance.

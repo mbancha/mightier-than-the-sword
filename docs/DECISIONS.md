@@ -2,7 +2,7 @@
 
 Authority: latest explicit designer decisions → v15 catalog/rules → provisional
 digital rulings here. Earlier Acts/bookmarks/plotlines/sidekick variants are retired.
-This file is for decisions, not a transcript. Date: 2026-09-29.
+This file is for decisions, not a transcript. Date: 2026-09-30.
 
 ## Confirmed source behavior
 
@@ -18,7 +18,7 @@ This file is for decisions, not a transcript. Date: 2026-09-29.
    power. The placer and owner gain their reward, once total if the same player.
 5. Erase returns an Inkling to supply; suspend sends it to the next reserve (out
    of play during Act III); foreshadow takes from the next reserve into supply.
-6. An Unlikely Champion costs returning your memory from your protagonist's book.
+6. An Unlikely Champion costs returning your memory from the conflict book.
    Return it to the rightmost uncovered matching row space. Its occupant stays.
 7. Combat Twists stay out of the draw/discard piles until combat is scored, so an
    Odysseus draw cannot recycle a Twist still being used in that same combat.
@@ -57,7 +57,7 @@ hosting or published balance claims. Basic bots are now playable opponents; thei
   site adjacent to at least two books, and places one supply Inkling in an
   existing neighboring book's overflow. This includes the last conflict of an Act.
 - Crossing a touching page edge or the internal fold costs one movement point.
-  Normal movement can stop early; a legal drag uses a single step at a time.
+  Normal movement can stop early after at least one step, on a different page from its start; a legal drag uses a single step at a time.
 - Each seat can be human or a basic bot. Bots must use only their own private view.
 
 Provisional edge cases: shuffle all nine books together (no genre quota); when
@@ -66,3 +66,33 @@ publication Inkling. Choosing submarine overflow erases that Inkling normally.
 Shoot-the-moon awards no publication because it is not a conflict. Publish after
 token rewards, before other full books or an Act transition. Travel Subplots count
 at most one new-book travel event per normal movement, even with several steps.
+
+## Space-check revision 0.3 (designer confirmed)
+
+- Normal protagonist movement is mandatory and must finish on a different page.
+  Optional movement granted by characters and effects remains optional.
+- After movement, an empty numbered space can be clicked to place directly;
+  clicking your own Inkling offers a memory upgrade, suspending that Inkling.
+- Every numbered space except the first and last across the book grants one Twist
+  on placement, including bonus placements. Moving an existing Inkling does not.
+- Finish rewards earned by the filling placement, then interrupt further
+  placements to resolve conflict immediately. Memories alone never fill a space.
+- Agamemnon explicitly triggers conflict with one space empty. He occupies no
+  numbered space and grants no Twist opportunity for the empty space.
+- All 15 Twists are conflict-only. Check numbered spaces once, left to right;
+  the current Inkling owner may play one Twist or pass at each occupied space.
+  Overflow and memory-only spaces grant no opportunity. A player may play at
+  several separate spaces. Agamemnon/Strategists grant one extra Twist at one
+  owned space check per conflict, not cumulative extra cards at every space.
+- Later checks use their current occupants after card effects. Earlier spaces
+  never repeat. The current check remains available if its Inkling is erased
+  during that check; conflict finishes even if effects empty numbered spaces.
+- Other books filled during conflict wait until it finishes. If the final token
+  ends the Act, waiting full books resolve before the next normal movement.
+- Seven former turn Twists were adapted to this timing: Mathematical Leap,
+  An Ocean Without Borders, Crossing the Threshold, Divine Favor, An Unlikely
+  Champion, Stolen Vitality and A Hero Returns. Stable catalog IDs are retained.
+
+The ordering of earned placement rewards before the immediate conflict and the
+latched current-space opportunity are implementation rulings recorded explicitly
+for playtest review. Other new movement/timing rules above are designer confirmed.

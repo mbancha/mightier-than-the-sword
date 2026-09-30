@@ -1,7 +1,7 @@
 # Mightier than the Sword
 
 A shared workspace for the game design, printable prototype, and an automated
-2–4 player prototype with human and basic-bot seats. Current source: **v15 components with growing-map rules 0.2**.
+2–4 player prototype with human and basic-bot seats. Current source: **v15 components with space-check rules 0.3**.
 
 The first build includes all nine books, fifteen Twists, ten incremental Subplots,
 ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
@@ -32,15 +32,20 @@ but cannot undo knowledge. A save requires the same content/rules edition.
 Choose Human or Basic bot for each seat (the default is you versus one bot).
 Click a starting page. Click your quill-and-inkwell to highlight adjacent pages,
 then drag it or click a highlighted page. Each step uses one move; click the
-figure again and choose **End move** when finished. Its menu offers your turn
-choices. Click an empty space to place an Inkling, a memory row to upgrade, a
-character activation space to use it, or a card in your hand to play it.
+figure again and choose **End move** when finished. You must move at least one
+page and finish on a different page from where you started. Then click an empty
+space to place an Inkling, or your own Inkling to choose a memory upgrade.
+Character activation spaces offer your alternative action. Middle numbered
+spaces draw a Twist when filled. A full book triggers conflict immediately: play
+a card from your hand or pass when each of your occupied spaces is checked from
+left to right. Twists are only played in conflict. Player boards show every
+upgrade level and highlight its current benefit.
 
 Drag the empty map background to pan. Use the wheel or +/− to zoom; **Fit map**
 frames the books. After a win, click a dashed publishing position, then a touching
 book's overflow. **All legal actions** remains available for unusual card choices
 and keyboard use. Bots can be paused or sped up; undo pauses bots for inspection.
-Saves preserve seat controllers. Old 0.1 saves require their matching release.
+Saves preserve seat controllers. Older saves require their matching rules release.
 
 ## Start a design session
 

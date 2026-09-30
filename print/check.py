@@ -17,11 +17,14 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     full=' '.join(full.split())
     assert not re.search(r'\b(development|developed|bookmark|Pathos|Love|Plotline|unpublished|sidekick|exhaust)\b',full,re.I)
     assert not re.search(r'\b(?:ink|unlock\w*)\b',full,re.I)
-    assert 'Return 1 of your memories from your protagonist' in full
-    assert 'EVERY conflict takes 1 available token' in full
+    assert 'Return 1 of your memories from this book' in full
+    assert 'EVERY conflict takes 1 available current-Act token' in full
     assert 'NO printed book points' in full
-    assert 'no conflict resolves without an available token' in full
-    assert 'The base pool has 15' in full
+    assert 'no conflict resolves without an available token' in full.lower()
+    assert 'base pool of 15' in full
+    for wording in ['ending on a different page', 'Twists are played ONLY in conflict', 'Check numbered spaces ONCE, left to right', 'Agamemnon triggers with 1 space still empty', 'placing an Inkling there draws 1 Twist']:
+        assert wording in full, wording
+    assert 'ON YOUR TURN' not in full
     assert sum(len(p.hyperlinks) for p in pdf.pages)==15
     assert Counter(a['kind'] for a in q['cards'])=={'Twist':15,'Subplot':10,'Character':10,'Horse power':5}
     for i in range(5,10):

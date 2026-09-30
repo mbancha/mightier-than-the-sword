@@ -39,6 +39,9 @@ export function publicView(s: GameState) {
           participants: [...s.battle.participants],
           powers: s.players.map((_, p) => power(s, p, s.battle!.book)),
           winner: s.battle.winner,
+          space: s.battle.cursor,
+          spaceOwner: s.battle.slotOwner,
+          spacePlayed: s.battle.slotPlayed,
         }
       : null,
     log: [...s.log],
@@ -55,6 +58,8 @@ export function playerView(s: GameState, p: number) {
       s.jobs[0]?.type === 'move'
         ? {
             character: s.jobs[0].char ?? null,
+            mandatory: s.jobs[0].source === 'normal',
+            origin: s.jobs[0].origin ?? s.players[p].page,
             remaining:
               s.jobs[0].mode === 'any' ? null : (s.jobs[0].n ?? 1 + s.players[p].rows.curiosity),
           }

@@ -20,7 +20,7 @@ OUT.mkdir(exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
 icons.configure();v.ASSET_DIR=ROOT.parent/'assets'/'icons'
 PDF=OUT/'Mightier_than_the_Sword_Current.pdf'
 c=canvas.Canvas(str(PDF),pagesize=(612,792))
-c.setTitle('Mightier than the Sword - Growing-map Playtest 0.2')
+c.setTitle('Mightier than the Sword - Space-check Playtest 0.3')
 v.install_callback(c)
 INK=HexColor('#263D49');GRAY=HexColor('#66757B');LIGHT=HexColor('#D3DFE1')
 BLUE=HexColor('#237B9C');GOLD=HexColor('#A07223');TEAL=HexColor('#207E71');PURPLE=HexColor('#79539A')
@@ -52,7 +52,7 @@ def hexagon(x,y,r=17,symbol=None):
     if symbol:v.draw_icon(c,icons.SYMBOLS[symbol],x-10,y-10,20)
 def finish(label,w=612,h=792,footer=True):
     if footer:
-        txt('MIGHTIER THAN THE SWORD / GROWING MAP 0.2',30,17,7,color=GRAY)
+        txt('MIGHTIER THAN THE SWORD / SPACE CHECKS 0.3',30,17,7,color=GRAY)
         txt(label,w-30-stringWidth(label,'Helvetica',7),17,7,color=GRAY)
     c.showPage();pages.append(label)
 def rich(s):
@@ -82,6 +82,7 @@ def legend():
         x=32+(i//6)*281;y=654-(i%6)*81
         v.draw_icon(c,icons.SYMBOLS[symbol],x,y-7,30)
         txt(title,x+42,y+15,10.5,'Helvetica-Bold',TEAL)
+        if symbol=='[twist]':meaning='Play during your Inkling space check in conflict. On a book space: draw 1 Twist when placing an Inkling.'
         if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into overflow on this book.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
     line(32,162,580,162,GRAY)
@@ -123,6 +124,7 @@ def book(b,x,y):
             assert xx>=side*w/2+4 and xx+54<=(side+1)*w/2-4
             rect(xx,53,54,54,None,HexColor('#000000'),.8);hexagon(xx+27,80,27)
             txt(str(n),xx+2,97,6.5,'Helvetica-Bold',GRAY)
+            if 1<n<b['slots']:v.draw_icon(c,'twist',xx+5,58,14)
     if b['title'].startswith('20,000'):
         para('NO OVERFLOW / incoming overflow Inklings are erased',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
     else:

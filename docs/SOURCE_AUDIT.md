@@ -40,3 +40,13 @@ hex-grid publication after conflicts, edge-by-edge movement, optional bot seats,
 and tactile piece interactions. Component counts and card text are unchanged.
 The shared rules catalog and generated current PDF include this revision; the
 approved v15 snapshot remains an immutable historical reference.
+
+## Digital and print revision 0.3
+
+Mandatory movement, direct space placement/upgrading, middle-space Twist rewards,
+immediate conflicts and per-space left-to-right conflict windows follow the latest
+designer instructions. Agamemnon retains the explicitly approved one-empty-space
+trigger exception. All 15 Twists now use conflict timing; IDs 8-14 were adapted,
+and Agamemnon/Strategists text specifies their once-per-conflict extra card.
+The app, generated rules and current 16-page PDF read this same catalog. Book
+sheets now show middle-space Twist symbols. Counts and the v15 snapshot stay intact.

@@ -417,17 +417,19 @@ export function TableMap({
                           {b.slots.map((spot, k) =>
                             spot.page === side ? (
                               <button
-                                className={`slot ${actions.some((a) => a.key === `place:${k}` && a.book === bi) ? 'legalSlot' : ''}`}
+                                className={`slot ${data.battle?.book === bi && data.battle.space === k && data.battle.spaceOwner !== null && data.battle.winner === null ? 'scanSlot' : ''} ${actions.some((a) => ['place:' + k, 'placeHere:' + k].includes(a.key) && a.book === bi) ? 'legalSlot' : ''}`}
                                 key={k}
                                 aria-label={`${def.title} space ${k + 1}${spot.owner !== null ? ' occupied by ' + data.players[spot.owner].name : ''}`}
                                 onClick={(e) => {
                                   const choices = actions.filter(
                                     (a) =>
-                                      (a.key === `place:${k}` && a.book === bi) ||
+                                      (['place:' + k, 'placeHere:' + k].includes(a.key) &&
+                                        a.book === bi) ||
                                       a.key.startsWith(`upgrade:${bi}:${k}:`) ||
+                                      a.key.startsWith(`memoryHere:${bi}:${k}:`) ||
                                       (a.key === `memory:${k}` &&
                                         view?.prompt === 'returnMemory' &&
-                                        Math.floor(data.players[data.actor].page / 2) === bi) ||
+                                        a.book === bi) ||
                                       a.key.startsWith(`target:${bi}:${k}:`),
                                   );
                                   if (choices.length === 1) choose(choices[0]);
@@ -444,6 +446,14 @@ export function TableMap({
                                 }}
                               >
                                 <small>{k + 1}</small>
+                                {k > 0 && k < b.slots.length - 1 && (
+                                  <span
+                                    className="slotReward"
+                                    title="Place an Inkling: draw 1 Twist"
+                                  >
+                                    {icon('twist', 17)}
+                                  </span>
+                                )}
                                 {spot.memory && (
                                   <span
                                     className="memory"
@@ -473,7 +483,7 @@ export function TableMap({
                   onClick={(e) => {
                     const opts = actions.filter(
                       (a) =>
-                        (a.key === 'place:null' && a.book === bi) ||
+                        (['place:null', 'placeHere:null'].includes(a.key) && a.book === bi) ||
                         a.key === `publishOverflow:${bi}` ||
                         a.key.startsWith(`target:${bi}:null:`),
                     );
@@ -554,7 +564,11 @@ export function TableMap({
               ? 'Click a neighboring book’s overflow.'
               : view?.moving
                 ? `Click or drag your figure · ${view.moving.remaining ?? 'any distance'} ${view.moving.remaining === null ? '' : 'steps remaining'}`
-                : 'Click pieces, spaces, and conflict tokens to act.'}
+                : data.battle
+                  ? 'Resolve the highlighted conflict using your cards and the choice panel.'
+                  : view?.prompt === 'turn'
+                    ? 'Click an empty space to place an Inkling, or your Inkling to leave a memory.'
+                    : 'Follow the current choice; highlighted pieces show available targets.'}
         </div>
       </div>
     </section>

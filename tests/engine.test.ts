@@ -174,8 +174,10 @@ describe('Memories and Inklings', () => {
     s.players[0].supply += 2;
     s.players[0].reserves[1] = 1;
     hand(s, 0, 10);
-    s.jobs = [{ type: 'turn', p: 0 }];
-    act(s, 'twist:10');
+    only(s, { type: 'optionalForeshadow', p: 0 });
+    act(s, 'foreshadow');
+    only(s, { type: 'optionalForeshadow', p: 0 });
+    act(s, 'foreshadow');
     expect(s.players[0].reserves[1]).toBe(0);
     expect(s.players[0].reserves[2]).toBe(3);
     expect(s.players[0].points).toBe(1);
@@ -246,7 +248,6 @@ describe('Conflict tokens and Acts', () => {
       participants: [0, 1],
       bonus: [0, 0],
       played: [0, 0],
-      passed: [],
       ignored: [],
       allIgnored: false,
       hero: [],
@@ -254,6 +255,9 @@ describe('Conflict tokens and Acts', () => {
       tribute: [],
       complete: [],
       cursor: 0,
+      slotOwner: 0,
+      slotPlayed: 0,
+      extraUsed: [],
       winner: 0,
       cards: [],
     };
@@ -269,6 +273,8 @@ describe('Conflict tokens and Acts', () => {
     hand(s, 0, 1);
     for (const id of s.decks.twist.splice(0)) s.players[1].hand.push(id);
     s.discards.twist = [];
+    put(s, 0, 0, 0);
+    put(s, 1, 0, 1);
     s.battle!.winner = null;
     s.jobs = [{ type: 'battle', p: 0 }];
     act(s, 'twist:1');
@@ -290,8 +296,7 @@ describe('Conflict tokens and Acts', () => {
     s.books[b].slots[0].memory = { owner: 0, row: 'valor' };
     s.jobs = [{ type: 'resolve', p: 0 }];
     act(s, `conflict:${b}`);
-    act(s, 'pass');
-    act(s, 'pass');
+    for (let i = 0; i < 3; i++) act(s, 'pass');
     expect(s.jobs[0].type).toBe('takeToken');
     expect(s.books[b].slots.every((x) => x.owner === null)).toBe(true);
     expect(s.books[b].slots[0].memory).toEqual({ owner: 0, row: 'valor' });

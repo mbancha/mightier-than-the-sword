@@ -117,7 +117,7 @@ function foreshadow(s: GameState, p: number, n: number) {
   }
   if (n > take) points(s, p, n - take, 'reserve unavailable');
 }
-function gainCharacter(s: GameState, p: number) {
+function gainCharacter(s: GameState, p: number, page = s.players[p].page) {
   const id = s.decks.character.pop();
   if (id === undefined) {
     points(s, p, 2, 'character deck empty');
@@ -126,12 +126,13 @@ function gainCharacter(s: GameState, p: number) {
   s.characters.push({
     id,
     owner: p,
-    page: s.players[p].page,
+    page,
     other: null,
     used: characters[id].actions.map(() => 0),
     collected: 0,
   });
   note(s, `${s.players[p].name} gains ${characters[id].name}.`);
+  if (id === 5) queue(s, job('checkConflict', p, { book: bookOf(page) }));
   if (id === 4) queue(s, job('horse', p));
 }
 function memoryJobs(p: number, row: Row, b: number): Job[] {
@@ -154,6 +155,8 @@ function place(s: GameState, p: number, b: number, slot: number | null) {
   } else {
     const spot = s.books[b].slots[slot];
     spot.owner = p;
+    queue(s, job('checkConflict', p, { book: b }));
+    if (slot > 0 && slot < s.books[b].slots.length - 1) draw(s, p, 1, 'twist');
     if (spot.memory) {
       const m = spot.memory;
       queue(s, ...memoryJobs(p, m.row, b), ...(m.owner !== p ? memoryJobs(m.owner, m.row, b) : []));
@@ -195,6 +198,7 @@ function upgrade(s: GameState, p: number, b: number, k: number, row: Row) {
 }
 function finishAct(s: GameState) {
   s.battle = null;
+  s.pendingConflicts = [];
   if (s.act === 3) {
     s.over = true;
     s.jobs = [];
@@ -263,7 +267,6 @@ function battleStart(s: GameState, b: number) {
     participants,
     bonus: s.players.map(() => 0),
     played: s.players.map(() => 0),
-    passed: [],
     ignored: [],
     allIgnored: false,
     hero: [],
@@ -271,6 +274,9 @@ function battleStart(s: GameState, b: number) {
     tribute: [],
     complete: [],
     cursor: 0,
+    slotOwner: null,
+    slotPlayed: 0,
+    extraUsed: [],
     winner: null,
     cards: [],
   };
@@ -296,32 +302,41 @@ function cardEffect(s: GameState, p: number, id: number) {
     if (id === 5) queue(s, job('erase', p, { book: b, n: 2, mode: 'own', source: 'experiment' }));
     if (id === 6) battle.revenge.push(p);
     if (id === 7) battle.hero.push(p);
-  } else if (id === 8) queue(s, job('move', p, { mode: 'any', source: 'twist' }));
-  else if (id === 9) queue(s, job('transfer', p, { book: b, n: 3 }));
-  else if (id === 10) foreshadow(s, p, 2);
-  else if (id === 11) queue(s, job('upgrade', p, { page: s.players[p].page, source: 'bonus' }));
-  else if (id === 12) queue(s, job('returnMemory', p, { book: b }));
-  else if (id === 13)
+  } else if (id === 8) {
+    battle!.bonus[p] += 2;
+    queue(s, job('move', p, { mode: 'any', book: b, source: 'twist' }));
+  } else if (id === 9) queue(s, job('transfer', p, { book: b, n: 3 }));
+  else if (id === 10) {
+    queue(s, job('place', p, { book: b, mode: 'overflow', n: 2, optional: true }));
+    foreshadow(s, p, 2);
+  } else if (id === 11) {
+    battle!.bonus[p] += 3;
+    queue(s, job('upgrade', p, { book: b, source: 'bonus' }));
+  } else if (id === 12)
     queue(
       s,
-      job('erase', p, { page: s.players[p].page, n: 1, mode: 'opponent', source: 'replace' }),
+      job('returnMemory', p, { book: b, page: b * 2 + s.books[b].slots[battle!.cursor].page }),
     );
-  else if (id === 14) queue(s, job('refresh', p, { n: 2 }));
+  else if (id === 13)
+    queue(s, job('erase', p, { book: b, n: 1, mode: 'opponent', source: 'replace' }));
+  else if (id === 14) {
+    battle!.bonus[p] += 3;
+    queue(s, job('refresh', p, { n: 2 }));
+  }
 }
 function playTwist(s: GameState, p: number, id: number) {
-  if (s.battle) {
-    s.players[p].hand.splice(s.players[p].hand.indexOf(id), 1);
-    s.battle.cards.push(id);
-  } else discard(s, p, id);
+  const bt = s.battle;
+  if (!bt) throw Error('Twists can only be played during a conflict space check.');
+  s.players[p].hand.splice(s.players[p].hand.indexOf(id), 1);
+  bt.cards.push(id);
+  bt.played[p]++;
+  bt.slotPlayed++;
+  if (bt.slotPlayed === 2) bt.extraUsed.push(p);
   note(s, `${s.players[p].name} plays ${twists[id].name}.`);
-  if (s.battle) {
-    s.battle.played[p]++;
-    s.battle.passed = [];
-    if (s.books[s.battle.book].id === 4 && count(s, p, s.battle.book) === 1)
-      s.battle.bonus[p] += CONFIG.iliadTwistBonus;
-    if (ownedChars(s, p, s.battle.book).some((c) => c.id === 6) && !abilitySuppressed(s, 6))
-      draw(s, p, 1, 'twist');
-  } else s.twisted = true;
+  if (s.books[bt.book].id === 4 && count(s, p, bt.book) === 1)
+    bt.bonus[p] += CONFIG.iliadTwistBonus;
+  if (ownedChars(s, p, bt.book).some((c) => c.id === 6) && !abilitySuppressed(s, 6))
+    draw(s, p, 1, 'twist');
   cardEffect(s, p, id);
   progress(s, p, 'twist');
 }
@@ -374,7 +389,11 @@ function options(s: GameState): Option[] {
       j.type === 'setup' || j.mode === 'any'
         ? Array.from({ length: s.books.length * 2 }, (_, i) => i)
         : reachable(s.books, from, j.n ?? CONFIG.baseMove + pl.rows.curiosity);
-    for (const page of pages)
+    for (const page of pages.filter(
+      (page) =>
+        (j.book === undefined || bookOf(page) === j.book) &&
+        (j.source !== 'normal' || page !== (j.origin ?? from)),
+    ))
       add(
         `page:${page}`,
         page === from && j.type !== 'setup' ? `Stay · ${pageLabel(s, page)}` : pageLabel(s, page),
@@ -385,7 +404,8 @@ function options(s: GameState): Option[] {
             cc.page = page;
             cc.other = null;
           } else s.players[p].page = page;
-          if (j.source === 'normal' && !j.travelled && bookOf(page) !== bookOf(from))
+          if (c?.id === 5) queue(s, job('checkConflict', p, { book: bookOf(page) }));
+          if (j.source === 'normal' && bookOf(page) !== bookOf(j.origin ?? from))
             progress(s, p, 'travel');
         },
         'Move',
@@ -396,24 +416,34 @@ function options(s: GameState): Option[] {
     const c = j.char === undefined ? null : s.characters.find((c) => c.id === j.char)!;
     const from = c ? c.page : pl.page;
     const remaining = j.n ?? CONFIG.baseMove + pl.rows.curiosity;
-    add('endMove', 'End move', done, 'Move');
+    if (j.source !== 'normal' || from !== (j.origin ?? from))
+      add(
+        'endMove',
+        'End move',
+        (state) => {
+          done(state);
+          if (j.source === 'normal' && bookOf(from) !== bookOf(j.origin ?? from))
+            progress(state, p, 'travel');
+        },
+        'Move',
+      );
     if (j.mode !== 'any' && remaining > 0)
-      for (const page of pageNeighbors(s.books, from))
+      for (const page of pageNeighbors(s.books, from).filter(
+        (page) => !(j.source === 'normal' && remaining === 1 && page === (j.origin ?? from)),
+      ))
         add(
           `step:${page}`,
           `Step to ${pageLabel(s, page)}`,
           (state) => {
             const pending = state.jobs[0];
             pending.n = remaining - 1;
+            pending.origin = j.origin ?? from;
             if (c) {
               const cc = state.characters.find((x) => x.id === c.id)!;
               cc.page = page;
               cc.other = null;
             } else state.players[p].page = page;
-            if (j.source === 'normal' && !j.travelled && bookOf(from) !== bookOf(page)) {
-              pending.travelled = true;
-              progress(state, p, 'travel');
-            }
+            if (c?.id === 5) queue(state, job('checkConflict', p, { book: bookOf(page) }));
           },
           'Step',
           { page },
@@ -455,6 +485,42 @@ function options(s: GameState): Option[] {
         );
     });
   if (j.type === 'turn') {
+    if (!s.acted) {
+      const pj = job('place', p, {
+        page: pl.page,
+        n: pl.rows.resolve >= 2 ? pl.rows.resolve : 1,
+        optional: true,
+      });
+      if (pl.supply)
+        for (const option of options({ ...s, jobs: [pj] }).filter((a) =>
+          a.key.startsWith('place:'),
+        )) {
+          add(
+            option.key.replace('place:', 'placeHere:'),
+            option.label,
+            (state) => {
+              state.acted = true;
+              state.jobs.unshift({ ...pj });
+              option.run(state);
+            },
+            'Place',
+            { book: bookOf(pl.page), page: pl.page },
+          );
+        }
+      for (const option of upgradeOptions(s, job('upgrade', p, { page: pl.page })))
+        add(
+          option.key.replace('upgrade:', 'memoryHere:'),
+          option.label,
+          (state) => {
+            state.acted = true;
+            state.jobs.unshift(job('upgrade', p, { page: pl.page }));
+            option.run(state);
+          },
+          'Memory',
+          { book: option.book, page: pl.page, detail: option.detail },
+        );
+    }
+
     if (!s.acted && pl.supply) {
       add(
         'place',
@@ -510,18 +576,10 @@ function options(s: GameState): Option[] {
             );
         });
     }
-    if (!s.twisted)
-      for (const card of pl.hand.filter((id) => twists[id].timing === 'ON YOUR TURN')) {
-        if (card === 12 && !s.books[bookOf(pl.page)].slots.some((x) => x.memory?.owner === p))
-          continue;
-        add(`twist:${card}`, twists[card].name, (s) => playTwist(s, p, card), 'Twist', {
-          detail: twists[card].text,
-        });
-      }
     if (s.acted)
       add(
         'finish',
-        'Resolve full books and end turn',
+        'End turn',
         (s) => {
           done(s);
           queue(s, job('resolve', p));
@@ -569,13 +627,19 @@ function options(s: GameState): Option[] {
   if (j.type === 'returnMemory')
     s.books[j.book!].slots.forEach((spot, k) => {
       if (spot.memory?.owner === p)
-        add(`memory:${k}`, `Return ${rowName(spot.memory.row)} memory from space ${k + 1}`, (s) => {
-          done(s);
-          const sp = s.books[j.book!].slots[k];
-          s.players[p].rows[sp.memory!.row]--;
-          sp.memory = null;
-          gainCharacter(s, p);
-        });
+        add(
+          `memory:${k}`,
+          `Return ${rowName(spot.memory.row)} memory from space ${k + 1}`,
+          (s) => {
+            done(s);
+            const sp = s.books[j.book!].slots[k];
+            s.players[p].rows[sp.memory!.row]--;
+            sp.memory = null;
+            gainCharacter(s, p, j.page);
+          },
+          'Return memory',
+          { book: j.book },
+        );
     });
   if (j.type === 'collect') {
     add('collect', 'Collect this erased Inkling on Frankenstein', (s) => {
@@ -736,30 +800,21 @@ function options(s: GameState): Option[] {
       );
   if (j.type === 'battle') {
     const bt = s.battle!,
-      actor = bt.participants[bt.cursor],
-      hand = s.players[actor].hand;
-    const limit = battleLimit(s, actor);
-    if (bt.played[actor] < limit)
-      for (const card of hand.filter((id) => twists[id].timing === 'CONFLICT'))
+      actor = bt.slotOwner;
+    if (actor === null) return opts;
+    const hand = s.players[actor].hand;
+    if (bt.slotPlayed < battleLimit(s, actor))
+      for (const card of hand) {
+        if (card === 12 && !s.books[bt.book].slots.some((x) => x.memory?.owner === actor)) continue;
         add(
           `twist:${card}`,
           twists[card].name,
-          (s) => {
-            playTwist(s, actor, card);
-            s.battle!.cursor = (s.battle!.cursor + 1) % bt.participants.length;
-          },
+          (state) => playTwist(state, actor, card),
           'Conflict Twist',
           { detail: twists[card].text },
         );
-    add(
-      'pass',
-      'Pass on a Twist',
-      (s) => {
-        if (!s.battle!.passed.includes(actor)) s.battle!.passed.push(actor);
-        s.battle!.cursor = (s.battle!.cursor + 1) % bt.participants.length;
-      },
-      'Conflict',
-    );
+      }
+    add('pass', 'Pass this space', (state) => advanceBattleSlot(state.battle!), 'Conflict');
   }
   if (j.type === 'nemo') {
     const c = s.characters.find((c) => c.id === 7)!;
@@ -831,6 +886,7 @@ function upgradeOptions(s: GameState, j: Job): Option[] {
       if (
         spot.owner !== p ||
         spot.memory ||
+        (j.book !== undefined && j.book !== i) ||
         (j.page !== undefined && (bookOf(j.page) !== i || spot.page !== j.page % 2))
       )
         return;
@@ -851,12 +907,17 @@ function upgradeOptions(s: GameState, j: Job): Option[] {
   );
   return opts;
 }
+function advanceBattleSlot(bt: Battle) {
+  bt.cursor++;
+  bt.slotOwner = null;
+  bt.slotPlayed = 0;
+}
 function battleLimit(s: GameState, p: number) {
   const bt = s.battle!;
-  return ownedChars(s, p, bt.book).some((c) => c.id === 5 && !abilitySuppressed(s, 5)) ||
-    bt.tribute.includes(-p - 1)
-    ? 2
-    : 1;
+  const extra =
+    ownedChars(s, p, bt.book).some((c) => c.id === 5 && !abilitySuppressed(s, 5)) ||
+    bt.tribute.includes(-p - 1);
+  return extra && !bt.extraUsed.includes(p) ? 2 : 1;
 }
 function pump(s: GameState) {
   for (let guard = 0; guard < 1000 && !s.over; guard++) {
@@ -864,19 +925,33 @@ function pump(s: GameState) {
     if (!j) throw Error('No pending job');
     const p = j.p,
       pl = s.players[p];
+    if (j.type === 'checkConflict') {
+      s.jobs.shift();
+      if (fullBooks(s).includes(j.book!)) {
+        if (s.battle) {
+          if (s.battle.book !== j.book && !s.pendingConflicts.includes(j.book!))
+            s.pendingConflicts.push(j.book!);
+        } else if (s.pools[s.act - 1].length) battleStart(s, j.book!);
+      }
+      continue;
+    }
     if (j.type === 'newsubplot') {
       s.jobs.shift();
       draw(s, p, 1, 'subplot');
       continue;
     }
     if (j.type === 'start') {
+      const waiting = fullBooks(s);
+      if (waiting.length && s.pools[s.act - 1].length) {
+        battleStart(s, waiting[0]);
+        continue;
+      }
       s.jobs.shift();
       s.acted = false;
-      s.twisted = false;
       if (!pl.supply) {
         note(s, `${pl.name} shoots the moon.`);
         queue(s, job('moon', p));
-      } else queue(s, job('move', p, { source: 'normal' }), job('turn', p));
+      } else queue(s, job('move', p, { source: 'normal', origin: pl.page }), job('turn', p));
       continue;
     }
     if (j.type === 'gain' || j.type === 'points' || j.type === 'draw' || j.type === 'foreshadow') {
@@ -966,9 +1041,22 @@ function pump(s: GameState) {
     }
     if (j.type === 'battle') {
       const bt = s.battle!;
-      s.jobs[0].p = bt.participants[bt.cursor];
-      const exhausted = (p: number) => bt.passed.includes(p) || bt.played[p] >= battleLimit(s, p);
-      if (bt.participants.every(exhausted)) {
+      const slots = s.books[bt.book].slots;
+      if (bt.cursor < slots.length) {
+        if (bt.slotOwner === null) {
+          if (slots[bt.cursor].owner === null) {
+            advanceBattleSlot(bt);
+            continue;
+          }
+          bt.slotOwner = slots[bt.cursor].owner;
+        }
+        if (bt.slotPlayed >= battleLimit(s, bt.slotOwner!)) {
+          advanceBattleSlot(bt);
+          continue;
+        }
+        s.jobs[0].p = bt.slotOwner!;
+      }
+      if (bt.cursor >= slots.length) {
         s.jobs.shift();
         const winner = bt.participants.reduce((a, b) =>
           power(s, b, bt.book) > power(s, a, bt.book) ? b : a,
@@ -999,10 +1087,6 @@ function pump(s: GameState) {
         queue(s, ...js, job('cleanup', winner, { book: bt.book }), job('takeToken', winner));
         continue;
       }
-      if (exhausted(bt.participants[bt.cursor])) {
-        bt.cursor = (bt.cursor + 1) % bt.participants.length;
-        continue;
-      }
     }
     if (j.type === 'revenge') {
       s.jobs.shift();
@@ -1028,6 +1112,8 @@ function pump(s: GameState) {
     if (j.type === 'afterRewards') {
       s.jobs.shift();
       s.battle = null;
+      if (s.pools[s.act - 1].length)
+        queue(s, ...s.pendingConflicts.splice(0).map((book) => job('checkConflict', p, { book })));
       if (!s.pools[s.act - 1].length) {
         const owner = s.active,
           c = ownedChars(s, owner).find((c) => c.id === 1 && c.collected === 3);
@@ -1133,6 +1219,7 @@ export function newGame(setup: Setup): GameState {
       .slice(0, 3)
       .map((id, i) => makeBook(id, initialHexes[i].q, initialHexes[i].r, setup.names.length)),
     unpublished: ids.slice(3),
+    pendingConflicts: [],
     characters: [],
     decks: {
       twist: shuffle(
@@ -1159,7 +1246,6 @@ export function newGame(setup: Setup): GameState {
     active: 0,
     turn: 1,
     acted: false,
-    twisted: false,
     jobs: [],
     battle: null,
     log: ['A new story begins.'],
