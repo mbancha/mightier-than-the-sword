@@ -21,13 +21,26 @@ import {
   publicationSites,
   adjacentBooks,
 } from './topology';
-import type { GameState, Job, Choice, Action, Character, Setup, Battle, Book } from './types';
+import type {
+  GameState,
+  Job,
+  Choice,
+  Action,
+  Character,
+  Setup,
+  Battle,
+  Book,
+  GameEvent,
+} from './types';
 export type { GameState, Action, Setup } from './types';
 type Option = Choice & { run: (s: GameState) => void };
 const job = (type: string, p: number, extra: Partial<Job> = {}): Job => ({ type, p, ...extra });
 const queue = (s: GameState, ...jobs: Job[]) => s.jobs.unshift(...jobs);
 const note = (s: GameState, t: string) => {
   s.log.push(t);
+};
+const emit = (s: GameState, event: Omit<GameEvent, 'act' | 'turn'>) => {
+  s.events?.push({ act: s.act, turn: s.turn, ...event });
 };
 export const pageLabel = (s: GameState, page: number) =>
   `${books[s.books[bookOf(page)].id].title} · ${pageSide(page)}`;
@@ -63,6 +76,13 @@ export function fullBooks(s: GameState) {
 }
 function points(s: GameState, p: number, n: number, why: string) {
   s.players[p].points += n;
+  emit(s, {
+    type: 'points',
+    player: p,
+    amount: n,
+    source: why,
+    book: s.battle ? s.books[s.battle.book].id : undefined,
+  });
   note(s, `${s.players[p].name}: +${n} plot points (${why}).`);
 }
 function draw(s: GameState, p: number, n: number, kind: 'twist' | 'subplot') {
@@ -73,6 +93,7 @@ function draw(s: GameState, p: number, n: number, kind: 'twist' | 'subplot') {
     if (kind === 'twist') s.players[p].hand.push(id);
     else {
       s.players[p].subplot = id;
+      emit(s, { type: 'subplotDraw', player: p, id });
       s.players[p].progress = 0;
       s.players[p].completing = false;
     }
@@ -112,6 +133,7 @@ function foreshadow(s: GameState, p: number, n: number) {
   if (s.act < 3) pl.reserves[s.act] -= take;
   pl.supply += take;
   if (take) {
+    emit(s, { type: 'foreshadow', player: p, amount: take });
     note(s, `${pl.name} foreshadows ${take} Inkling${take > 1 ? 's' : ''}.`);
     progress(s, p, 'foreshadow', take);
   }
@@ -123,6 +145,7 @@ function gainCharacter(s: GameState, p: number, page = s.players[p].page) {
     points(s, p, 2, 'character deck empty');
     return;
   }
+  emit(s, { type: 'character', player: p, id });
   s.characters.push({
     id,
     owner: p,
@@ -145,11 +168,18 @@ function place(s: GameState, p: number, b: number, slot: number | null) {
   const pl = s.players[p];
   if (!pl.supply) return;
   pl.supply--;
+  emit(s, {
+    type: 'place',
+    player: p,
+    book: s.books[b].id,
+    source: slot === null ? 'overflow' : 'numbered',
+  });
   if (slot === null) {
     if (s.books[b].id === 0) {
       pl.supply++;
       collect(s, p);
       note(s, 'An overflow Inkling drowns in the submarine.');
+      emit(s, { type: 'erase', player: p, book: s.books[b].id, source: 'drowning' });
       progress(s, p, 'erase');
     } else s.books[b].overflow[p]++;
   } else {
@@ -159,6 +189,7 @@ function place(s: GameState, p: number, b: number, slot: number | null) {
     if (slot > 0 && slot < s.books[b].slots.length - 1) draw(s, p, 1, 'twist');
     if (spot.memory) {
       const m = spot.memory;
+      emit(s, { type: 'memoryReward', player: p, row: m.row, book: s.books[b].id });
       queue(s, ...memoryJobs(p, m.row, b), ...(m.owner !== p ? memoryJobs(m.owner, m.row, b) : []));
       progress(s, p, 'memory');
       if (m.owner !== p) progress(s, m.owner, 'shared');
@@ -182,7 +213,10 @@ function erase(
   else s.books[b].slots[slot].owner = null;
   s.players[p].supply++;
   collect(s, p);
-  if (!cleanup) progress(s, actor, 'erase');
+  if (!cleanup) {
+    emit(s, { type: 'erase', player: actor, book: s.books[b].id });
+    progress(s, actor, 'erase');
+  }
 }
 function upgrade(s: GameState, p: number, b: number, k: number, row: Row) {
   const pl = s.players[p],
@@ -190,6 +224,7 @@ function upgrade(s: GameState, p: number, b: number, k: number, row: Row) {
   spot.owner = null;
   spot.memory = { owner: p, row };
   pl.rows[row]++;
+  emit(s, { type: 'upgrade', player: p, row, book: s.books[b].id });
   if (!pl.everUpgraded.includes(row)) pl.everUpgraded.push(row);
   if (s.act < 3) pl.reserves[s.act]++;
   else pl.out++;
@@ -226,6 +261,7 @@ function finishAct(s: GameState) {
   );
   s.active = (s.active + 1) % s.players.length;
   s.turn++;
+  emit(s, { type: 'turn', player: s.active });
   s.jobs = [];
   for (const c of s.characters) if (c.id === 4) s.jobs.push(job('horse', c.owner));
   s.jobs.push(job('start', s.active));
@@ -234,6 +270,7 @@ function nextTurn(s: GameState) {
   s.battle = null;
   s.active = (s.active + 1) % s.players.length;
   s.turn++;
+  emit(s, { type: 'turn', player: s.active });
   queue(s, job('start', s.active));
 }
 function tokenJobs(p: number, id: number): Job[] {
@@ -280,6 +317,13 @@ function battleStart(s: GameState, b: number) {
     winner: null,
     cards: [],
   };
+  emit(s, {
+    type: 'conflictStart',
+    player: s.active,
+    book: s.books[b].id,
+    participants,
+    characters: s.characters.filter((c) => here(c, b)).map(({ id, owner }) => ({ id, owner })),
+  });
   note(s, `Conflict at ${books[s.books[b].id].title}.`);
   const jobs: Job[] = [];
   for (const c of s.characters)
@@ -329,6 +373,7 @@ function playTwist(s: GameState, p: number, id: number) {
   if (!bt) throw Error('Twists can only be played during a conflict space check.');
   s.players[p].hand.splice(s.players[p].hand.indexOf(id), 1);
   bt.cards.push(id);
+  emit(s, { type: 'twist', player: p, id, book: s.books[bt.book].id });
   bt.played[p]++;
   bt.slotPlayed++;
   if (bt.slotPlayed === 2) bt.extraUsed.push(p);
@@ -342,6 +387,7 @@ function playTwist(s: GameState, p: number, id: number) {
 }
 function charAction(s: GameState, p: number, c: Character, a: number) {
   c.used[a]++;
+  emit(s, { type: 'activate', player: p, id: c.id });
   s.players[p].supply--;
   progress(s, p, 'activate');
   note(s, `${s.players[p].name} activates ${characters[c.id].name}.`);
@@ -717,6 +763,12 @@ function options(s: GameState): Option[] {
               if (s.books[j.book!].id === 0) {
                 s.players[p].supply++;
                 collect(s, p);
+                emit(s, {
+                  type: 'erase',
+                  player: p,
+                  book: s.books[j.book!].id,
+                  source: 'drowning',
+                });
                 progress(s, p, 'erase');
               } else s.books[j.book!].overflow[p]++;
             } else {
@@ -761,6 +813,7 @@ function options(s: GameState): Option[] {
   if (j.type === 'subplot') {
     const close = (s: GameState) => {
       done(s);
+      emit(s, { type: 'subplotComplete', player: p, id: j.card! });
       s.discards.subplot.push(j.card!);
       s.players[p].subplot = null;
       note(s, `${s.players[p].name} completes ${subplots[j.card!].name}.`);
@@ -836,6 +889,7 @@ function options(s: GameState): Option[] {
         tokens[id].name,
         (s) => {
           done(s);
+          emit(s, { type: 'token', player: p, id, source: j.type });
           s.pools[s.act - 1].splice(s.pools[s.act - 1].indexOf(id), 1);
           if (j.type === 'moon') {
             queue(s, ...tokenJobs(p, id), job('moon', p));
@@ -949,6 +1003,7 @@ function pump(s: GameState) {
       s.jobs.shift();
       s.acted = false;
       if (!pl.supply) {
+        emit(s, { type: 'moon', player: p });
         note(s, `${pl.name} shoots the moon.`);
         queue(s, job('moon', p));
       } else queue(s, job('move', p, { source: 'normal', origin: pl.page }), job('turn', p));
@@ -1062,6 +1117,15 @@ function pump(s: GameState) {
           power(s, b, bt.book) > power(s, a, bt.book) ? b : a,
         );
         bt.winner = winner;
+        emit(s, {
+          type: 'conflictEnd',
+          player: winner,
+          book: s.books[bt.book].id,
+          participants: [...bt.participants],
+          characters: s.characters
+            .filter((c) => here(c, bt.book))
+            .map(({ id, owner }) => ({ id, owner })),
+        });
         note(s, `${s.players[winner].name} wins with ${power(s, winner, bt.book)} power.`);
         s.discards.twist.push(...bt.cards.splice(0));
         const js: Job[] = [];
@@ -1176,7 +1240,7 @@ function makeBook(id: number, q: number, r: number, players: number): Book {
     tokens: [],
   };
 }
-export function newGame(setup: Setup): GameState {
+export function newGame(setup: Setup, recordEvents = false): GameState {
   if (
     !Array.isArray(setup.names) ||
     setup.names.length < 2 ||
@@ -1251,12 +1315,14 @@ export function newGame(setup: Setup): GameState {
     log: ['A new story begins.'],
     over: false,
   };
+  if (recordEvents) s.events = [];
   s.players.forEach((_, p) => {
     draw(s, p, 2, 'twist');
     draw(s, p, 1, 'subplot');
     s.jobs.push(job('setup', p));
   });
   s.jobs.push(job('start', 0));
+  emit(s, { type: 'turn', player: 0 });
   return s;
 }
 export function assertInvariants(s: GameState) {

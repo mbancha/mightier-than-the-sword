@@ -102,3 +102,12 @@ for playtest review. Other new movement/timing rules above are designer confirme
 Every player, human or bot, begins with one distinct face-up Subplot drawn from
 the shuffled core deck, at zero progress, before choosing starting pages. The
 player board shows its objective and reward expanded by default.
+
+## Strategic bots and simulations
+
+No game rules changed. All bot seats now use the strategic heuristic policy.
+The original policy is retained only as a simulation baseline. All simulations
+use the normal engine and private-player boundaries. Default batch: 1,000 games,
+balanced as closely as possible across 2/3/4 players, seeds starting at 1.
+Comparison mode rotates one strategic seat against original bots. Statistics
+are descriptive playtest evidence, not automated declarations of overpowering.

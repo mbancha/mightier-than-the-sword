@@ -250,6 +250,32 @@ try {
   assert.equal(await botPage.locator('.handoff').count(), 0);
   await botPage.getByRole('button', { name: 'Pause bots', exact: true }).click();
   await botPage.screenshot({ path: 'artifacts/bot-game.png', fullPage: true });
+  // The headless worker uses the same rules without replacing the current table.
+  const turnBeforeLab = await botPage.locator('.toolbar strong').textContent();
+  await botPage.getByRole('button', { name: 'Balance lab', exact: true }).click();
+  assert.equal(await botPage.getByLabel('Games', { exact: true }).inputValue(), '1000');
+  await botPage.getByLabel('Games', { exact: true }).fill('6');
+  await botPage.getByRole('button', { name: 'Run simulation', exact: true }).click();
+  await botPage.getByRole('button', { name: 'Download readable report' }).waitFor();
+  assert.ok(
+    (await botPage.locator('.simulationPanel').textContent()).includes('6 completed · 0 failed'),
+  );
+  assert.equal(await botPage.locator('.toolbar strong').textContent(), turnBeforeLab);
+  const downloadPromise = botPage.waitForEvent('download');
+  await botPage.getByRole('button', { name: 'Download readable report' }).click();
+  const download = await downloadPromise;
+  assert.equal(download.suggestedFilename(), 'mightier-simulation.html');
+  await download.saveAs('artifacts/browser-simulation.html');
+  report.simulation = true;
+  const labAxe = await new AxeBuilder({ page: botPage })
+    .include('.simulationPanel')
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+    .analyze();
+  assert.deepEqual(labAxe.violations, []);
+  await botPage.screenshot({ path: 'artifacts/simulation-desktop.png', fullPage: true });
+  await botPage.setViewportSize({ width: 820, height: 1180 });
+  assert.ok(await botPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await botPage.screenshot({ path: 'artifacts/simulation-tablet.png', fullPage: true });
   report.botTurn = true;
   report.memoryClick = true;
   assert.deepEqual(errors, []);

@@ -53,3 +53,10 @@ sheets now show middle-space Twist symbols. Counts and the v15 snapshot stay int
 
 Starting Subplots are unchanged in the rules and PDF: every player receives one.
 The digital board now displays the full objective and reward by default.
+
+## Bot and simulation update
+
+Rules and all printed component text remain edition 0.3, unchanged. Strategy
+uses the same stable catalog identities. Optional structured engine events feed
+the new simulator; the PDF needs no regeneration for this software-only update.
+Reports retain the rules version, catalog fingerprint, bot version and seed range.
