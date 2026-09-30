@@ -59,14 +59,13 @@ export interface Job {
   target?: number;
   optional?: boolean;
   remaining?: number[];
-  travelled?: boolean;
+  origin?: number;
 }
 export interface Battle {
   book: number;
   participants: number[];
   bonus: number[];
   played: number[];
-  passed: number[];
   ignored: number[];
   allIgnored: boolean;
   hero: number[];
@@ -74,6 +73,9 @@ export interface Battle {
   tribute: number[];
   complete: number[];
   cursor: number;
+  slotOwner: number | null;
+  slotPlayed: number;
+  extraUsed: number[];
   winner: number | null;
   cards: number[];
 }
@@ -85,6 +87,7 @@ export interface GameState {
   players: Player[];
   books: Book[];
   unpublished: number[];
+  pendingConflicts: number[];
   characters: Character[];
   decks: { twist: number[]; subplot: number[]; character: number[] };
   discards: { twist: number[]; subplot: number[] };
@@ -93,7 +96,6 @@ export interface GameState {
   active: number;
   turn: number;
   acted: boolean;
-  twisted: boolean;
   jobs: Job[];
   battle: Battle | null;
   log: string[];

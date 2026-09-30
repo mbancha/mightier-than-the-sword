@@ -39,7 +39,7 @@ try {
     await page.getByRole('button', { name: 'Confirm choice', exact: true }).click();
   }
   await choose();
-  await choose();
+  await choose(2);
   await reveal();
   assert.equal(await page.locator('.mapBook').count(), 3);
   const coords = await page
@@ -50,10 +50,16 @@ try {
   assert.equal(coords[0].y, coords[1].y);
   assert.equal(coords[2].x, (coords[0].x + coords[1].x) / 2);
   assert.ok(coords[2].y > coords[0].y);
+  assert.equal(await page.locator('.playerSubplot[open]').count(), 2);
+  assert.equal(await page.locator('.playerSubplot p:visible').count(), 4);
   // Actual pointer drag of the protagonist, then its contextual end-move menu.
   let figure = page.getByRole('button', { name: 'Teal protagonist', exact: true });
   await figure.click();
   assert.ok((await page.locator('.legalPage').count()) > 0);
+  assert.equal(
+    await page.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).count(),
+    0,
+  );
   await page.getByRole('button', { name: 'Close piece menu' }).click();
   const src = await figure.boundingBox(),
     target = await page.locator('[data-page="1"] .pageLabel').boundingBox();
@@ -70,13 +76,10 @@ try {
   );
   await figure.click();
   await page.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
-  await figure.click();
-  await page
-    .locator('.mapPopup')
-    .getByRole('button', { name: 'Place Inklings', exact: true })
-    .click();
   await page.locator('.legalSlot.slot').first().click();
   assert.equal(await page.locator('.mapBook .piece').count(), 1);
+  assert.equal(await page.locator('.trackLevel').count(), 32);
+  assert.equal(await page.locator('.slotReward').count(), 6);
   // Zoom and pan affect the camera, not game state.
   const oldZoom = await page.getByLabel('Map zoom').innerText();
   await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
@@ -112,7 +115,49 @@ try {
   await page.screenshot({ path: 'artifacts/table-tablet.png', fullPage: true });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   await page.setViewportSize({ width: 1600, height: 1100 });
+  async function directMove(name, pageNumber) {
+    await reveal();
+    const fig = page.getByRole('button', { name: name + ' protagonist', exact: true });
+    await fig.click();
+    await page.locator(`[data-page="${pageNumber}"] .pageLabel`).click();
+    await fig.click();
+    await page.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
+  }
+  async function finishTurn() {
+    await page
+      .locator('.quickChoices')
+      .getByRole('button', { name: 'End turn', exact: true })
+      .click();
+  }
+  await finishTurn();
+  await directMove('Amber', 3);
+  await page.locator('[data-book="1"] .slot').nth(1).click();
+  await finishTurn();
+  await directMove('Teal', 0);
+  await page.locator('[data-book="0"] .slot').nth(0).click();
+  await finishTurn();
+  await directMove('Amber', 2);
+  await page.locator('[data-book="1"] .slot').nth(0).click();
+  await finishTurn();
+  await directMove('Teal', 1);
+  await page.locator('[data-book="0"] .slot').nth(2).click();
+  await page
+    .locator('.mapPopup')
+    .getByRole('button', { name: /Valor memory/ })
+    .click();
+  assert.equal(
+    await page
+      .locator('.player')
+      .first()
+      .getByRole('button', { name: 'Valor 1/3', exact: true })
+      .count(),
+    1,
+  );
+  assert.equal(await page.locator('.mapBook .memory').count(), 1);
+  await page.screenshot({ path: 'artifacts/upgrades-desktop.png', fullPage: true });
+  report.memoryClick = true;
   let choices = 0,
+    scanned = false,
     published = false;
   while (
     !(await page.getByRole('heading', { name: 'Fin', exact: true }).count()) &&
@@ -123,7 +168,12 @@ try {
       texts = await list.allTextContents();
     let index = -1;
     const prompt = await page.locator('.choices h2').innerText();
-    if (prompt.startsWith('Choose where')) {
+    if (prompt.startsWith('Your Inkling') && !scanned) {
+      assert.equal(await page.locator('.scanSlot').count(), 1);
+      await page.screenshot({ path: 'artifacts/conflict-scan.png', fullPage: true });
+      scanned = true;
+    }
+    if (prompt.startsWith('Move your figure')) {
       const book = page.locator('.mapBook').first(),
         title = await book.locator('h3').innerText();
       for (let side = 0; side < 2; side++) {
@@ -149,9 +199,9 @@ try {
       await page.locator('.overflow.legalSlot').first().click();
       continue;
     }
-    if (index < 0) index = texts.findIndex((t) => t === 'Resolve full books and end turn');
+    if (index < 0) index = texts.findIndex((t) => t === 'End turn');
     if (index < 0) index = texts.findIndex((t) => t === 'Place Inklings');
-    if (index < 0) index = texts.findIndex((t) => t === 'Pass on a Twist');
+    if (index < 0) index = texts.findIndex((t) => t === 'Pass this space');
     if (index < 0 && prompt.startsWith('Choose an Inkling to erase'))
       index = texts.findIndex((t) => t === 'Skip this optional effect');
     if (index < 0)
@@ -163,6 +213,7 @@ try {
   }
   assert.ok(choices < 900);
   assert.ok(published, 'Conflict should publish a new book');
+  assert.ok(scanned, 'Conflict scan is visible');
   await page.screenshot({ path: 'artifacts/result-desktop.png', fullPage: true });
   await page.locator('.log summary').click();
   const log = await page.locator('.log').innerText();
@@ -184,12 +235,13 @@ try {
   await botPage.waitForFunction(() => !document.querySelector('.botStatus'));
   assert.equal(await botPage.locator('.handoff').count(), 0);
   await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
+  await botPage.locator('[data-page="1"] .pageLabel').click();
+  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
   await botPage.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
-  await botPage.getByRole('button', { name: 'Teal Inkling supply', exact: true }).click();
   await botPage.locator('.legalSlot.slot').first().click();
   await botPage
     .locator('.quickChoices')
-    .getByRole('button', { name: 'Resolve full books and end turn', exact: true })
+    .getByRole('button', { name: 'End turn', exact: true })
     .click();
   await botPage.waitForFunction(() =>
     document.querySelector('.toolbar strong')?.textContent.includes('Turn 3'),
@@ -197,23 +249,6 @@ try {
   assert.equal(await botPage.locator('.hand').count(), 1);
   assert.equal(await botPage.locator('.handoff').count(), 0);
   await botPage.getByRole('button', { name: 'Pause bots', exact: true }).click();
-  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
-  await botPage.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
-  await botPage
-    .locator('.player')
-    .first()
-    .getByRole('button', { name: 'Valor 0/3', exact: true })
-    .click();
-  await botPage.locator('.pieceDialog button').filter({ hasText: 'Valor memory' }).first().click();
-  assert.equal(
-    await botPage
-      .locator('.player')
-      .first()
-      .getByRole('button', { name: 'Valor 1/3', exact: true })
-      .count(),
-    1,
-  );
-  assert.equal(await botPage.locator('.mapBook .memory').count(), 1);
   await botPage.screenshot({ path: 'artifacts/bot-game.png', fullPage: true });
   report.botTurn = true;
   report.memoryClick = true;

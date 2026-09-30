@@ -1108,3 +1108,110 @@ footer {
   display: grid;
   gap: 6px;
 }
+.rows {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+.memoryTrack {
+  display: block;
+  clip-path: none;
+  width: 100%;
+  border-radius: 8px;
+  text-align: left;
+  padding: 8px 10px;
+  background: #f8f4e9;
+  border: 1px solid #b9b8a7;
+}
+.trackHeading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.trackLevels {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+.trackLevel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border: 1px solid #c4c7ba;
+  border-radius: 5px;
+  font-size: 11px;
+  min-height: 48px;
+  line-height: 1.25;
+}
+.activeLevel {
+  border: 2px solid #28634d;
+  background: #dcebdc;
+  font-weight: 700;
+}
+.coveredLevel {
+  background: #eee6d6;
+  color: #4f5150;
+}
+.revealedLevel:not(.activeLevel) {
+  background: #fffefa;
+}
+.trackHex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 28px;
+  background: #d3c7a6;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  font-size: 14px;
+}
+.activeLevel .trackHex {
+  background: #326f54;
+  color: white;
+}
+.trackMemory {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+}
+.slotReward {
+  position: absolute;
+  left: 2px;
+  bottom: 2px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.slotReward .icon {
+  width: 17px;
+  height: 17px;
+}
+.mapBook .slot.scanSlot {
+  outline: 4px solid #b05116;
+  background: #fff0b9;
+  box-shadow: 0 0 0 7px #f9d593;
+}
+.scanStatus {
+  font-weight: 700;
+  color: #804615;
+}
+.slot .memory {
+  z-index: 1;
+}
+.slot .piece {
+  z-index: 2;
+}
+@media (max-width: 850px) {
+  .players {
+    grid-template-columns: 1fr;
+  }
+  .trackLevel {
+    font-size: 12px;
+  }
+  .player .muted {
+    margin-bottom: 8px;
+  }
+}

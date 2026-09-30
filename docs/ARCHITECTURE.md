@@ -64,3 +64,21 @@ decision number and public turn state. They do not inspect the full game state,
 opponent hands, or deck order. Their decisions enter the same action history as
 human decisions. A cancellable UI timer drives them; pause and undo stop the timer.
 The map camera and open menus remain presentation state and do not affect saves.
+
+## Immediate conflicts and space checks
+
+Normal movement jobs retain their origin. Legal destinations and End move require
+leaving that page; a final step back to it is rejected. Effect moves stay optional.
+Direct placeHere/memoryHere actions delegate to the same placement/upgrade jobs.
+
+Placement queues checkConflict before earned reward jobs are added ahead of it.
+Those rewards finish first; battle interrupts the remaining placement jobs.
+A pendingConflicts list serializes other full books without nested battles.
+The last token still ends the turn and Act after rewards/publication.
+
+Battle cursor is a numbered space index. slotOwner is latched for the current
+check; future occupants are read live. slotPlayed and extraUsed enforce one card
+per space and at most one character-granted extra per player per conflict.
+The public projection exposes the current scan position, never hidden cards.
+UI tracks render the shared catalog's four levels, showing covered memories and
+the currently active level. Rules version 0.3 rejects earlier edition replays.

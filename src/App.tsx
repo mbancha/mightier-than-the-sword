@@ -32,14 +32,14 @@ const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
   publishOverflow: 'Place an Inkling in a neighboring book’s overflow.',
   setup: 'Choose a starting page for your protagonist.',
-  move: 'Choose where to move. Staying is allowed.',
-  turn: 'Take one action. You may also play one turn Twist.',
+  move: 'Move your figure to a highlighted page.',
+  turn: 'Click an empty space to place, or your Inkling to leave a memory.',
   place: 'Choose an empty space. Full pages use shared overflow.',
   upgrade: 'Choose a memory. Your Inkling is suspended to the next Act.',
   returnMemory: 'Return a memory to its row to draw a character.',
   horse: 'Choose a hidden Trojan Horse power for this Act.',
   subplot: 'Your Subplot is complete. Choose its reward.',
-  battle: 'Play a conflict Twist or pass. Compare the live power totals below.',
+  battle: 'Your Inkling is being checked. Play a Twist from your hand or pass this space.',
   resolve: 'Choose which full book resolves next.',
   takeToken: 'Choose the new conflict token. Only an uncovered book scores its multiplier.',
   tokenRewards: 'Choose the order of this book’s token rewards.',
@@ -179,7 +179,7 @@ export default function App() {
     <>
       <header className="masthead">
         <div>
-          <div className="eyebrow">A shared story · digital playtest 0.2</div>
+          <div className="eyebrow">A shared story · digital playtest 0.3</div>
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
@@ -221,10 +221,7 @@ export default function App() {
       {catalog && (
         <section className="reference">
           <h2>Component library</h2>
-          <p>
-            Current printed edition v15. Live text comes from the same content file used for
-            printing.
-          </p>
+          <p>Current edition 0.3. Live text comes from the same content file used for printing.</p>
           <div className="library">
             {twists.map((t) => (
               <article className="smallCard" key={'t' + t.id}>
@@ -476,33 +473,50 @@ export default function App() {
                       className="memoryTrack"
                       key={row}
                       title={String(content.tracks[ROWS.indexOf(row)][4])}
+                      aria-label={`${rowName(row)} ${p.rows[row]}/3`}
                       onClick={() => {
-                        if (i !== actor) return;
-                        const a = actions.find((a) => a.key === 'upgrade');
-                        if (a) {
-                          const next = advance(session!, { key: a.key });
-                          setSession(next);
-                          setTimeout(
-                            () =>
-                              setContextMenu({
-                                title: `Leave a ${rowName(row)} memory`,
-                                choices: playerView(next.history.at(-1)!, i).actions.filter((a) =>
-                                  a.key.endsWith(':' + row),
-                                ),
-                              }),
-                            0,
-                          );
-                        } else
+                        if (i === actor)
                           setContextMenu({
-                            title: rowName(row) + ' memory',
+                            title: `${rowName(row)} memory`,
                             choices: actions.filter(
-                              (a) => a.key.startsWith('upgrade:') && a.key.endsWith(':' + row),
+                              (a) =>
+                                (a.key.startsWith('upgrade:') || a.key.startsWith('memoryHere:')) &&
+                                a.key.endsWith(':' + row),
                             ),
                           });
                       }}
                     >
-                      <Icon name={row} />
-                      {rowName(row)} {p.rows[row]}/3
+                      <span className="trackHeading">
+                        <Icon name={row} />
+                        {rowName(row)} · level {p.rows[row]}
+                      </span>
+                      <span className="trackLevels">
+                        {[0, 1, 2, 3].map((level) => (
+                          <span
+                            key={level}
+                            className={`trackLevel ${level === p.rows[row] ? 'activeLevel' : ''} ${level > p.rows[row] ? 'coveredLevel' : 'revealedLevel'}`}
+                            aria-label={`Level ${level}: ${level === 0 ? content.tracks[ROWS.indexOf(row)][2] : (content.tracks[ROWS.indexOf(row)][3] as string[])[level - 1]}${level === p.rows[row] ? ', current' : ''}`}
+                          >
+                            <span className="trackHex">
+                              {level > p.rows[row] ? (
+                                <Icon name={row} size={20} />
+                              ) : level === p.rows[row] ? (
+                                '✓'
+                              ) : (
+                                level
+                              )}
+                            </span>
+                            <span>
+                              {level === 0
+                                ? String(content.tracks[ROWS.indexOf(row)][2])
+                                : (content.tracks[ROWS.indexOf(row)][3] as string[])[level - 1]}
+                            </span>
+                          </span>
+                        ))}
+                      </span>
+                      <small className="trackMemory">
+                        Memory: {String(content.tracks[ROWS.indexOf(row)][4])}
+                      </small>
                     </button>
                   ))}
                 </div>
@@ -512,9 +526,10 @@ export default function App() {
                   {p.rows.resolve === 1 ? ' (or discard to place 2)' : ''}
                 </p>
                 {p.subplot !== null && (
-                  <details>
+                  <details className="playerSubplot" open>
                     <summary>
-                      {subplots[p.subplot].name} · {p.progress}/{subplots[p.subplot].target}
+                      Subplot: {subplots[p.subplot].name} · {p.progress}/
+                      {subplots[p.subplot].target}
                     </summary>
                     <p>{subplots[p.subplot].text}</p>
                     <p>Draw a character OR {subplots[p.subplot].reward}</p>
@@ -586,6 +601,12 @@ export default function App() {
               {publicData!.battle && (
                 <section className="battle">
                   <h2>Conflict power</h2>
+                  {publicData!.battle.spaceOwner !== null && publicData!.battle.winner === null && (
+                    <p className="scanStatus">
+                      Checking space {publicData!.battle.space + 1} ·{' '}
+                      {publicData!.players[publicData!.battle.spaceOwner!].name}
+                    </p>
+                  )}
                   {publicData!.battle.participants.map((p) => (
                     <p key={p}>
                       <b>{publicData!.players[p].name}</b> {publicData!.battle!.powers[p]}
@@ -791,8 +812,8 @@ export default function App() {
         }}
       />
       <footer>
-        Shared design workspace · v15 components · growing-map rules 0.2 · local hotseat privacy
-        protects the screen, not the device’s stored data.
+        Shared design workspace · Space-check edition 0.3 · local hotseat privacy protects the
+        screen, not the device’s stored data.
       </footer>
     </>
   );
