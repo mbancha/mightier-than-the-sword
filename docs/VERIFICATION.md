@@ -1,6 +1,6 @@
 # Verification — 2026-09-30
 
-Current scope: space-check revision 0.3 on the growing-map prototype. This is
+Earlier verification: space-check revision 0.3 on the growing-map prototype. This is
 ready for designer testing, not a balance or rules-completeness certification.
 No public hosted release is claimed.
 
@@ -68,3 +68,18 @@ The static build uses relative asset paths so it can load from the repository
 subpath on GitHub Pages. The publishing workflow builds from `main`, uploads
 `dist`, and deploys to the `github-pages` environment. Local tests/build and a
 live-site browser check are required before calling the hosted edition ready.
+
+## Digital revision 0.4 verification
+
+- All 80 tests pass, including 13 focused cases for new setup, shared hand limit,
+  no middle-space draw, castle erasure, surviving Frankenstein overflow, seeded
+  coin flips and negative scores, Iliad power, Odyssey movement, Aeneid cleanup,
+  World movement, Nemo suspension and per-Inkling Journey overflow power.
+- Production build and browser smoke pass. Browser playthrough completed after
+  170 choices, six conflicts and all nine books published; bot turn and six-game
+  worker simulation passed, with no browser errors or accessibility violations.
+- Inspected desktop and tablet screenshots: castle visible, plain middle slots,
+  combined hand limits and card counts readable, no horizontal tablet overflow.
+- Print outputs and generators were not changed. They remain the previous edition
+  until an explicit print-sync request. Historical simulation results remain
+  labeled 0.3 and must not be treated as balance evidence for 0.4.

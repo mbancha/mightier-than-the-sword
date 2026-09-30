@@ -81,7 +81,7 @@ check; future occupants are read live. slotPlayed and extraUsed enforce one card
 per space and at most one character-granted extra per player per conflict.
 The public projection exposes the current scan position, never hidden cards.
 UI tracks render the shared catalog's four levels, showing covered memories and
-the currently active level. Rules version 0.3 rejects earlier edition replays.
+the currently active level. Rules version 0.4 rejects earlier edition replays. Print outputs are synced only on explicit request.
 
 ## Strategic policy and headless Balance lab
 

@@ -10,14 +10,12 @@ its seat within each player count. All-strategic is the normal benchmark.
 - Complete the current Subplot when a legal action makes progress; favor
   travel, upgrades, activation, numbered placement, foreshadowing, memory
   triggers, conflict participation, erasures or Twists as appropriate.
-- Favor useful numbered placement rewards, especially middle spaces with a
-  Twist plus a memory. Anticipate whether filling a book favors the bot's side.
+- Favor memory rewards and the Dracula castle space; numbered spaces no longer grant Twists. Anticipate whether filling a book favors the bot's side.
 - Develop movement/placement early, hand limit when needed, and combat power.
 - Activate characters for plausible erasures, useful new positions, power,
   replenishment, or Subplot progress. Avoid empty erasure actions.
 - Prefer a Twist that reverses a visible losing conflict; conserve a pure-power
-  card with a secure lead. Recognize Odysseus's replacement draw, solo Iliad
-  bonuses, character bonuses, foreshadowing and overflow reinforcements.
+  card with a secure lead. Recognize Odysseus's replacement draw, character bonuses, foreshadowing and overflow reinforcements.
 - Choose rewards using current supply, hand size, available activation Inklings,
   Subplot needs and remaining Acts. Avoid submarine overflow when reinforcing.
 
@@ -25,7 +23,7 @@ These are estimates, not a search engine. Hidden hands, deck order and future
 coin flips are unknown. The policy cannot optimize all multi-step combos or
 predict opponents' responses. Subplot completion and resource values are fixed
 heuristic weights, not a trained model. The Shared Story is pursued indirectly
-by leaving attractive middle-space memories; bots cannot force others to use them.
+by leaving attractive memories; bots cannot force others to use them.
 
 ## Report definitions
 
@@ -58,8 +56,8 @@ Missing denominators show a dash, never a fabricated zero rate.
   They are not inferred from final upgrade levels.
 - **Resources:** numbered/overflow placement attempts, actual foreshadowed
   Inklings, erasures excluding conflict cleanup, and placement-triggered memory
-  rewards (counted for the placer, not doubled for the memory owner). Submarine
-  drowning caused by placement/transfer counts as an erasure.
+  rewards (counted for the placer, not doubled for the memory owner).
+  Suspension in the submarine or The Aeneid does not count as erasure.
 - **Points:** all engine point awards grouped by their stated source. Their sum
   is tested against final player scores. Seat/policy tables reveal order effects.
 

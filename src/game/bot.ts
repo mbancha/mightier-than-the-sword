@@ -2,7 +2,7 @@ import { characters, subplots, content, CONFIG, type Row } from '../data/catalog
 import { reachable, bookOf, adjacentBooks } from './topology';
 import type { playerView } from './views';
 import type { Choice, Character } from './types';
-export const BOT_VERSION = 'strategic-1';
+export const BOT_VERSION = 'strategic-2';
 type View = ReturnType<typeof playerView>;
 // Heuristics only: no engine simulation, deck access or opponent hand access.
 export function rankBotActions(v: View, decision: number) {
@@ -25,7 +25,8 @@ export function rankBotActions(v: View, decision: number) {
       ? 2 * Math.min(amount, subplots[me.subplot].target - me.progress) +
         (me.progress + amount >= subplots[me.subplot].target ? 5 : 0)
       : 0;
-  const drawValue = () => (v.hand.length < 3 + me.rows.insight ? 1.8 : 0.4);
+  const handSize = v.hand.length + (me.subplot === null ? 0 : 1);
+  const drawValue = () => (handSize < CONFIG.baseHand + me.rows.insight ? 1.8 : 0.4);
   const forecast = (n: number) => {
     const available = v.act < 3 ? me.reserves[v.act] : 0,
       take = Math.min(n, available);
@@ -38,7 +39,7 @@ export function rankBotActions(v: View, decision: number) {
       {
         curiosity: level === 0 ? 2.2 : 0.6,
         valor: 1.8,
-        insight: v.hand.length >= 3 + level ? 2.4 : 0.7,
+        insight: handSize >= CONFIG.baseHand + level ? 2.4 : 0.7,
         resolve: level === 1 ? 3.6 : level === 0 ? 2.5 : 1.7,
       }[row] * time
     );
@@ -63,11 +64,14 @@ export function rankBotActions(v: View, decision: number) {
     return added * 0.5 + (gap >= 0 && added > gap ? 2.5 : 0) * (0.3 + near(b));
   };
   const placement = (b: number, k: number | null) => {
-    if (k === null) return v.books[b].id === 0 ? -9 : 1.6 + influence(b, 1);
+    if (k === null)
+      return v.books[b].id === 0 ? -9 : 1.6 + influence(b, v.books[b].id === 2 ? 2 : 1);
     const book = v.books[b],
       spot = book.slots[k];
     let n = 3 + goal([3]) + influence(b, 1);
-    if (k > 0 && k < book.slots.length - 1) n += drawValue();
+    if (book.id === 6 && k === 0) n += 1.5;
+    if (book.id === 1) n += 0.7;
+    if (book.id === 5) n -= 0.7;
     if (spot.memory)
       n += memoryValue(spot.memory.row, b) + goal([9]) - (spot.memory.owner !== p ? 0.6 : 0);
     const empty = book.slots.filter((s) => s.owner === null).length;
@@ -192,7 +196,6 @@ export function rankBotActions(v: View, decision: number) {
           2,
           own.reduce((n, c) => n + c.used.reduce((a, b) => a + b, 0), 0),
         ) * 1.5;
-    if (v.books[b].id === 4 && inks(b) === 1) gain += CONFIG.iliadTwistBonus;
     const leader = bt.participants.reduce((a, i) => (bt.powers[i] > bt.powers[a] ? i : a));
     const rival = Math.max(0, ...bt.participants.filter((i) => i !== p).map((i) => bt.powers[i]));
     const wins = bt.participants.every(
@@ -227,6 +230,8 @@ export function rankBotActions(v: View, decision: number) {
           ? null
           : own.find((c) => c.id === v.moving!.character);
       n += c ? charDestination(c, +x) : pageValue(+x);
+      const from = c?.page ?? me.page;
+      if (v.books[bookOf(from)].id === 3 && bookOf(+x) !== bookOf(from)) n += 1;
       if (v.moving?.mandatory && bookOf(+x) !== bookOf(v.moving.origin)) n += goal([0]);
     }
     if (kind === 'placeHere' || kind === 'place') {
@@ -249,7 +254,6 @@ export function rankBotActions(v: View, decision: number) {
         const row = z as Row,
           book = v.books[+x];
         n += 1.7 + rowValue(row) + goal([1, 2]) + goal([5]) * 0.35 - (me.supply < 2 ? 0.8 : 0);
-        if (+y > 0 && +y < book.slots.length - 1) n += 0.8;
         if (bt?.book === +x) n -= 1.8;
       }
     }
@@ -258,13 +262,15 @@ export function rankBotActions(v: View, decision: number) {
     if (kind === 'boost')
       n += me.supply >= 2 ? pageValue(me.page) + goal([3], 2) - twistValue(+x) * 0.4 : -10;
     if (kind === 'discard') n -= twistValue(+x);
+    if (kind === 'discardSubplot') n -= 6 + me.progress * 2;
+    if (kind === 'bookMove') n += 1;
     if (kind === 'character') n += effectsValue([{ type: 'gain' }]);
     if (kind === 'alternative' && me.subplot !== null)
       n += effectsValue(content.subplotEffects[me.subplot]);
     if (kind === 'token' || kind === 'reward') n += effectsValue(content.tokenEffects[+x]);
     if (kind === 'foreshadow') n += forecast(1);
     if (kind === 'refresh') n += 3 + (me.supply < 2 ? 2 : 0);
-    if (kind === 'nemo') n += +x * (bt && v.books[bt.book].id === 0 ? 1 : 2);
+    if (kind === 'nemo') n += +x * (bt && v.books[bt.book].id === 0 ? -3 : 2);
     if (kind === 'ignore') n += cp(v.characters.find((c) => c.id === +x)!) * 2;
     if (kind === 'memory') n += 3 - rowValue(v.books[a.book!].slots[+x].memory!.row);
     if (kind === 'collect') {
@@ -291,7 +297,7 @@ export function rankBotActions(v: View, decision: number) {
           (v.effect.source === 'replace' && me.supply ? placement(b, k) : 0);
       else
         n +=
-          v.effect.source === 'experiment' || v.effect.source === 'draculaBook'
+          v.effect.source === 'experiment'
             ? 1.5 + goal([8]) - (k !== null && bt && k > bt.space ? 2 : 0)
             : -2;
     }

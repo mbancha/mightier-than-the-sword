@@ -50,7 +50,8 @@ const prompts: Record<string, string> = {
   collect: 'Collect the erased Inkling on Frankenstein, or leave it in supply.',
   nemo: 'Move activation Inklings into this book’s overflow, or skip.',
   refresh: 'Return activation Inklings to supply, or skip.',
-  discard: 'Discard to your Twist hand limit.',
+  discard: 'Discard a Twist or Subplot to your combined hand limit.',
+  bookMove: 'You may move your protagonist or any one of your characters 1 page.',
   cycle: 'Discard a Twist to draw a Twist, or skip.',
   ignore: 'Choose an opposing character whose power is ignored.',
   bridge: 'Choose two adjoining pages on different books.',
@@ -181,7 +182,7 @@ export default function App() {
     <>
       <header className="masthead">
         <div>
-          <div className="eyebrow">A shared story · digital playtest 0.3</div>
+          <div className="eyebrow">A shared story · digital playtest 0.4</div>
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
@@ -232,7 +233,9 @@ export default function App() {
       {catalog && (
         <section className="reference">
           <h2>Component library</h2>
-          <p>Current edition 0.3. Live text comes from the same content file used for printing.</p>
+          <p>
+            Current digital edition 0.4. Printable sheets are updated separately when requested.
+          </p>
           <div className="library">
             {twists.map((t) => (
               <article className="smallCard" key={'t' + t.id}>
@@ -532,8 +535,9 @@ export default function App() {
                   ))}
                 </div>
                 <p className="muted">
-                  Move {p.rows.curiosity + 1} · Power {p.rows.valor} · Hand limit{' '}
-                  {3 + p.rows.insight} · Place {p.rows.resolve >= 2 ? p.rows.resolve : 1}
+                  Move {p.rows.curiosity + 1} · Power {p.rows.valor} · Combined hand limit{' '}
+                  {3 + p.rows.insight} ({p.handCount + (p.subplot === null ? 0 : 1)} cards) · Place{' '}
+                  {p.rows.resolve >= 2 ? p.rows.resolve : 1}
                   {p.rows.resolve === 1 ? ' (or discard to place 2)' : ''}
                 </p>
                 {p.subplot !== null && (
@@ -544,6 +548,14 @@ export default function App() {
                     </summary>
                     <p>{subplots[p.subplot].text}</p>
                     <p>Draw a character OR {subplots[p.subplot].reward}</p>
+                    {i === actor &&
+                      view?.actions
+                        .filter((a) => a.key === 'discardSubplot')
+                        .map((a) => (
+                          <button key={a.key} onClick={() => dispatch(a)}>
+                            Discard this Subplot
+                          </button>
+                        ))}
                   </details>
                 )}
               </article>
@@ -635,17 +647,18 @@ export default function App() {
                   </h2>
                   <div className="quickChoices">
                     {actions
-                      .filter((a) =>
-                        [
-                          'skip',
-                          'pass',
-                          'finish',
-                          'endMove',
-                          'collect',
-                          'foreshadow',
-                          'character',
-                          'alternative',
-                        ].includes(a.key),
+                      .filter(
+                        (a) =>
+                          [
+                            'skip',
+                            'pass',
+                            'finish',
+                            'endMove',
+                            'collect',
+                            'foreshadow',
+                            'character',
+                            'alternative',
+                          ].includes(a.key) || a.key.startsWith('bookMove:'),
                       )
                       .map((a) => (
                         <button key={a.key} onClick={() => dispatch(a)}>
@@ -823,8 +836,8 @@ export default function App() {
         }}
       />
       <footer>
-        Shared design workspace · Space-check edition 0.3 · local hotseat privacy protects the
-        screen, not the device’s stored data.
+        Shared design workspace · Digital edition 0.4 · local hotseat privacy protects the screen,
+        not the device’s stored data.
       </footer>
     </>
   );

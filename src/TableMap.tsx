@@ -174,8 +174,8 @@ export function TableMap({
       : own
         ? actions.filter((a) =>
             cid === undefined
-              ? ['place', 'upgrade', 'finish'].includes(a.key)
-              : a.key.startsWith(`activate:${cid}:`),
+              ? ['place', 'upgrade', 'finish', 'bookMove:protagonist'].includes(a.key)
+              : a.key.startsWith(`activate:${cid}:`) || a.key === `bookMove:${cid}`,
           )
         : [];
     popup(e, label, [...opts, ...actions.filter((a) => a.key === `ignore:${cid}`)]);
@@ -321,7 +321,14 @@ export function TableMap({
                   </button>
                 </div>
                 <p className="bookEffect">
-                  {icon(def.timing.includes('CONFLICT') ? 'conflict' : 'ongoing', 17)}{' '}
+                  {icon(
+                    def.timing.includes('CONFLICT')
+                      ? 'conflict'
+                      : def.timing.startsWith('ON ')
+                        ? 'inkling'
+                        : 'ongoing',
+                    17,
+                  )}{' '}
                   <b>{def.timing.toLowerCase()}</b> · {def.effect}
                 </p>
                 <div className="pages">
@@ -446,12 +453,12 @@ export function TableMap({
                                 }}
                               >
                                 <small>{k + 1}</small>
-                                {k > 0 && k < b.slots.length - 1 && (
+                                {b.id === 6 && k === 0 && (
                                   <span
-                                    className="slotReward"
-                                    title="Place an Inkling: draw 1 Twist"
+                                    className="castleSlot"
+                                    title="Castle: before conflict, this Inkling's owner may erase any 1 Inkling here"
                                   >
-                                    {icon('twist', 17)}
+                                    {icon('castle', 18)}
                                   </span>
                                 )}
                                 {spot.memory && (
@@ -491,7 +498,7 @@ export function TableMap({
                     else popup(e, 'Shared overflow', opts);
                   }}
                 >
-                  <b>{b.id === 0 ? 'No overflow · Inklings drown' : 'Shared overflow'}</b>
+                  <b>{b.id === 0 ? 'Overflow · suspend Inklings' : 'Shared overflow'}</b>
                   {b.overflow.map((n, p) =>
                     n ? (
                       <span key={p} style={{ color: colors[p] }}>

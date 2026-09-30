@@ -1,7 +1,7 @@
 # Mightier than the Sword
 
 A shared workspace for the game design, printable prototype, and an automated
-2–4 player prototype with human and basic-bot seats. Current source: **v15 components with space-check rules 0.3**.
+2–4 player prototype with human and strategic-bot seats. Current digital rules: **0.4**. Printable outputs are synced only when requested and currently reflect the earlier 0.3 edition.
 
 The first build includes all nine books, fifteen Twists, ten incremental Subplots,
 ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
@@ -37,11 +37,12 @@ then drag it or click a highlighted page. Each step uses one move; click the
 figure again and choose **End move** when finished. You must move at least one
 page and finish on a different page from where you started. Then click an empty
 space to place an Inkling, or your own Inkling to choose a memory upgrade.
-Character activation spaces offer your alternative action. Middle numbered
-spaces draw a Twist when filled. A full book triggers conflict immediately: play
+Character activation spaces offer your alternative action. Numbered spaces have
+no automatic Twist reward. A full book triggers conflict immediately: play
 a card from your hand or pass when each of your occupied spaces is checked from
 left to right. Twists are only played in conflict. Player boards show every
-upgrade level and highlight its current benefit.
+upgrade level and highlight its current benefit. Start with 6 supply Inklings,
+1 Twist and 1 Subplot. Your Subplot and Twists share the hand limit.
 
 Drag the empty map background to pan. Use the wheel or +/− to zoom; **Fit map**
 frames the books. After a win, click a dashed publishing position, then a touching

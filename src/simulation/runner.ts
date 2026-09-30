@@ -409,7 +409,7 @@ export function summarize(
   const resources: Table = {
     title: 'Resources and engine building',
     description:
-      'Per-player averages across completed games. Upgrade counts are placements, so returned and replayed memories can count again. Erasures exclude conflict cleanup and include submarine drowning caused by placements or transfers; memory rewards count the placing player.',
+      'Per-player averages across completed games. Upgrade counts are placements, so returned and replayed memories can count again. Erasures exclude conflict cleanup and suspension; memory rewards count the placing player.',
     columns: [
       col('players', 'Players'),
       col('placements', 'Numbered placements', 'decimal'),

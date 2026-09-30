@@ -52,7 +52,7 @@ describe('Growing hex map', () => {
     const bonus = legalActions(s).find((a) => s.books[a.book!].id !== 0)!;
     act(s, bonus.key);
     expect(s.books[bonus.book!].overflow[0]).toBe(1);
-    expect(s.players[0].supply).toBe(3);
+    expect(s.players[0].supply).toBe(5);
   });
   it('permits any number of touching neighbors, and cannot place over an existing book', () => {
     const map = [...initialHexes, { q: 1, r: 1 }];

@@ -24,7 +24,7 @@ describe('Strategic bots', () => {
     const a = chooseBotAction(playerView(s, 0), 0);
     expect(a.page! >= 2).toBe(true);
   });
-  it('values the middle-space Twist plus memory reward over a plain edge space', () => {
+  it('values a memory reward completing its Subplot over a plain space', () => {
     const s = fresh();
     s.players[0].page = 0;
     s.players[0].subplot = 9;
@@ -116,7 +116,7 @@ describe('Strategic bots', () => {
   it('is deterministic and ignores opponent hands, hidden powers and deck order', () => {
     const s = fresh(),
       t = structuredClone(s);
-    t.players[1].hand = [14, 13];
+    t.players[1].hand = [14];
     t.players[1].horse = 4;
     t.decks.character.reverse();
     t.decks.twist.reverse();

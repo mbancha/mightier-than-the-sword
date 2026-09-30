@@ -201,12 +201,13 @@ describe('Memories and Inklings', () => {
     expect(s.players[0].reserves[2]).toBe(3);
     expect(s.players[0].points).toBe(1);
   });
-  it('drowns overflow in the submarine without losing an Inkling', () => {
+  it('suspends overflow in the submarine to the next reserve', () => {
     const s = fresh(),
       b = ensureBook(s, 0);
     only(s, { type: 'place', p: 0, book: b, mode: 'overflow', n: 1 });
     act(s, 'place:null');
-    expect(s.players[0].supply).toBe(4);
+    expect(s.players[0].supply).toBe(5);
+    expect(s.players[0].reserves[1]).toBe(4);
     expect(s.books[b].overflow[0]).toBe(0);
   });
   it('requires all slots across both pages before conflict', () => {
@@ -225,7 +226,7 @@ describe('Characters and card-specific decisions', () => {
     give(s, 0, 3);
     s.jobs = [{ type: 'turn', p: 0 }];
     act(s, 'activate:3:0');
-    expect(s.players[0].supply).toBe(3);
+    expect(s.players[0].supply).toBe(5);
     expect(s.characters[0].used[0]).toBe(1);
     act(s, 'page:0');
     s.acted = false;
@@ -245,7 +246,7 @@ describe('Characters and card-specific decisions', () => {
     give(s, 0, 1);
     const c = s.characters[0];
     c.collected = 2;
-    s.players[0].supply = 2;
+    s.players[0].supply = 4;
     only(s, { type: 'collect', p: 0 });
     act(s, 'collect');
     expect(c.collected).toBe(2);
@@ -301,7 +302,7 @@ describe('Conflict tokens and Acts', () => {
     expect(s.players[0].hand).not.toContain(1);
     expect(s.discards.twist).not.toContain(1);
   });
-  it('cleans all book Inklings but leaves characters and memories in place', () => {
+  it('suspends Aeneid Inklings but leaves characters and memories in place', () => {
     const s = fresh(),
       b = ensureBook(s, 5);
     s.players[0].page = b * 2;
