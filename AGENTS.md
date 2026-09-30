@@ -9,9 +9,12 @@ other games by default.
 
 - Latest explicit designer instructions override existing files. Record new
   rulings in docs/DECISIONS.md, including what remains provisional.
-- src/data/content.json is the current component text, numbers, token/Subplot
-  effects, and rules source for both the app and PDF. Do not edit generated rules
-  or PDF files as their source. Run npm run docs after changing rules.
+- All edit requests apply to the digital prototype by default. Update print-and-play
+  outputs only when the designers explicitly request a print sync.
+- src/data/content.json is the current digital component text, numbers, effects,
+  and rules source. Print generators can read it when a print sync is requested;
+  existing printed outputs may represent an older edition. Run npm run docs after
+  changing rules, but do not regenerate PDFs without that explicit request.
 - Entries have stable numeric IDs equal to their original array positions.
   Append new entries; never reorder an existing catalog. Changes to card identity
   or mechanics require reviewing src/game/engine.ts and its focused tests.

@@ -1178,14 +1178,14 @@ footer {
   margin-top: 5px;
   font-size: 10px;
 }
-.slotReward {
+.castleSlot {
   position: absolute;
   left: 2px;
   bottom: 2px;
   opacity: 0.85;
   pointer-events: none;
 }
-.slotReward .icon {
+.castleSlot .icon {
   width: 17px;
   height: 17px;
 }

@@ -7,7 +7,7 @@ This file is for decisions, not a transcript. Date: 2026-09-30.
 ## Confirmed source behavior
 
 1. Two pages per book, with 3–5 slots split as evenly as possible. Figures occupy
-   pages, not slots. Overflow belongs to the whole book; the submarine has none.
+   pages, not slots. Overflow belongs to the whole book; the submarine suspends incoming overflow Inklings.
 2. Every conflict takes a current-Act token. Only an uncovered +3 space scores
    `3 × new token's Act`; covered books score zero printed points. All face-up
    token rewards are collected in the winner's chosen order and flip weak.
@@ -40,14 +40,14 @@ This file is for decisions, not a transcript. Date: 2026-09-30.
 - The last conflict still runs the active player's end-turn Frankenstein move and
   hand-limit discard before the Act refresh; further full books wait until the
   next turn. This follows the printed end-turn and last-token instructions together.
-- The Odyssey remembers rows that were ever upgraded, even when An Unlikely
-  Champion returns their last memory. Current row strength still drops normally.
+- The former Odyssey row-count reward is retired in digital edition 0.4.
 
 ## Scope boundaries
 
 The game is automated for the imported set; tests and first browser journeys are
-not a designer sign-off. No network multiplayer, matchmaking, public
-hosting or published balance claims. Basic bots are now playable opponents; their heuristics and simulations are not strategic balance evidence.
+not a designer sign-off. No network multiplayer, matchmaking or published balance
+claims. The prototype is hosted on GitHub Pages. Strategic bots are playable
+opponents; their heuristics and simulations are not proof of balance.
 
 ## Growing-map revision (designer confirmed)
 
@@ -62,12 +62,12 @@ hosting or published balance claims. Basic bots are now playable opponents; thei
 
 Provisional edge cases: shuffle all nine books together (no genre quota); when
 all books are published, skip publication and its bonus. No supply means no
-publication Inkling. Choosing submarine overflow erases that Inkling normally.
+publication Inkling. Choosing submarine overflow suspends that Inkling.
 Shoot-the-moon awards no publication because it is not a conflict. Publish after
 token rewards, before other full books or an Act transition. Travel Subplots count
 at most one new-book travel event per normal movement, even with several steps.
 
-## Space-check revision 0.3 (designer confirmed)
+## Space-check revision 0.3 (historical; 0.4 changes below supersede it)
 
 - Normal protagonist movement is mandatory and must finish on a different page.
   Optional movement granted by characters and effects remains optional.
@@ -120,3 +120,15 @@ through GitHub Actions; it does not add a multiplayer server. Games, private
 saves and Balance lab simulations remain local to each player's browser unless
 the player explicitly downloads or shares a file. Source changes still go
 through branches and pull requests.
+
+## Digital revision 0.4
+
+All edits target the digital game; print outputs change only on an explicit print-sync request. The current PDFs remain 0.3. The digital catalog and rules are 0.4, so earlier saves require their matching release.
+
+Start with 6 supply Inklings, 1 Twist and 1 Subplot. The Insight limit covers Twists plus the active face-up Subplot. Middle spaces no longer grant Twists. The nine books now use only the new designer effects; The Aeneid replaces Beowulf at its former stable book ID. No Beowulf character existed in the deck. Agamemnon and Odysseus retain two activations each and their confirmed passives.
+
+Provisional defaults stated during implementation (not designer-confirmed answers): keep 3 Inklings in each later reserve (12 total); Dracula's first space is the castle; allow discarding the active Subplot, losing progress without replacement. Frankenstein erases old overflow, then moves numbered-space Inklings into overflow where they survive. Jekyll can reduce points below zero.
+
+Dracula's castle owner receives one optional erasure before Twist checks, of any Inkling on that book. Around the World placement effects include overflow and bonus placements and can move any owned figure one page; resolve these rewards before checking for conflict. Moving existing Inklings is not placement. The submarine suspends every incoming overflow Inkling, including transfers and Nemo's activation Inklings; this is not erasure. The Aeneid suspends both numbered and overflow Inklings at cleanup.
+
+Odyssey rewards the moving figure's owner when it leaves for another book, on normal or ability movement. Internal page moves and setup do not reward. Direct destination choices follow a deterministic shortest page route; step controls allow a chosen route. Ichthyosaur only leaves Odyssey when neither of its occupied pages remains there. Journey overflow contributes 2 power per Inkling. Iliad adds 1 per contributing character and protagonist, including a protagonist at Valor 0.

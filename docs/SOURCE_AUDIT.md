@@ -62,3 +62,7 @@ Rules and all printed component text remain edition 0.3, unchanged. Strategy
 uses the same stable catalog identities. Optional structured engine events feed
 the new simulator; the PDF needs no regeneration for this software-only update.
 Reports retain the rules version, catalog fingerprint, bot version and seed range.
+
+## Digital-only revision 0.4
+
+Latest designer edits replace all nine book effects, swap Beowulf for The Aeneid, change setup and the combined hand limit, and remove middle-space Twist rewards. Character IDs remain unchanged (there was no Beowulf character). A new original castle SVG marks Dracula’s first slot. Rules and live catalog updated; all print files deliberately unchanged pending an explicit print-sync request.

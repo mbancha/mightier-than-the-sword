@@ -62,8 +62,11 @@ export function power(s: GameState, p: number, b: number) {
   for (const c of ownedChars(s, p, b))
     if (s.battle?.book !== b || !suppressed(s, c.id))
       v += c.id === 1 && c.collected === 3 ? 5 : characters[c.id].power;
-  if (s.books[b].id === 2 && s.books[b].overflow[p]) v += 2;
-  if (s.books[b].id === 5 && ownedChars(s, p, b).some((c) => !suppressed(s, c.id))) v++;
+  if (s.books[b].id === 2) v += s.books[b].overflow[p];
+  if (s.books[b].id === 4) {
+    if (bookOf(s.players[p].page) === b) v++;
+    v += ownedChars(s, p, b).filter((c) => s.battle?.book !== b || !suppressed(s, c.id)).length;
+  }
   return v + (s.battle?.book === b ? s.battle.bonus[p] : 0);
 }
 export function fullBooks(s: GameState) {
@@ -83,7 +86,7 @@ function points(s: GameState, p: number, n: number, why: string) {
     source: why,
     book: s.battle ? s.books[s.battle.book].id : undefined,
   });
-  note(s, `${s.players[p].name}: +${n} plot points (${why}).`);
+  note(s, `${s.players[p].name}: ${n >= 0 ? '+' : ''}${n} plot points (${why}).`);
 }
 function draw(s: GameState, p: number, n: number, kind: 'twist' | 'subplot') {
   for (let i = 0; i < n; i++) {
@@ -164,6 +167,51 @@ function memoryJobs(p: number, row: Row, b: number): Job[] {
   if (row === 'resolve') return [job('foreshadow', p, { n: 1 })];
   return [job('place', p, { n: 1, book: b, mode: 'overflow' })];
 }
+function suspend(s: GameState, p: number, n = 1) {
+  if (s.act < 3) s.players[p].reserves[s.act] += n;
+  else s.players[p].out += n;
+}
+// Receives Inklings already removed from their source; moves grant no placement rewards.
+function toOverflow(s: GameState, p: number, b: number, n = 1) {
+  if (s.books[b].id === 0) {
+    suspend(s, p, n);
+    note(s, `${s.players[p].name} suspends ${n} Inkling(s) sent to the submarine's overflow.`);
+  } else s.books[b].overflow[p] += n;
+}
+function moveFigure(
+  s: GameState,
+  p: number,
+  from: number,
+  to: number,
+  char?: number,
+  other: number | null = null,
+) {
+  const c = char === undefined ? null : s.characters.find((c) => c.id === char)!;
+  const leftOdyssey =
+    [from, c?.other].some(
+      (page) => page !== null && page !== undefined && s.books[bookOf(page)].id === 3,
+    ) && ![to, other].some((page) => page !== null && s.books[bookOf(page)].id === 3);
+  if (leftOdyssey) points(s, p, 1, 'leaving The Odyssey');
+  if (char === undefined) s.players[p].page = to;
+  else {
+    c!.page = to;
+    c!.other = other;
+  }
+}
+function movePath(s: GameState, from: number, to: number): number[] {
+  const paths = [[from]],
+    seen = new Set([from]);
+  for (const path of paths) {
+    const end = path[path.length - 1];
+    if (end === to) return path.slice(1);
+    for (const next of pageNeighbors(s.books, end))
+      if (!seen.has(next)) {
+        seen.add(next);
+        paths.push([...path, next]);
+      }
+  }
+  return [];
+}
 function place(s: GameState, p: number, b: number, slot: number | null) {
   const pl = s.players[p];
   if (!pl.supply) return;
@@ -175,18 +223,11 @@ function place(s: GameState, p: number, b: number, slot: number | null) {
     source: slot === null ? 'overflow' : 'numbered',
   });
   if (slot === null) {
-    if (s.books[b].id === 0) {
-      pl.supply++;
-      collect(s, p);
-      note(s, 'An overflow Inkling drowns in the submarine.');
-      emit(s, { type: 'erase', player: p, book: s.books[b].id, source: 'drowning' });
-      progress(s, p, 'erase');
-    } else s.books[b].overflow[p]++;
+    toOverflow(s, p, b);
   } else {
     const spot = s.books[b].slots[slot];
     spot.owner = p;
     queue(s, job('checkConflict', p, { book: b }));
-    if (slot > 0 && slot < s.books[b].slots.length - 1) draw(s, p, 1, 'twist');
     if (spot.memory) {
       const m = spot.memory;
       emit(s, { type: 'memoryReward', player: p, row: m.row, book: s.books[b].id });
@@ -196,6 +237,11 @@ function place(s: GameState, p: number, b: number, slot: number | null) {
     }
     progress(s, p, 'place');
   }
+  if (s.books[b].id === 8) {
+    const heads = nextInt(s.rng, 2) === 0;
+    points(s, p, heads ? 1 : -1, `Jekyll: ${heads ? 'heads' : 'tails'}`);
+  }
+  if (s.books[b].id === 1) queue(s, job('bookMove', p));
 }
 function collect(s: GameState, p: number) {
   const c = s.characters.find((c) => c.id === 1 && c.owner === p);
@@ -378,8 +424,6 @@ function playTwist(s: GameState, p: number, id: number) {
   bt.slotPlayed++;
   if (bt.slotPlayed === 2) bt.extraUsed.push(p);
   note(s, `${s.players[p].name} plays ${twists[id].name}.`);
-  if (s.books[bt.book].id === 4 && count(s, p, bt.book) === 1)
-    bt.bonus[p] += CONFIG.iliadTwistBonus;
   if (ownedChars(s, p, bt.book).some((c) => c.id === 6) && !abilitySuppressed(s, 6))
     draw(s, p, 1, 'twist');
   cardEffect(s, p, id);
@@ -445,11 +489,14 @@ function options(s: GameState): Option[] {
         page === from && j.type !== 'setup' ? `Stay · ${pageLabel(s, page)}` : pageLabel(s, page),
         (s) => {
           done(s);
-          if (c) {
-            const cc = s.characters.find((x) => x.id === c.id)!;
-            cc.page = page;
-            cc.other = null;
-          } else s.players[p].page = page;
+          if (j.type === 'setup') s.players[p].page = page;
+          else {
+            let previous = from;
+            for (const step of j.mode === 'any' ? [page] : movePath(s, from, page)) {
+              moveFigure(s, p, previous, step, c?.id);
+              previous = step;
+            }
+          }
           if (c?.id === 5) queue(s, job('checkConflict', p, { book: bookOf(page) }));
           if (j.source === 'normal' && bookOf(page) !== bookOf(j.origin ?? from))
             progress(s, p, 'travel');
@@ -484,16 +531,24 @@ function options(s: GameState): Option[] {
             const pending = state.jobs[0];
             pending.n = remaining - 1;
             pending.origin = j.origin ?? from;
-            if (c) {
-              const cc = state.characters.find((x) => x.id === c.id)!;
-              cc.page = page;
-              cc.other = null;
-            } else state.players[p].page = page;
+            moveFigure(state, p, from, page, c?.id);
             if (c?.id === 5) queue(state, job('checkConflict', p, { book: bookOf(page) }));
           },
           'Step',
           { page },
         );
+  }
+  if (j.type === 'bookMove') {
+    for (const id of [undefined, ...ownedChars(s, p).map((c) => c.id)])
+      add(
+        `bookMove:${id ?? 'protagonist'}`,
+        `Move ${id === undefined ? 'your protagonist' : characters[id].name} up to 1 page`,
+        (state) => {
+          done(state);
+          queue(state, job('move', p, { n: 1, char: id, source: 'book' }));
+        },
+      );
+    pass();
   }
   if (j.type === 'publish') {
     const id = s.unpublished[0];
@@ -723,7 +778,8 @@ function options(s: GameState): Option[] {
           add(`bridge:${a}:${b}`, `${pageLabel(s, a)} ↔ ${pageLabel(s, b)}`, (s) => {
             done(s);
             const c = s.characters.find((c) => c.id === j.char)!;
-            c.page = a;
+            const from = c.page;
+            moveFigure(s, p, from, a, c.id, b);
             c.other = b;
           });
   if (j.type === 'refresh')
@@ -749,7 +805,7 @@ function options(s: GameState): Option[] {
       if (j.type === 'erase' && j.page !== undefined && b !== bookOf(j.page)) return;
       if (j.mode === 'otherBook' && b === j.target) return;
       const eligible = (owner: number) =>
-        j.type === 'transfer' || j.mode === 'own' ? owner === p : owner !== p;
+        j.mode === 'any' || (j.type === 'transfer' || j.mode === 'own' ? owner === p : owner !== p);
       const target = (owner: number, k: number | null) =>
         add(
           `target:${b}:${k}:${owner}`,
@@ -760,21 +816,10 @@ function options(s: GameState): Option[] {
             if (j.type === 'transfer') {
               if (k === null) s.books[b].overflow[owner]--;
               else s.books[b].slots[k].owner = null;
-              if (s.books[j.book!].id === 0) {
-                s.players[p].supply++;
-                collect(s, p);
-                emit(s, {
-                  type: 'erase',
-                  player: p,
-                  book: s.books[j.book!].id,
-                  source: 'drowning',
-                });
-                progress(s, p, 'erase');
-              } else s.books[j.book!].overflow[p]++;
+              toOverflow(s, p, j.book!);
             } else {
               erase(s, owner, b, k, p);
               if (j.source === 'experiment') s.battle!.bonus[p] += CONFIG.experimentPerErased;
-              if (j.source === 'draculaBook') s.battle!.bonus[p] += CONFIG.draculaBookBonus;
               if (j.source === 'replace') place(s, p, b, k);
             }
           },
@@ -802,6 +847,18 @@ function options(s: GameState): Option[] {
         s.battle!.ignored.push(c.id);
       });
   if (j.type === 'discard' || j.type === 'cycle') {
+    if (j.type === 'discard' && pl.subplot !== null)
+      add(
+        'discardSubplot',
+        `Discard Subplot: ${subplots[pl.subplot].name} (lose its progress)`,
+        (state) => {
+          done(state);
+          state.discards.subplot.push(state.players[p].subplot!);
+          state.players[p].subplot = null;
+          state.players[p].progress = 0;
+          state.players[p].completing = false;
+        },
+      );
     for (const card of pl.hand)
       add(`discard:${card}`, `Discard ${twists[card].name}`, (s) => {
         done(s);
@@ -875,10 +932,7 @@ function options(s: GameState): Option[] {
       add(`nemo:${n}`, `Move ${n} activation Inkling${n > 1 ? 's' : ''} into overflow`, (s) => {
         done(s);
         s.characters.find((c) => c.id === 7)!.used[0] -= n;
-        if (s.books[j.book!].id === 0) {
-          s.players[p].supply += n;
-          for (let i = 0; i < n; i++) collect(s, p);
-        } else s.books[j.book!].overflow[p] += n;
+        toOverflow(s, p, j.book!, n);
       });
     pass();
   }
@@ -1053,7 +1107,7 @@ function pump(s: GameState) {
       continue;
     }
     if (j.type === 'handLimit') {
-      if (pl.hand.length > CONFIG.baseHand + pl.rows.insight) {
+      if (pl.hand.length + (pl.subplot === null ? 0 : 1) > CONFIG.baseHand + pl.rows.insight) {
         queue(s, job('discard', p));
         continue;
       }
@@ -1083,11 +1137,9 @@ function pump(s: GameState) {
       const bt = s.battle!,
         id = s.books[bt.book].id,
         js: Job[] = [];
-      for (const p of bt.participants) {
-        if (id === 6)
-          js.push(job('erase', p, { book: bt.book, mode: 'own', n: 1, source: 'draculaBook' }));
-        if (id === 8) js.push(job('cycle', p));
-      }
+      const castleOwner = s.books[bt.book].slots[0].owner;
+      if (id === 6 && castleOwner !== null)
+        js.push(job('erase', castleOwner, { book: bt.book, mode: 'any', n: 1, source: 'castle' }));
       for (const c of s.characters)
         if (c.id === 7 && here(c, bt.book) && !abilitySuppressed(s, 7))
           js.push(job('nemo', c.owner, { book: bt.book }));
@@ -1139,15 +1191,6 @@ function pump(s: GameState) {
             js.push(job('subplot', p, { card: s.players[p].subplot! }));
           }
         for (const p of bt.revenge) if (p !== winner) js.push(job('revenge', p, { book: bt.book }));
-        const id = s.books[bt.book].id;
-        for (const p of bt.participants) {
-          if (id === 1) js.push(job('move', p, { mode: 'any', source: 'book' }));
-          if (id === 3)
-            js.push(
-              job('points', p, { n: s.players[p].everUpgraded.length, source: 'The Odyssey' }),
-            );
-          if (id === 7) js.push(job('optionalForeshadow', p, { n: 1 }));
-        }
         queue(s, ...js, job('cleanup', winner, { book: bt.book }), job('takeToken', winner));
         continue;
       }
@@ -1160,11 +1203,21 @@ function pump(s: GameState) {
     if (j.type === 'cleanup') {
       s.jobs.shift();
       const b = s.books[j.book!];
-      b.slots.forEach((spot, k) => {
-        if (spot.owner !== null) erase(s, spot.owner, j.book!, k, p, true);
-      });
       b.overflow.forEach((n, owner) => {
-        for (let i = 0; i < n; i++) erase(s, owner, j.book!, null, p, true);
+        if (b.id === 5) {
+          b.overflow[owner] = 0;
+          suspend(s, owner, n);
+        } else for (let i = 0; i < n; i++) erase(s, owner, j.book!, null, p, true);
+      });
+      b.slots.forEach((spot, k) => {
+        if (spot.owner === null) return;
+        if (b.id === 7) {
+          b.overflow[spot.owner]++;
+          spot.owner = null;
+        } else if (b.id === 5) {
+          suspend(s, spot.owner);
+          spot.owner = null;
+        } else erase(s, spot.owner, j.book!, k, p, true);
       });
       continue;
     }
@@ -1317,7 +1370,7 @@ export function newGame(setup: Setup, recordEvents = false): GameState {
   };
   if (recordEvents) s.events = [];
   s.players.forEach((_, p) => {
-    draw(s, p, 2, 'twist');
+    draw(s, p, 1, 'twist');
     draw(s, p, 1, 'subplot');
     s.jobs.push(job('setup', p));
   });
@@ -1347,10 +1400,14 @@ export function assertInvariants(s: GameState) {
       (n, c) => n + c.collected + c.used.reduce((a, b) => a + b, 0),
       0,
     );
-    if (pl.supply + pl.reserves.reduce((a, b) => a + b, 0) + pl.out + onBooks + onChars !== 10)
+    if (
+      pl.supply + pl.reserves.reduce((a, b) => a + b, 0) + pl.out + onBooks + onChars !==
+      CONFIG.supply + 2 * CONFIG.reserve
+    )
       throw Error('Inkling conservation');
     if (
-      [pl.supply, ...pl.reserves, pl.out, onBooks, onChars, pl.points].some(
+      !Number.isInteger(pl.points) ||
+      [pl.supply, ...pl.reserves, pl.out, onBooks, onChars].some(
         (x) => !Number.isInteger(x) || x < 0,
       )
     )

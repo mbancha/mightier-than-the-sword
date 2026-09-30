@@ -94,7 +94,7 @@ describe('Mandatory protagonist movement', () => {
     expect(s.characters[0].page).toBe(0);
   });
 });
-describe('Direct spaces and middle-space draws', () => {
+describe('Direct spaces and memory rewards', () => {
   it('places directly as the turn action; first and last spaces do not draw', () => {
     for (const k of [0, 4]) {
       const s = fresh();
@@ -106,7 +106,7 @@ describe('Direct spaces and middle-space draws', () => {
       expect(s.players[0].hand).toHaveLength(n);
     }
   });
-  it('draws one Twist on every middle space, including a bonus placement and a memory space', () => {
+  it('draws only the Insight memory reward on middle spaces, with no inherent Twist reward', () => {
     for (const k of [1, 2, 3]) {
       const s = fresh();
       s.players[0].rows.insight = 1;
@@ -117,7 +117,7 @@ describe('Direct spaces and middle-space draws', () => {
       ];
       const n = s.players[0].hand.length;
       act(s, `place:${k}`);
-      expect(s.players[0].hand).toHaveLength(n + 2);
+      expect(s.players[0].hand).toHaveLength(n + 1);
     }
   });
   it('upgrades directly without needing a supply Inkling and leaves the space empty', () => {
@@ -187,7 +187,7 @@ describe('Immediate left-to-right conflicts', () => {
     expect(s.battle!.played[0]).toBe(2);
     expect(s.battle!.cards).toContain(1);
   });
-  it('uses a changed future occupant after Stolen Vitality, awarding its placement draw', () => {
+  it('uses a changed future occupant after Stolen Vitality without a middle-space draw', () => {
     const s = start([0, 1, 0, 1]);
     hand(s, 0, 13);
     const n = s.players[0].hand.length;
@@ -195,7 +195,7 @@ describe('Immediate left-to-right conflicts', () => {
     act(s, 'target:0:1:1');
     expect(s.battle!.cursor).toBe(1);
     expect(s.jobs[0].p).toBe(0);
-    expect(s.players[0].hand.length).toBe(n);
+    expect(s.players[0].hand.length).toBe(n - 1);
   });
   it('skips a future space changed to memory-only, without canceling conflict', () => {
     const s = start([0, 1, 0, 1]);

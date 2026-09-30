@@ -79,7 +79,7 @@ try {
   await page.locator('.legalSlot.slot').first().click();
   assert.equal(await page.locator('.mapBook .piece').count(), 1);
   assert.equal(await page.locator('.trackLevel').count(), 32);
-  assert.equal(await page.locator('.slotReward').count(), 6);
+  assert.equal(await page.locator('.slotReward').count(), 0);
   // Zoom and pan affect the camera, not game state.
   const oldZoom = await page.getByLabel('Map zoom').innerText();
   await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
