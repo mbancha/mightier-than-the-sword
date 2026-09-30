@@ -50,3 +50,6 @@ trigger exception. All 15 Twists now use conflict timing; IDs 8-14 were adapted,
 and Agamemnon/Strategists text specifies their once-per-conflict extra card.
 The app, generated rules and current 16-page PDF read this same catalog. Book
 sheets now show middle-space Twist symbols. Counts and the v15 snapshot stay intact.
+
+Starting Subplots are unchanged in the rules and PDF: every player receives one.
+The digital board now displays the full objective and reward by default.

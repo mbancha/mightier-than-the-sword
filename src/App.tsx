@@ -526,9 +526,10 @@ export default function App() {
                   {p.rows.resolve === 1 ? ' (or discard to place 2)' : ''}
                 </p>
                 {p.subplot !== null && (
-                  <details>
+                  <details className="playerSubplot" open>
                     <summary>
-                      {subplots[p.subplot].name} · {p.progress}/{subplots[p.subplot].target}
+                      Subplot: {subplots[p.subplot].name} · {p.progress}/
+                      {subplots[p.subplot].target}
                     </summary>
                     <p>{subplots[p.subplot].text}</p>
                     <p>Draw a character OR {subplots[p.subplot].reward}</p>

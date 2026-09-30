@@ -96,3 +96,9 @@ at most one new-book travel event per normal movement, even with several steps.
 The ordering of earned placement rewards before the immediate conflict and the
 latched current-space opportunity are implementation rulings recorded explicitly
 for playtest review. Other new movement/timing rules above are designer confirmed.
+
+## Starting Subplots
+
+Every player, human or bot, begins with one distinct face-up Subplot drawn from
+the shuffled core deck, at zero progress, before choosing starting pages. The
+player board shows its objective and reward expanded by default.

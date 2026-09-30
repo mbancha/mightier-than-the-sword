@@ -50,6 +50,8 @@ try {
   assert.equal(coords[0].y, coords[1].y);
   assert.equal(coords[2].x, (coords[0].x + coords[1].x) / 2);
   assert.ok(coords[2].y > coords[0].y);
+  assert.equal(await page.locator('.playerSubplot[open]').count(), 2);
+  assert.equal(await page.locator('.playerSubplot p:visible').count(), 4);
   // Actual pointer drag of the protagonist, then its contextual end-move menu.
   let figure = page.getByRole('button', { name: 'Teal protagonist', exact: true });
   await figure.click();

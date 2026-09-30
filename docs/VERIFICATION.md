@@ -6,7 +6,7 @@ No public hosted release is claimed.
 
 ## Local evidence
 
-- `npm run verify` passed: 50 tests, production build and browser journey.
+- `npm run verify` passed: 51 tests, production build and browser journey.
 - Tests include 36 seeded 2/3/4-player legal-action simulations and 24 complete
   basic-bot games, alongside deterministic replay, privacy and conservation checks.
 - Sixteen focused new tests cover mandatory movement, invalid return-to-origin,
@@ -37,3 +37,7 @@ Revised card text fits without clipping. Historical v15 snapshot is unchanged.
 
 Screenshots/reports are generated under ignored `artifacts/`; CI stores browser
 evidence for review. Human playtesting remains necessary for feel and balance.
+
+Starting Subplot follow-up: setup coverage verifies one distinct face-up Subplot
+for every seat in 2/3/4-player human/bot games, correct deck removal and zero
+progress. Browser checks verify both starting objectives and rewards are visible.

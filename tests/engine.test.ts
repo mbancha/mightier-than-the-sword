@@ -86,6 +86,25 @@ describe('Determinism, privacy and resource accounting', () => {
     expect(fresh(18).books).not.toEqual(fresh().books);
     assertInvariants(fresh());
   });
+  it('deals one distinct face-up Subplot to every human and bot before setup in 2-4 player games', () => {
+    for (const n of [2, 3, 4]) {
+      const s = newGame({
+        names: ['A', 'B', 'C', 'D'].slice(0, n),
+        seed: 29,
+        controllers: Array.from({ length: n }, (_, i) => (i % 2 ? 'bot' : 'human')),
+      });
+      const dealt = s.players.map((p) => p.subplot);
+      expect(dealt.every((id) => id !== null && subplots.some((card) => card.id === id))).toBe(
+        true,
+      );
+      expect(new Set(dealt).size).toBe(n);
+      expect(s.decks.subplot).toHaveLength(subplots.length - n);
+      expect(dealt.every((id) => !s.decks.subplot.includes(id!))).toBe(true);
+      expect(s.players.every((p) => p.progress === 0)).toBe(true);
+      expect(publicView(s).players.map((p) => p.subplot)).toEqual(dealt);
+      assertInvariants(s);
+    }
+  });
   it('rejects illegal actions without mutation', () => {
     const s = fresh(),
       before = structuredClone(s);
