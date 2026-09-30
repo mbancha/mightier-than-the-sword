@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="22.1667" height="22.25" preserveAspectRatio="xMinYMin meet" viewBox="0.916667 0.375 22.1667 22.25" version="1.0" fill-rule="evenodd">
+	<title>...</title>
+	<desc>...</desc>
+	<g id="group" transform="scale(1,-1) translate(0,-24)">
+		<g transform="">
+			<polygon points="3 3, 6 2, 21 19, 22 23, 18 21" style="stroke: rgb(14%,23%,28%); stroke-linecap: round; stroke-width: 1.25; fill: rgb(70%,27%,31%); fill-rule: evenodd;" />
+			<polygon points="21 3, 18 2, 3 19, 2 23, 6 21" style="stroke: rgb(14%,23%,28%); stroke-linecap: round; stroke-width: 1.25; fill: rgb(72%,50%,12%); fill-rule: evenodd;" />
+			<path d="M 2,8 L 8,3 Z" style="stroke: rgb(14%,23%,28%); stroke-linecap: round; stroke-width: 2.1;" />
+			<path d="M 16,3 L 22,8 Z" style="stroke: rgb(14%,23%,28%); stroke-linecap: round; stroke-width: 2.1;" />
+		</g>
+	</g>
+</svg>

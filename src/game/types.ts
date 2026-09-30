@@ -1,0 +1,110 @@
+import type { Row } from '../data/catalog';
+import type { RngState } from '../kernel/rng';
+export interface Player {
+  name: string;
+  supply: number;
+  reserves: number[];
+  out: number;
+  points: number;
+  page: number;
+  rows: Record<Row, number>;
+  everUpgraded: Row[];
+  hand: number[];
+  subplot: number | null;
+  progress: number;
+  completing: boolean;
+  horse: number | null;
+  horseSpent: boolean;
+}
+export interface Memory {
+  owner: number;
+  row: Row;
+}
+export interface Slot {
+  page: number;
+  owner: number | null;
+  memory: Memory | null;
+}
+export interface Book {
+  id: number;
+  slots: Slot[];
+  overflow: number[];
+  covered: boolean;
+  tokens: { id: number; strong: boolean }[];
+}
+export interface Character {
+  id: number;
+  owner: number;
+  page: number;
+  other: number | null;
+  used: number[];
+  collected: number;
+}
+// Jobs are data, not closures: saves and undo preserve every pending choice.
+export interface Job {
+  type: string;
+  p: number;
+  n?: number;
+  book?: number;
+  page?: number;
+  char?: number;
+  action?: number;
+  row?: Row;
+  card?: number;
+  mode?: string;
+  source?: string;
+  target?: number;
+  optional?: boolean;
+  remaining?: number[];
+}
+export interface Battle {
+  book: number;
+  participants: number[];
+  bonus: number[];
+  played: number[];
+  passed: number[];
+  ignored: number[];
+  allIgnored: boolean;
+  hero: number[];
+  revenge: number[];
+  tribute: number[];
+  complete: number[];
+  cursor: number;
+  winner: number | null;
+  cards: number[];
+}
+export interface GameState {
+  schema: 1;
+  version: string;
+  seed: number;
+  rng: RngState;
+  players: Player[];
+  books: Book[];
+  characters: Character[];
+  decks: { twist: number[]; subplot: number[]; character: number[] };
+  discards: { twist: number[]; subplot: number[] };
+  pools: number[][];
+  act: number;
+  active: number;
+  turn: number;
+  acted: boolean;
+  twisted: boolean;
+  jobs: Job[];
+  battle: Battle | null;
+  log: string[];
+  over: boolean;
+}
+export interface Action {
+  key: string;
+}
+export interface Choice extends Action {
+  label: string;
+  group: string;
+  page?: number;
+  book?: number;
+  detail?: string;
+}
+export interface Setup {
+  names: string[];
+  seed: number;
+}

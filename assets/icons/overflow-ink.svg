@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="19.75" height="20.3333" preserveAspectRatio="xMinYMin meet" viewBox="2.125 2.54167 19.75 20.3333" version="1.0" fill-rule="evenodd">
+	<title>...</title>
+	<desc>...</desc>
+	<g id="group" transform="scale(1,-1) translate(0,-24)">
+		<g transform="">
+			<g transform=" matrix(0.62,0,0,0.62,4.34,8.06)">
+				<g transform="">
+					<path d="M 11 20.8 C 8.36 15.52 4.84 12 5.72 8.48 C 6.6 2.32 15.4 2.32 16.28 8.48 C 17.16 12 13.64 15.52 11 20.8 Z " style="stroke: rgb(14%,23%,28%); stroke-linecap: round; stroke-width: 1.5; fill: rgb(12%,49%,44%); fill-rule: evenodd;" />
+					<path d="M 8.36,9.36 L 9.24,7.6 Z" style="stroke: rgb(96%,95%,91%); stroke-linecap: round; stroke-width: 1.5;" />
+				</g>
+			</g>
+			<path d="M 3,9 L 3,2 Z" style="stroke: rgb(14%,23%,28%); stroke-linecap: butt; stroke-width: 1.7;" />
+			<path d="M 3,2 L 21,2 Z" style="stroke: rgb(14%,23%,28%); stroke-linecap: butt; stroke-width: 1.7;" />
+			<path d="M 21,2 L 21,9 Z" style="stroke: rgb(14%,23%,28%); stroke-linecap: butt; stroke-width: 1.7;" />
+		</g>
+	</g>
+</svg>

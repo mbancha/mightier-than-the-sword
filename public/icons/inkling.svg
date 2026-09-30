@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="12.4167" height="18.5" preserveAspectRatio="xMinYMin meet" viewBox="4.79167 2.41667 12.4167 18.5" version="1.0" fill-rule="evenodd">
+	<title>...</title>
+	<desc>...</desc>
+	<g id="group" transform="scale(1,-1) translate(0,-24)">
+		<g transform="">
+			<path d="M 11 20.8 C 8.36 15.52 4.84 12 5.72 8.48 C 6.6 2.32 15.4 2.32 16.28 8.48 C 17.16 12 13.64 15.52 11 20.8 Z " style="stroke: rgb(14%,23%,28%); stroke-linecap: round; stroke-width: 1.5; fill: rgb(12%,49%,44%); fill-rule: evenodd;" />
+			<path d="M 8.36,9.36 L 9.24,7.6 Z" style="stroke: rgb(96%,95%,91%); stroke-linecap: round; stroke-width: 1.5;" />
+		</g>
+	</g>
+</svg>

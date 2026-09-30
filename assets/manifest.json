@@ -1,0 +1,142 @@
+{
+  "source": "Original Mightier vector drawings, editions v10/v13",
+  "status": "Owner project assets; no external art license asserted",
+  "assets": [
+    {
+      "id": "character",
+      "master": "assets/icons/character.svg",
+      "web": "public/icons/character.svg",
+      "type": "original-vector",
+      "meaning": "character",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "conflict",
+      "master": "assets/icons/conflict.svg",
+      "web": "public/icons/conflict.svg",
+      "type": "original-vector",
+      "meaning": "conflict",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "curiosity",
+      "master": "assets/icons/curiosity.svg",
+      "web": "public/icons/curiosity.svg",
+      "type": "original-vector",
+      "meaning": "curiosity",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "early-inkling",
+      "master": "assets/icons/early-inkling.svg",
+      "web": "public/icons/early-inkling.svg",
+      "type": "original-vector",
+      "meaning": "early-inkling",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "inkling",
+      "master": "assets/icons/inkling.svg",
+      "web": "public/icons/inkling.svg",
+      "type": "original-vector",
+      "meaning": "inkling",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "insight",
+      "master": "assets/icons/insight.svg",
+      "web": "public/icons/insight.svg",
+      "type": "original-vector",
+      "meaning": "insight",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "ongoing",
+      "master": "assets/icons/ongoing.svg",
+      "web": "public/icons/ongoing.svg",
+      "type": "original-vector",
+      "meaning": "ongoing",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "overflow-ink",
+      "master": "assets/icons/overflow-ink.svg",
+      "web": "public/icons/overflow-ink.svg",
+      "type": "original-vector",
+      "meaning": "overflow-ink",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "player-amber",
+      "master": "assets/icons/player-amber.svg",
+      "web": "public/icons/player-amber.svg",
+      "type": "original-vector",
+      "meaning": "player-amber",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "player-rose",
+      "master": "assets/icons/player-rose.svg",
+      "web": "public/icons/player-rose.svg",
+      "type": "original-vector",
+      "meaning": "player-rose",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "player-teal",
+      "master": "assets/icons/player-teal.svg",
+      "web": "public/icons/player-teal.svg",
+      "type": "original-vector",
+      "meaning": "player-teal",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "player-violet",
+      "master": "assets/icons/player-violet.svg",
+      "web": "public/icons/player-violet.svg",
+      "type": "original-vector",
+      "meaning": "player-violet",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "points",
+      "master": "assets/icons/points.svg",
+      "web": "public/icons/points.svg",
+      "type": "original-vector",
+      "meaning": "points",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "protagonist",
+      "master": "assets/icons/protagonist.svg",
+      "web": "public/icons/protagonist.svg",
+      "type": "original-vector",
+      "meaning": "protagonist",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "resolve",
+      "master": "assets/icons/resolve.svg",
+      "web": "public/icons/resolve.svg",
+      "type": "original-vector",
+      "meaning": "resolve",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "twist",
+      "master": "assets/icons/twist.svg",
+      "web": "public/icons/twist.svg",
+      "type": "original-vector",
+      "meaning": "twist",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "valor",
+      "master": "assets/icons/valor.svg",
+      "web": "public/icons/valor.svg",
+      "type": "original-vector",
+      "meaning": "valor",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    }
+  ]
+}
