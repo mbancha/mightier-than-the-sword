@@ -111,3 +111,12 @@ use the normal engine and private-player boundaries. Default batch: 1,000 games,
 balanced as closely as possible across 2/3/4 players, seeds starting at 1.
 Comparison mode rotates one strategic seat against original bots. Statistics
 are descriptive playtest evidence, not automated declarations of overpowering.
+
+## Browser-hosted prototype
+
+The designers chose to make this repository public so GitHub Pages can serve the
+game on their current GitHub plan. The site publishes the `main` production build
+through GitHub Actions; it does not add a multiplayer server. Games, private
+saves and Balance lab simulations remain local to each player's browser unless
+the player explicitly downloads or shares a file. Source changes still go
+through branches and pull requests.

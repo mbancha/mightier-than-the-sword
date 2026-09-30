@@ -29,7 +29,8 @@ other games by default.
 ## Collaboration and verification
 
 One change per branch. Pull the latest main before starting; use a pull request
-for review. Keep unrelated work untouched. No automatic merging or public hosting.
+for review. Keep unrelated work untouched. The repository and its GitHub Pages
+site are public by designer request; publish reviewed changes from `main`.
 
 Run npm test and npm run build. For interaction changes run npm run smoke and
 inspect its desktop/tablet screenshots. Tests verify mechanics, not game balance.
@@ -38,4 +39,4 @@ then python print/check.py and inspect the rendered sheets in artifacts/print.
 
 Update source audit, decisions, and verification evidence alongside implementation.
 Keep maturity honest: currently a first human-playable automated prototype, not a
-designer-validated rules-complete or hosted release. No implied balance guarantees.
+designer-validated rules-complete release. No implied balance guarantees.

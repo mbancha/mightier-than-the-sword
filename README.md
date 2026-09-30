@@ -11,7 +11,9 @@ rules fidelity and balance still need human playtesting. No remote multiplayer i
 
 ## Run it
 
-Install Node.js 22.12 or newer, then open a terminal in this folder:
+Play in your browser at [the hosted prototype](https://mbancha.github.io/mightier-than-the-sword/). No installation is needed to play or use the Balance lab. GitHub Pages serves the same static build that contributors can run locally.
+
+To work on the source locally, install Node.js 22.12 or newer, then open a terminal in this folder:
 
 ```sh
 npm ci
@@ -92,11 +94,12 @@ wide and conflict tokens are 1 inch square with mirrored backs.
 
 ## Sharing
 
-The GitHub repository is private. Its owner can invite the co-designer under
-Settings → Collaborators. Both designers use separate branches and review pull
-requests. GitHub Actions runs the rules/build/browser checks and saves the built
-app as an artifact. Hosting is not enabled automatically; a private source
-repository does not by itself establish who can access a hosted site.
+The GitHub repository and hosted prototype are public. Anyone with the link can
+play; editing the source still requires repository access. The owner can invite
+the co-designer under Settings → Collaborators. Both designers use separate
+branches and review pull requests. GitHub Actions verifies changes and publishes
+the current `main` build to GitHub Pages. Saves and Balance lab reports stay on
+your device unless you download or share them yourself.
 
 Framework provenance: selectively copied from the owner's BG-Prototypes template
 (React/Vite setup and seeded randomness), then adapted into this independent app.
@@ -112,7 +115,7 @@ preserved and live bots are paused. Stop a run to view its completed batch.
 Download the readable HTML report, full JSON, per-player CSV or statistics CSV.
 Results disappear when the lab is closed unless downloaded.
 
-The same runner works without a browser:
+Contributors can also run the same simulator without a browser:
 
 ```sh
 npm run simulate
@@ -124,7 +127,8 @@ Defaults: 1,000 games, mixed player counts, all strategic bots, seed 1, 5,000
 choices per game. `--help` lists options. On Windows use `npm.cmd` if needed.
 The default report is `artifacts/simulations/latest/report.html`. JSON and CSV
 files are saved beside it. Output folders are overwritten when reused; choose
-`--out` to retain a previous experiment. No public hosting or remote computation.
+`--out` to retain a previous experiment. The hosted Balance lab runs locally in
+your browser; it does not send simulation results to a server.
 
 Reports separate player counts and show sample sizes, character ownership and
 conflict performance, starting/completed Subplots, book conflict outcomes, Twist

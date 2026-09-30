@@ -61,3 +61,10 @@ progress. Browser checks verify both starting objectives and rewards are visible
   errors. Lab axe checks reported no accessibility violations.
 - Standalone CLI ran with HTTP/HMR disabled and produced all four report files.
   No PDF regeneration: this update changes policy, reporting and controls only.
+
+## GitHub Pages publication
+
+The static build uses relative asset paths so it can load from the repository
+subpath on GitHub Pages. The publishing workflow builds from `main`, uploads
+`dist`, and deploys to the `github-pages` environment. Local tests/build and a
+live-site browser check are required before calling the hosted edition ready.
