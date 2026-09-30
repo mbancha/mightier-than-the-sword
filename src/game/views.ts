@@ -19,6 +19,7 @@ export function publicView(s: GameState) {
       horseSpent: p.horseSpent,
     })),
     books: structuredClone(s.books),
+    bookPowers: s.books.map((_, b) => s.players.map((_, p) => power(s, p, b))),
     unpublishedCount: s.unpublished.length,
     publishing: s.jobs[0]?.type === 'publish' ? (s.unpublished[0] ?? null) : null,
     characters: structuredClone(s.characters),
@@ -36,6 +37,7 @@ export function publicView(s: GameState) {
     battle: s.battle
       ? {
           book: s.battle.book,
+          allIgnored: s.battle.allIgnored,
           participants: [...s.battle.participants],
           powers: s.players.map((_, p) => power(s, p, s.battle!.book)),
           winner: s.battle.winner,
@@ -54,6 +56,7 @@ export function playerView(s: GameState, p: number) {
     horse: s.players[p].horse,
     actions: currentPlayer(s) === p ? legalActions(s) : [],
     prompt: s.jobs[0]?.type ?? 'over',
+    effect: { book: s.jobs[0]?.book ?? null, source: s.jobs[0]?.source ?? null },
     moving:
       s.jobs[0]?.type === 'move'
         ? {

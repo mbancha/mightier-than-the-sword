@@ -20,6 +20,7 @@ import {
 } from './game/session';
 import { currentPlayer, pageLabel } from './game/engine';
 import { publicView, playerView } from './game/views';
+import { SimulationPanel } from './SimulationPanel';
 import { TableMap } from './TableMap';
 import { chooseBotAction } from './game/bot';
 import type { Choice } from './game/types';
@@ -71,6 +72,7 @@ export default function App() {
     [group, setGroup] = useState('All'),
     [pageFilter, setPageFilter] = useState<number | null>(null),
     [rules, setRules] = useState(false),
+    [simulation, setSimulation] = useState(false),
     [catalog, setCatalog] = useState(false),
     [error, setError] = useState(''),
     [saved, setSaved] = useState(() => !!localStorage.getItem(storage));
@@ -183,12 +185,21 @@ export default function App() {
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
+          <button
+            onClick={() => {
+              setSimulation(!simulation);
+              setBotsPaused(true);
+            }}
+          >
+            {simulation ? 'Close balance lab' : 'Balance lab'}
+          </button>
           <button onClick={() => setRules(!rules)}>{rules ? 'Close rules' : 'Rules'}</button>
           <button onClick={() => setCatalog(!catalog)}>
             {catalog ? 'Close library' : 'Card library'}
           </button>
         </nav>
       </header>
+      {simulation && <SimulationPanel />}
       {error && (
         <p role="status" className="notice">
           {error}
@@ -214,7 +225,7 @@ export default function App() {
           </p>
           <p>
             Playtest status: first automated build; designer validation and balance testing remain.
-            Basic bots are available; online multiplayer is not included.
+            Strategic bots are available; online multiplayer is not included.
           </p>
         </section>
       )}
@@ -317,7 +328,7 @@ export default function App() {
                   }
                 >
                   <option value="human">Human</option>
-                  <option value="bot">Basic bot</option>
+                  <option value="bot">Strategic bot</option>
                 </select>
               </label>
             ))}

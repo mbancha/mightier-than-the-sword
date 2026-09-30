@@ -1215,3 +1215,66 @@ footer {
     margin-bottom: 8px;
   }
 }
+
+.simulationPanel {
+  margin: 24px;
+  padding: 24px;
+  background: #fffdf5;
+  border: 2px solid #407566;
+  border-radius: 12px;
+}
+.simulationSettings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.simulationSettings label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.simulationPanel fieldset {
+  border: 1px solid #9cad9e;
+  margin-bottom: 18px;
+}
+.simulationPanel details {
+  padding: 14px 0;
+  border-bottom: 1px solid #cbd7d1;
+}
+.simulationPanel summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+.simulationTable {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.simulationTable table {
+  border-collapse: collapse;
+  font-size: 14px;
+  width: 100%;
+}
+.simulationTable th,
+.simulationTable td {
+  text-align: right;
+  padding: 9px;
+  border-bottom: 1px solid #cbd7d1;
+  white-space: nowrap;
+}
+.simulationTable th {
+  background: #e2eee6;
+}
+.simulationTable td:nth-child(2) {
+  text-align: left;
+}
+.simulationDownloads {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 560px) {
+  .simulationPanel {
+    margin: 8px;
+    padding: 12px;
+  }
+}

@@ -82,3 +82,32 @@ per space and at most one character-granted extra per player per conflict.
 The public projection exposes the current scan position, never hidden cards.
 UI tracks render the shared catalog's four levels, showing covered memories and
 the currently active level. Rules version 0.3 rejects earlier edition replays.
+
+## Strategic policy and headless Balance lab
+
+`game/bot.ts` scores legal choices using only `playerView`. The view supplies
+public per-book powers and the current effect's public source/book. No hidden
+decks, other hands, seed or simulation telemetry are exposed. Scores combine
+Subplot progress/completion, memory/placement rewards, character destinations,
+resource needs and visible conflict margins, with small deterministic variation.
+`basicBot.ts` preserves the original baseline. Neither policy searches future
+states; displayed character IDs remain the catalog's stable numeric IDs.
+
+`newGame(setup, true)` optionally enables a structured event buffer. Engine
+mutation sites emit events without changing mechanics or consuming randomness.
+The simulator drains this buffer after each atomic action; interactive saves do
+not enable it. Turn events follow the actual turn counter, including automatic
+Act transitions and shoot-the-moon turns. Public views exclude events.
+
+`simulation/runner.ts` executes the same legal engine actions as the UI, using
+one current state rather than keeping all undo snapshots. It checks normal
+engine invariants on every action, caps decisions per game, and retains failed
+seeds/action lists. `summarize` derives tables from per-game/per-player records.
+`simulation/report.ts` formats HTML and CSV. The UI worker and Node CLI share
+these modules, so reported data does not depend on the interface used.
+
+The worker yields every ten games for progress/cancellation. Closing the lab
+terminates it; downloaded reports are the durable output. The CLI's Vite module
+loader transpiles local TypeScript with no listening HTTP/HMR server. It exits
+nonzero if any game fails. A seed reproduces a run only with the same rules,
+catalog and bot implementation; report metadata records all three versions.

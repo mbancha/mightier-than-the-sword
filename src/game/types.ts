@@ -79,7 +79,38 @@ export interface Battle {
   winner: number | null;
   cards: number[];
 }
+export interface GameEvent {
+  type:
+    | 'turn'
+    | 'points'
+    | 'subplotDraw'
+    | 'subplotComplete'
+    | 'character'
+    | 'activate'
+    | 'upgrade'
+    | 'place'
+    | 'foreshadow'
+    | 'erase'
+    | 'twist'
+    | 'conflictStart'
+    | 'conflictEnd'
+    | 'moon'
+    | 'token'
+    | 'memoryReward';
+  act: number;
+  turn: number;
+  player: number;
+  id?: number;
+  book?: number;
+  amount?: number;
+  row?: Row;
+  source?: string;
+  participants?: number[];
+  characters?: { id: number; owner: number }[];
+}
 export interface GameState {
+  // Opt-in structured telemetry. Never exposed to bots or required for replay.
+  events?: GameEvent[];
   schema: 1;
   version: string;
   seed: number;

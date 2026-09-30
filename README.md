@@ -7,7 +7,7 @@ The first build includes all nine books, fifteen Twists, ten incremental Subplot
 ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
 movement, memories, conflicts, Acts, card effects, private-hand handoffs, undo,
 local saves, and portable private replays. It is ready for designer testing;
-rules fidelity and balance still need human playtesting. No remote multiplayer is included. Basic bots can fill any seat. See [known rulings](docs/DECISIONS.md).
+rules fidelity and balance still need human playtesting. No remote multiplayer is included. Strategic bots can fill any seat. See [known rulings](docs/DECISIONS.md).
 
 ## Run it
 
@@ -29,7 +29,7 @@ but cannot undo knowledge. A save requires the same content/rules edition.
 
 ## Playing at the table
 
-Choose Human or Basic bot for each seat (the default is you versus one bot).
+Choose Human or Strategic bot for each seat (the default is you versus one bot).
 Click a starting page. Click your quill-and-inkwell to highlight adjacent pages,
 then drag it or click a highlighted page. Each step uses one move; click the
 figure again and choose **End move** when finished. You must move at least one
@@ -102,3 +102,32 @@ Framework provenance: selectively copied from the owner's BG-Prototypes template
 (React/Vite setup and seeded randomness), then adapted into this independent app.
 Game content and icons come from the existing Mightier prototype. No open-source
 license is granted by this repository; retain third-party package licenses.
+
+## Balance lab and headless simulations
+
+Click **Balance lab** at the top of the app. Choose a game count (default 1,000),
+player count or an even 2/3/4-player mix, first seed, and bot policy. Simulations
+run in a background worker without drawing the table; your current game is
+preserved and live bots are paused. Stop a run to view its completed batch.
+Download the readable HTML report, full JSON, per-player CSV or statistics CSV.
+Results disappear when the lab is closed unless downloaded.
+
+The same runner works without a browser:
+
+```sh
+npm run simulate
+npm run simulate -- --games 2000 --players 4 --seed 100 --out artifacts/simulations/four-player
+npm run simulate -- --games 300 --policy compare --seed 10001 --out artifacts/simulations/comparison
+```
+
+Defaults: 1,000 games, mixed player counts, all strategic bots, seed 1, 5,000
+choices per game. `--help` lists options. On Windows use `npm.cmd` if needed.
+The default report is `artifacts/simulations/latest/report.html`. JSON and CSV
+files are saved beside it. Output folders are overwritten when reused; choose
+`--out` to retain a previous experiment. No public hosting or remote computation.
+
+Reports separate player counts and show sample sizes, character ownership and
+conflict performance, starting/completed Subplots, book conflict outcomes, Twist
+usage, turn order, points, turns, upgrades, completion counts and resources.
+Comparison mode rotates one strategic bot through the seats against original
+basic bots. See [simulation definitions and limitations](docs/SIMULATION.md).
