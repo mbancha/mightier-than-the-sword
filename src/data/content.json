@@ -432,7 +432,7 @@
   "rules": [
     [
       "Setup",
-      "Use all 9 books in a random 3-by-3 grid. Each book has 2 pages. Edge-adjacent pages are 1 step apart, including the two halves of a book. Each player takes a protagonist, 10 Inklings and 12 matching-color memories (3 per row). Start with 4 Inklings in supply; reserve 3 for Act II and 3 for Act III. Cover all row upgrades with memories. Start at 0 points, with no characters. Shuffle the shared decks; deal 2 Twists and 1 face-up Subplot each. Place protagonists on any pages. The base pool has 15 conflict tokens, 5 per Act. Randomly select 1 per player for EACH Act; set the others aside. Put Act I's selected tokens on the main board. Choose a first player; turns run clockwise."
+      "Shuffle the 9 books. Start with 3: two side by side and one centered below them, forming a triangle on a hexagonal grid. Keep the remaining books in a face-down stack. Each book has 2 pages. Edge-adjacent pages are 1 step apart, including the two halves of a book. Each player takes a protagonist, 10 Inklings and 12 matching-color memories (3 per row). Start with 4 Inklings in supply; reserve 3 for Act II and 3 for Act III. Cover all row upgrades with memories. Start at 0 points, with no characters. Shuffle the shared decks; deal 2 Twists and 1 face-up Subplot each. Place protagonists on any pages. The base pool has 15 conflict tokens, 5 per Act. Randomly select 1 per player for EACH Act; set the others aside. Put Act I's selected tokens on the main board. Choose a first player; turns run clockwise."
     ],
     [
       "Your turn",
@@ -456,7 +456,7 @@
     ],
     [
       "Conflict rewards",
-      "EVERY conflict takes 1 available token from the current Act pool on the main board. The winner places it on the book and gains its strong bonus. If the book's +3 point space is uncovered, also score 3 times this new token's multiplier (Act I/II/III: x1/x2/x3), then cover that space. A covered book gives NO printed book points. Also gain each older token's face-up reward: its bonus if strong, or 1/2/3 points by its Act if on its back. Then flip all tokens there to their backs. Only the new token can multiply the book's points; never multiply token rewards. Choose the order of token rewards."
+      "EVERY conflict takes 1 available token from the current Act pool on the main board. The winner places it on the book and gains its strong bonus. If the book's +3 point space is uncovered, also score 3 times this new token's multiplier (Act I/II/III: x1/x2/x3), then cover that space. A covered book gives NO printed book points. Also gain each older token's face-up reward: its bonus if strong, or 1/2/3 points by its Act if on its back. Then flip all tokens there to their backs. Only the new token can multiply the book's points; never multiply token rewards. Choose the order of token rewards. After each conflict, the winner draws the next book and publishes it in an empty hex-grid position touching at least 2 books. If they have supply, they place 1 Inkling in the overflow of an existing book touching the new book. Resolve this before ending the Act. If the stack is empty, skip publication and its bonus."
     ],
     [
       "Acts and victory",
@@ -513,7 +513,7 @@
     }
   ],
   "edition": "pnp-v15",
-  "rulesVersion": "mightier-0.1.0",
+  "rulesVersion": "mightier-0.2.0",
   "balance": {
     "supply": 4,
     "reserve": 3,

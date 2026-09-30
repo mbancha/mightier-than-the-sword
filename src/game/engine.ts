@@ -11,8 +11,17 @@ import {
   type Row,
 } from '../data/catalog';
 import { makeRng, shuffle, nextInt } from '../kernel/rng';
-import { bookOf, reachable, distance, pageSide } from './topology';
-import type { GameState, Job, Choice, Action, Character, Setup, Battle } from './types';
+import {
+  bookOf,
+  reachable,
+  distance,
+  pageSide,
+  pageNeighbors,
+  initialHexes,
+  publicationSites,
+  adjacentBooks,
+} from './topology';
+import type { GameState, Job, Choice, Action, Character, Setup, Battle, Book } from './types';
 export type { GameState, Action, Setup } from './types';
 type Option = Choice & { run: (s: GameState) => void };
 const job = (type: string, p: number, extra: Partial<Job> = {}): Job => ({ type, p, ...extra });
@@ -363,8 +372,8 @@ function options(s: GameState): Option[] {
     const from = c ? c.page : pl.page;
     const pages =
       j.type === 'setup' || j.mode === 'any'
-        ? Array.from({ length: 18 }, (_, i) => i)
-        : reachable(from, j.n ?? CONFIG.baseMove + pl.rows.curiosity);
+        ? Array.from({ length: s.books.length * 2 }, (_, i) => i)
+        : reachable(s.books, from, j.n ?? CONFIG.baseMove + pl.rows.curiosity);
     for (const page of pages)
       add(
         `page:${page}`,
@@ -376,12 +385,75 @@ function options(s: GameState): Option[] {
             cc.page = page;
             cc.other = null;
           } else s.players[p].page = page;
-          if (j.source === 'normal' && bookOf(page) !== bookOf(from)) progress(s, p, 'travel');
+          if (j.source === 'normal' && !j.travelled && bookOf(page) !== bookOf(from))
+            progress(s, p, 'travel');
         },
         'Move',
         { page },
       );
   }
+  if (j.type === 'move') {
+    const c = j.char === undefined ? null : s.characters.find((c) => c.id === j.char)!;
+    const from = c ? c.page : pl.page;
+    const remaining = j.n ?? CONFIG.baseMove + pl.rows.curiosity;
+    add('endMove', 'End move', done, 'Move');
+    if (j.mode !== 'any' && remaining > 0)
+      for (const page of pageNeighbors(s.books, from))
+        add(
+          `step:${page}`,
+          `Step to ${pageLabel(s, page)}`,
+          (state) => {
+            const pending = state.jobs[0];
+            pending.n = remaining - 1;
+            if (c) {
+              const cc = state.characters.find((x) => x.id === c.id)!;
+              cc.page = page;
+              cc.other = null;
+            } else state.players[p].page = page;
+            if (j.source === 'normal' && !j.travelled && bookOf(from) !== bookOf(page)) {
+              pending.travelled = true;
+              progress(state, p, 'travel');
+            }
+          },
+          'Step',
+          { page },
+        );
+  }
+  if (j.type === 'publish') {
+    const id = s.unpublished[0];
+    if (id !== undefined)
+      for (const site of publicationSites(s.books))
+        add(
+          `publish:${site.q}:${site.r}`,
+          `Publish ${books[id].title} at ${site.q}, ${site.r}`,
+          (state) => {
+            done(state);
+            state.unpublished.shift();
+            state.books.push(makeBook(id, site.q, site.r, state.players.length));
+            note(state, `${pl.name} publishes ${books[id].title}.`);
+            queue(state, job('publishOverflow', p, { book: state.books.length - 1 }));
+          },
+          'Publish',
+          {
+            ...site,
+            detail: 'Touches at least two books. Then place an Inkling in a neighboring overflow.',
+          },
+        );
+  }
+  if (j.type === 'publishOverflow' && pl.supply)
+    s.books.forEach((b, bi) => {
+      if (adjacentBooks(s.books[j.book!], b))
+        add(
+          `publishOverflow:${bi}`,
+          `Overflow at ${books[b.id].title}`,
+          (state) => {
+            done(state);
+            place(state, p, bi, null);
+          },
+          'Publication bonus',
+          { book: bi },
+        );
+    });
   if (j.type === 'turn') {
     if (!s.acted && pl.supply) {
       add(
@@ -535,9 +607,9 @@ function options(s: GameState): Option[] {
         { detail: content.horse[i][1] },
       );
   if (j.type === 'bridge')
-    for (let a = 0; a < 18; a++)
-      for (let b = a + 1; b < 18; b++)
-        if (bookOf(a) !== bookOf(b) && distance(a, b) === 1)
+    for (let a = 0; a < s.books.length * 2; a++)
+      for (let b = a + 1; b < s.books.length * 2; b++)
+        if (bookOf(a) !== bookOf(b) && distance(s.books, a, b) === 1)
           add(`bridge:${a}:${b}`, `${pageLabel(s, a)} ↔ ${pageLabel(s, b)}`, (s) => {
             done(s);
             const c = s.characters.find((c) => c.id === j.char)!;
@@ -950,7 +1022,7 @@ function pump(s: GameState) {
     }
     if (j.type === 'tokenRewards' && !j.remaining?.length) {
       s.jobs.shift();
-      queue(s, job('afterRewards', p));
+      queue(s, job('publish', p), job('afterRewards', p));
       continue;
     }
     if (j.type === 'afterRewards') {
@@ -1005,13 +1077,29 @@ export function applyAction(s: GameState, action: Action): string | null {
     return String(e);
   }
 }
+function makeBook(id: number, q: number, r: number, players: number): Book {
+  return {
+    id,
+    q,
+    r,
+    slots: books[id].page_slots.flatMap((n, side) =>
+      Array.from({ length: n }, () => ({ page: side, owner: null, memory: null })),
+    ),
+    overflow: Array(players).fill(0),
+    covered: false,
+    tokens: [],
+  };
+}
 export function newGame(setup: Setup): GameState {
   if (
     !Array.isArray(setup.names) ||
     setup.names.length < 2 ||
     setup.names.length > 4 ||
     setup.names.some((n) => typeof n !== 'string' || !n.trim() || n.length > 40) ||
-    !Number.isInteger(setup.seed)
+    !Number.isInteger(setup.seed) ||
+    (setup.controllers !== undefined &&
+      (setup.controllers.length !== setup.names.length ||
+        setup.controllers.some((c) => c !== 'human' && c !== 'bot')))
   )
     throw Error('Use 2–4 named players and an integer seed.');
   const rng = makeRng(setup.seed),
@@ -1024,7 +1112,8 @@ export function newGame(setup: Setup): GameState {
     version: content.rulesVersion,
     seed: setup.seed,
     rng,
-    players: setup.names.map((name) => ({
+    players: setup.names.map((name, i) => ({
+      controller: setup.controllers?.[i] ?? 'human',
       name,
       supply: CONFIG.supply,
       reserves: [0, CONFIG.reserve, CONFIG.reserve],
@@ -1040,15 +1129,10 @@ export function newGame(setup: Setup): GameState {
       horse: null,
       horseSpent: false,
     })),
-    books: ids.map((id) => ({
-      id,
-      slots: books[id].page_slots.flatMap((n, side) =>
-        Array.from({ length: n }, () => ({ page: side, owner: null, memory: null })),
-      ),
-      overflow: setup.names.map(() => 0),
-      covered: false,
-      tokens: [],
-    })),
+    books: ids
+      .slice(0, 3)
+      .map((id, i) => makeBook(id, initialHexes[i].q, initialHexes[i].r, setup.names.length)),
+    unpublished: ids.slice(3),
     characters: [],
     decks: {
       twist: shuffle(
@@ -1090,6 +1174,18 @@ export function newGame(setup: Setup): GameState {
   return s;
 }
 export function assertInvariants(s: GameState) {
+  const ids = [...s.books.map((b) => b.id), ...s.unpublished];
+  if (ids.length !== books.length || new Set(ids).size !== books.length)
+    throw Error('Book conservation');
+  if (new Set(s.books.map((b) => `${b.q},${b.r}`)).size !== s.books.length)
+    throw Error('Overlapping books');
+  for (const [i, b] of s.books.entries()) {
+    if (!Number.isInteger(b.q) || !Number.isInteger(b.r)) throw Error('Invalid book coordinate');
+    if (i >= 3 && s.books.slice(0, i).filter((x) => adjacentBooks(x, b)).length < 2)
+      throw Error('Unsupported book');
+  }
+  for (const p of s.players) if (!s.books[bookOf(p.page)]) throw Error('Figure off map');
+
   for (const [p, pl] of s.players.entries()) {
     const onBooks = s.books.reduce(
       (n, b) => n + b.slots.filter((x) => x.owner === p).length + b.overflow[p],

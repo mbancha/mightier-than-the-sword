@@ -1,6 +1,7 @@
 import type { Row } from '../data/catalog';
 import type { RngState } from '../kernel/rng';
 export interface Player {
+  controller: 'human' | 'bot';
   name: string;
   supply: number;
   reserves: number[];
@@ -27,6 +28,8 @@ export interface Slot {
 }
 export interface Book {
   id: number;
+  q: number;
+  r: number;
   slots: Slot[];
   overflow: number[];
   covered: boolean;
@@ -56,6 +59,7 @@ export interface Job {
   target?: number;
   optional?: boolean;
   remaining?: number[];
+  travelled?: boolean;
 }
 export interface Battle {
   book: number;
@@ -80,6 +84,7 @@ export interface GameState {
   rng: RngState;
   players: Player[];
   books: Book[];
+  unpublished: number[];
   characters: Character[];
   decks: { twist: number[]; subplot: number[]; character: number[] };
   discards: { twist: number[]; subplot: number[] };
@@ -103,8 +108,11 @@ export interface Choice extends Action {
   page?: number;
   book?: number;
   detail?: string;
+  q?: number;
+  r?: number;
 }
 export interface Setup {
   names: string[];
   seed: number;
+  controllers?: ('human' | 'bot')[];
 }

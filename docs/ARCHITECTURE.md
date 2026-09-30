@@ -8,8 +8,9 @@ the new engine follows its deterministic state/legality/replay patterns.
 
 - Card wording or routine numbers: `src/data/content.json` and `catalog.ts`.
 - Rules interaction: the named handler in `engine.ts`, then the relevant test.
-- Page adjacency: `topology.ts` only. Page IDs are `book position * 2 + side`.
-- Layout or action choices: `App.tsx` and `styles.css`.
+- Page adjacency: `topology.ts` only. Page IDs are `book insertion index * 2 + side`; axial coordinates are stored on each book. Publication appends rather than reorders.
+- Map camera, piece drag and piece menus: `TableMap.tsx`; player controls: `App.tsx`.
+- Basic opponent decisions: `game/bot.ts`, using only a player projection.
 - Save/undo: `session.ts`. Public/private boundaries: `views.ts`.
 - Print layout: `print/source/build.py`. Content is imported through `catalog.py`.
 
@@ -45,8 +46,21 @@ Horse choice, and legal choices. Handoffs unmount private cards and action lists
 This is screen privacy on one trusted device, not adversarial network security.
 Private save files and browser memory intentionally retain all information.
 
-## Change scope
+## Growing map and bots
 
-The initial UI is deliberately straightforward: named legal targets and a confirm
-step, with the board also filtering target choices. There are no bots, servers,
-accounts, analytics, external art requests, or cross-game imports.
+Three shuffled books start at axial coordinates (0,0), (1,0), (0,1). A publication
+site must be empty and touch at least two existing books. Page edges connect the
+right half of the left book to the left half of the right book; internal folds
+also cost one step. Shortest paths search the current map, never absent books.
+
+Movement supports a final destination action for bots/keyboard fallback and
+single-step actions for dragging. Remaining movement lives in the pending job;
+invalid drops do nothing. Publication and its neighboring-overflow bonus resolve
+after token rewards but before the last token advances the Act. Unpublished order
+is private; only the book currently being published is exposed.
+
+Bots rank legal choices from `playerView`, with deterministic variation keyed by
+decision number and public turn state. They do not inspect the full game state,
+opponent hands, or deck order. Their decisions enter the same action history as
+human decisions. A cancellable UI timer drives them; pause and undo stop the timer.
+The map camera and open menus remain presentation state and do not affect saves.

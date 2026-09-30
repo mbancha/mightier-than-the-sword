@@ -20,6 +20,8 @@ import {
 } from './game/session';
 import { currentPlayer, pageLabel } from './game/engine';
 import { publicView, playerView } from './game/views';
+import { TableMap } from './TableMap';
+import { chooseBotAction } from './game/bot';
 import type { Choice } from './game/types';
 
 const colors = content.players.map((p) => p.color);
@@ -27,6 +29,8 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
   return <img className="icon" src={`./icons/${name}.svg`} alt="" width={size} height={size} />;
 }
 const prompts: Record<string, string> = {
+  publish: 'Place the drawn book touching at least two books.',
+  publishOverflow: 'Place an Inkling in a neighboring book’s overflow.',
   setup: 'Choose a starting page for your protagonist.',
   move: 'Choose where to move. Staying is allowed.',
   turn: 'Take one action. You may also play one turn Twist.',
@@ -56,6 +60,10 @@ export default function App() {
   const [session, setSession] = useState<Session | null>(null),
     [names, setNames] = useState(['Teal', 'Amber', 'Rose', 'Violet']),
     [count, setCount] = useState(2),
+    [controllers, setControllers] = useState<('human' | 'bot')[]>(['human', 'bot', 'bot', 'bot']),
+    [botsPaused, setBotsPaused] = useState(false),
+    [botDelay, setBotDelay] = useState(650),
+    [contextMenu, setContextMenu] = useState<{ title: string; choices: Choice[] } | null>(null),
     [seed, setSeed] = useState(() => Math.floor(Date.now() % 1000000)),
     [revealed, setRevealed] = useState<number | null>(null),
     [spectator, setSpectator] = useState(false),
@@ -70,6 +78,7 @@ export default function App() {
   const state = session?.history.at(-1),
     actor = state ? currentPlayer(state) : null;
   useEffect(() => {
+    setContextMenu(null);
     setSelected(null);
     setGroup('All');
     setPageFilter(null);
@@ -78,9 +87,34 @@ export default function App() {
     setRevealed(null);
   }, [actor, spectator]);
   useEffect(() => {
+    if (
+      !session ||
+      !state ||
+      state.over ||
+      botsPaused ||
+      state.players[actor!].controller !== 'bot'
+    )
+      return;
+    const timer = setTimeout(() => {
+      try {
+        setSession(
+          advance(session, {
+            key: chooseBotAction(playerView(state, actor!), session.actions.length).key,
+          }),
+        );
+        setError('');
+      } catch (e) {
+        setError(String(e));
+        setBotsPaused(true);
+      }
+    }, botDelay);
+    return () => clearTimeout(timer);
+  }, [session, botsPaused, botDelay]);
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSelected(null);
+        setContextMenu(null);
         setPageFilter(null);
       }
     };
@@ -125,7 +159,16 @@ export default function App() {
     }
   }
   const publicData = state ? publicView(state) : null;
-  const view = state && revealed === actor && !spectator ? playerView(state, actor!) : null;
+  const humans = state?.players.flatMap((p, i) => (p.controller === 'human' ? [i] : [])) ?? [];
+  const singleHuman = humans.length === 1;
+  const viewer = singleHuman ? humans[0] : revealed;
+  const view =
+    state &&
+    !spectator &&
+    viewer !== null &&
+    (singleHuman || (viewer === actor && state.players[actor!].controller === 'human'))
+      ? playerView(state, viewer)
+      : null;
   const actions = view?.actions ?? [];
   const filtered = actions.filter(
     (a) =>
@@ -136,7 +179,7 @@ export default function App() {
     <>
       <header className="masthead">
         <div>
-          <div className="eyebrow">A shared story · digital playtest 0.1</div>
+          <div className="eyebrow">A shared story · digital playtest 0.2</div>
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
@@ -171,7 +214,7 @@ export default function App() {
           </p>
           <p>
             Playtest status: first automated build; designer validation and balance testing remain.
-            No online multiplayer or bots.
+            Basic bots are available; online multiplayer is not included.
           </p>
         </section>
       )}
@@ -239,8 +282,8 @@ export default function App() {
             <Icon name="protagonist" size={64} />
             <h2>Open a new chapter</h2>
             <p>
-              Move between pages, leave memories, enlist literary characters, and win conflicts
-              across nine books.
+              Move between pages, leave memories, enlist literary characters, and win conflicts on a
+              growing map of books.
             </p>
             <label>
               Players
@@ -262,6 +305,25 @@ export default function App() {
                 />
               </label>
             ))}
+            {names.slice(0, count).map((n, i) => (
+              <label key={'controller' + i}>
+                {n || `Player ${i + 1}`} controls
+                <select
+                  aria-label={`Player ${i + 1} controller`}
+                  value={controllers[i]}
+                  onChange={(e) =>
+                    setControllers(
+                      controllers.map((old, k) =>
+                        k === i ? (e.target.value as 'human' | 'bot') : old,
+                      ),
+                    )
+                  }
+                >
+                  <option value="human">Human</option>
+                  <option value="bot">Basic bot</option>
+                </select>
+              </label>
+            ))}
             <label>
               Shuffle seed
               <input type="number" value={seed} onChange={(e) => setSeed(+e.target.value)} />
@@ -270,7 +332,14 @@ export default function App() {
               className="primary"
               onClick={() => {
                 try {
-                  setSession(createSession({ names: names.slice(0, count), seed }));
+                  setBotsPaused(false);
+                  setSession(
+                    createSession({
+                      names: names.slice(0, count),
+                      seed,
+                      controllers: controllers.slice(0, count),
+                    }),
+                  );
                   setError('');
                 } catch (e) {
                   setError(String(e));
@@ -279,7 +348,7 @@ export default function App() {
             >
               Begin story
             </button>
-            <p className="muted">Hotseat · one device · private hands · undo and save</p>
+            <p className="muted">Play against bots or share the device · undo and save</p>
             {saved && (
               <button
                 onClick={() => {
@@ -326,12 +395,24 @@ export default function App() {
             <div>
               <button
                 onClick={() => {
+                  setBotsPaused(true);
                   setSession(undo(session));
                   setRevealed(null);
                 }}
                 disabled={session.history.length < 2}
               >
                 Undo
+              </button>
+              <select
+                aria-label="Bot speed"
+                value={botDelay}
+                onChange={(e) => setBotDelay(+e.target.value)}
+              >
+                <option value={650}>Normal bots</option>
+                <option value={150}>Fast bots</option>
+              </select>
+              <button onClick={() => setBotsPaused(!botsPaused)}>
+                {botsPaused ? 'Resume bots' : 'Pause bots'}
               </button>
               <button onClick={save}>Save locally</button>
               <button onClick={download}>Download private save</button>
@@ -365,6 +446,7 @@ export default function App() {
                 <h2>
                   <Icon name={content.players[i].icon} />
                   {p.name}
+                  {p.controller === 'bot' ? ' · bot' : ''}
                   {i === actor ? ' · choosing' : ''}
                 </h2>
                 <div className="resources">
@@ -372,10 +454,17 @@ export default function App() {
                     <Icon name="points" />
                     {p.points} points
                   </span>
-                  <span>
-                    <Icon name="inkling" />
-                    {p.supply} supply
-                  </span>
+                  <button
+                    className="supplyButton"
+                    aria-label={`${p.name} Inkling supply`}
+                    onClick={() => {
+                      const a = actions.find((a) => a.key === 'place');
+                      if (i === actor && a) dispatch(a);
+                      else setContextMenu({ title: 'Inkling supply', choices: [] });
+                    }}
+                  >
+                    <Icon name="inkling" /> {p.supply} supply
+                  </button>
                   <span>
                     II: {p.reserves[1]} · III: {p.reserves[2]}
                   </span>
@@ -383,10 +472,38 @@ export default function App() {
                 </div>
                 <div className="rows">
                   {ROWS.map((row) => (
-                    <span key={row} title={String(content.tracks[ROWS.indexOf(row)][4])}>
+                    <button
+                      className="memoryTrack"
+                      key={row}
+                      title={String(content.tracks[ROWS.indexOf(row)][4])}
+                      onClick={() => {
+                        if (i !== actor) return;
+                        const a = actions.find((a) => a.key === 'upgrade');
+                        if (a) {
+                          const next = advance(session!, { key: a.key });
+                          setSession(next);
+                          setTimeout(
+                            () =>
+                              setContextMenu({
+                                title: `Leave a ${rowName(row)} memory`,
+                                choices: playerView(next.history.at(-1)!, i).actions.filter((a) =>
+                                  a.key.endsWith(':' + row),
+                                ),
+                              }),
+                            0,
+                          );
+                        } else
+                          setContextMenu({
+                            title: rowName(row) + ' memory',
+                            choices: actions.filter(
+                              (a) => a.key.startsWith('upgrade:') && a.key.endsWith(':' + row),
+                            ),
+                          });
+                      }}
+                    >
                       <Icon name={row} />
                       {rowName(row)} {p.rows[row]}/3
-                    </span>
+                    </button>
                   ))}
                 </div>
                 <p className="muted">
@@ -425,6 +542,10 @@ export default function App() {
               </p>
               <p>Save this story to keep a replay for your next design session.</p>
             </section>
+          ) : state!.players[actor!].controller === 'bot' ? (
+            <section className="botStatus" role="status">
+              {publicData!.players[actor!].name} {botsPaused ? 'is paused.' : 'is thinking…'}
+            </section>
           ) : !view && !spectator ? (
             <section className="handoff">
               <h2>Pass to {publicData!.players[actor!].name}</h2>
@@ -435,150 +556,30 @@ export default function App() {
             </section>
           ) : null}
           <div className="table">
-            <section className="books" aria-label="Nine books">
-              {publicData!.books.map((b, bi) => {
-                const def = books[b.id];
-                return (
-                  <article
-                    key={bi}
-                    className={`book ${state!.battle?.book === bi ? 'fighting' : ''}`}
-                    data-genre={def.genre}
-                  >
-                    <div className="bookTitle">
-                      <div>
-                        <span className="eyebrow">{def.genre}</span>
-                        <h3>{def.title}</h3>
-                        <em>{def.where}</em>
-                      </div>
-                      <div className="vpSpace">
-                        <Icon name="points" />
-                        {b.covered ? 'Covered' : '+3'}
-                        <small>{b.covered ? 'No book points' : '× new token'}</small>
-                      </div>
-                    </div>
-                    <p className="bookEffect">
-                      <Icon
-                        name={def.timing.includes('CONFLICT') ? 'conflict' : 'ongoing'}
-                        size={17}
-                      />
-                      <b>{def.timing.toLowerCase()}</b> · {def.effect}
-                    </p>
-                    <div className="pages">
-                      {[0, 1].map((side) => {
-                        const page = bi * 2 + side;
-                        return (
-                          <div
-                            className={`page ${pageFilter === page ? 'selected' : ''}`}
-                            key={side}
-                          >
-                            <button
-                              className="pageLabel"
-                              disabled={!view}
-                              onClick={() => {
-                                setPageFilter(page);
-                                setGroup('All');
-                              }}
-                            >
-                              {side === 0 ? 'Left' : 'Right'} page
-                              {actions.some((a) => a.page === page) ? ' · choose' : ''}
-                            </button>
-                            <div className="figures">
-                              {publicData!.players.map((p, i) =>
-                                p.page === page ? (
-                                  <span
-                                    key={'p' + i}
-                                    className="figure"
-                                    style={{ borderColor: colors[i] }}
-                                    title={p.name}
-                                  >
-                                    <Icon name="protagonist" />
-                                    {p.name}
-                                  </span>
-                                ) : null,
-                              )}
-                              {publicData!.characters
-                                .filter((c) => c.page === page || c.other === page)
-                                .map((c) => (
-                                  <span
-                                    className="figure"
-                                    key={'c' + c.id}
-                                    style={{ borderColor: colors[c.owner] }}
-                                  >
-                                    {characters[c.id].name}
-                                  </span>
-                                ))}
-                            </div>
-                            <div className="slots">
-                              {b.slots.map((spot, k) =>
-                                spot.page === side ? (
-                                  <div
-                                    className="slot"
-                                    key={k}
-                                    title={`Space ${k + 1}${spot.memory ? ' · ' + rowName(spot.memory.row) + ' memory from ' + publicData!.players[spot.memory.owner].name : ''}`}
-                                  >
-                                    <small>{k + 1}</small>
-                                    {spot.memory && (
-                                      <span
-                                        className="memory"
-                                        style={{ borderColor: colors[spot.memory.owner] }}
-                                      >
-                                        <Icon name={spot.memory.row} />
-                                      </span>
-                                    )}
-                                    {spot.owner !== null && (
-                                      <span
-                                        className="piece"
-                                        style={{ background: colors[spot.owner] }}
-                                        aria-label={`${publicData!.players[spot.owner].name}'s Inkling`}
-                                      >
-                                        {spot.owner + 1}
-                                      </span>
-                                    )}
-                                  </div>
-                                ) : null,
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className="overflow">
-                      <b>{b.id === 0 ? 'No overflow' : 'Shared overflow'}</b>
-                      {b.overflow.map((n, p) =>
-                        n ? (
-                          <span key={p} style={{ color: colors[p] }}>
-                            {publicData!.players[p].name}: {n}
-                          </span>
-                        ) : null,
-                      )}
-                    </div>
-                    <div className="bookTokens">
-                      {b.tokens.map((t) => (
-                        <span
-                          key={t.id}
-                          title={t.strong ? tokens[t.id].text : `${tokens[t.id].act} plot points`}
-                        >
-                          Act {tokens[t.id].act} · {tokens[t.id].name} ·{' '}
-                          {t.strong ? 'strong' : `${tokens[t.id].act} PP`}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
-                );
-              })}
-            </section>
+            <TableMap
+              data={publicData!}
+              view={view && viewer === actor ? view : null}
+              onAction={dispatch}
+            />
             <aside className="actionPanel">
               <section>
                 <h2>Available conflict tokens</h2>
                 <div className="tokenPool">
                   {state!.pools[state!.act - 1].map((id) => (
-                    <div key={id}>
+                    <button
+                      key={id}
+                      className="poolToken"
+                      onClick={() => {
+                        const a = actions.find((a) => a.key === `token:${id}`);
+                        setContextMenu({ title: tokens[id].name, choices: a ? [a] : [] });
+                      }}
+                    >
                       <b>{tokens[id].name}</b>
                       <p>{tokens[id].text}</p>
                       <small>
                         Act {tokens[id].act} · ×{tokens[id].act}
                       </small>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </section>
@@ -594,47 +595,74 @@ export default function App() {
               )}
               {view && !state!.over && (
                 <section className="choices" aria-live="polite">
-                  <div className="eyebrow">{publicData!.players[actor!].name}'s choice</div>
-                  <h2>{prompts[view.prompt] ?? 'Resolve the next effect.'}</h2>
-                  <div className="filters">
-                    {['All', ...new Set(actions.map((a) => a.group))].map((g) => (
-                      <button
-                        key={g}
-                        className={g === group ? 'chosen' : ''}
-                        onClick={() => {
-                          setGroup(g);
-                          setSelected(null);
-                        }}
-                      >
-                        {g}
-                      </button>
-                    ))}
+                  <div className="eyebrow">{publicData!.players[viewer!].name}'s choice</div>
+                  <h2>
+                    {viewer === actor
+                      ? (prompts[view.prompt] ?? 'Resolve the next effect.')
+                      : 'Waiting for the other player.'}
+                  </h2>
+                  <div className="quickChoices">
+                    {actions
+                      .filter((a) =>
+                        [
+                          'skip',
+                          'pass',
+                          'finish',
+                          'endMove',
+                          'collect',
+                          'foreshadow',
+                          'character',
+                          'alternative',
+                        ].includes(a.key),
+                      )
+                      .map((a) => (
+                        <button key={a.key} onClick={() => dispatch(a)}>
+                          {a.label}
+                        </button>
+                      ))}
                   </div>
-                  {pageFilter !== null && (
-                    <button onClick={() => setPageFilter(null)}>Show all locations ×</button>
-                  )}
-                  {selected ? (
-                    <div className="confirmation">
-                      <h3>{selected.label}</h3>
-                      <p>{selected.detail}</p>
-                      <button className="primary" onClick={() => dispatch(selected)}>
-                        Confirm choice
-                      </button>
-                      <button onClick={() => setSelected(null)}>Cancel</button>
-                    </div>
-                  ) : (
-                    <div className="actionList">
-                      {filtered.length === 0 && (
-                        <p>No choices here. Select “Show all locations” to continue.</p>
-                      )}
-                      {filtered.map((a) => (
-                        <button key={a.key} onClick={() => setSelected(a)}>
-                          <b>{a.label}</b>
-                          {a.detail && <small>{a.detail}</small>}
+                  <details className="fallbackActions">
+                    <summary>All legal actions</summary>
+                    <div className="filters">
+                      {['All', ...new Set(actions.map((a) => a.group))].map((g) => (
+                        <button
+                          key={g}
+                          className={g === group ? 'chosen' : ''}
+                          onClick={() => {
+                            setGroup(g);
+                            setSelected(null);
+                          }}
+                        >
+                          {g}
                         </button>
                       ))}
                     </div>
-                  )}
+                    {pageFilter !== null && (
+                      <button onClick={() => setPageFilter(null)}>Show all locations ×</button>
+                    )}
+                    {selected ? (
+                      <div className="confirmation">
+                        <h3>{selected.label}</h3>
+                        <p>{selected.detail}</p>
+                        <button className="primary" onClick={() => dispatch(selected)}>
+                          Confirm choice
+                        </button>
+                        <button onClick={() => setSelected(null)}>Cancel</button>
+                      </div>
+                    ) : (
+                      <div className="actionList">
+                        {filtered.length === 0 && (
+                          <p>No choices here. Select “Show all locations” to continue.</p>
+                        )}
+                        {filtered.map((a) => (
+                          <button key={a.key} onClick={() => setSelected(a)}>
+                            <b>{a.label}</b>
+                            {a.detail && <small>{a.detail}</small>}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </details>
                 </section>
               )}
               {view && (
@@ -642,18 +670,31 @@ export default function App() {
                   <h2>Your Twists</h2>
                   {view.hand.length === 0 && <p>No Twists in hand.</p>}
                   {view.hand.map((id) => (
-                    <article key={id} className="handCard">
+                    <button
+                      key={id}
+                      className="handCard"
+                      onClick={() =>
+                        setContextMenu({
+                          title: twists[id].name,
+                          choices: actions.filter((a) =>
+                            ['twist:', 'discard:', 'boost:', 'cycle:'].some(
+                              (prefix) => a.key === prefix + id,
+                            ),
+                          ),
+                        })
+                      }
+                    >
                       <span className="eyebrow">{twists[id].timing}</span>
                       <h3>{twists[id].name}</h3>
                       <p>{twists[id].text}</p>
-                    </article>
+                    </button>
                   ))}
                   {view.horse !== null && (
                     <article className="handCard">
                       <h3>Hidden Horse power</h3>
                       <p>
                         {content.horse[view.horse][0]} ·{' '}
-                        {publicData!.players[actor!].horseSpent ? 'spent this Act' : 'ready'}
+                        {publicData!.players[viewer!].horseSpent ? 'spent this Act' : 'ready'}
                       </p>
                     </article>
                   )}
@@ -677,12 +718,19 @@ export default function App() {
                   <h3>{characters[c.id].name}</h3>
                   <p className="muted">{pageLabel(state!, c.page)}</p>
                   {characters[c.id].actions.map(([max, t], i) => (
-                    <p key={i}>
+                    <button
+                      key={i}
+                      className="characterActivation"
+                      onClick={() => {
+                        const a = actions.find((a) => a.key === `activate:${c.id}:${i}`);
+                        setContextMenu({ title: characters[c.id].name, choices: a ? [a] : [] });
+                      }}
+                    >
                       <b>
                         {c.used[i]}/{max} occupied
                       </b>{' '}
                       · {t}
-                    </p>
+                    </button>
                   ))}
                   {characters[c.id].collection > 0 && <p>Collected Inklings: {c.collected}/3</p>}
                   {characters[c.id].passive && <p>{characters[c.id].passive![1]}</p>}
@@ -703,6 +751,29 @@ export default function App() {
           </details>
         </main>
       )}
+      {contextMenu && (
+        <div className="contextBackdrop" onClick={() => setContextMenu(null)}>
+          <section
+            className="pieceDialog"
+            role="dialog"
+            aria-label={contextMenu.title}
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button aria-label="Close menu" onClick={() => setContextMenu(null)}>
+              ×
+            </button>
+            <h2>{contextMenu.title}</h2>
+            {contextMenu.choices.map((a) => (
+              <button key={a.key} onClick={() => dispatch(a)}>
+                <b>{a.label}</b>
+                <small>{a.detail}</small>
+              </button>
+            ))}
+            {!contextMenu.choices.length && <p>No action available here right now.</p>}
+          </section>
+        </div>
+      )}
       <input
         hidden
         type="file"
@@ -720,8 +791,8 @@ export default function App() {
         }}
       />
       <footer>
-        Shared design workspace · source edition v15 · local hotseat privacy protects the screen,
-        not the device’s stored data.
+        Shared design workspace · v15 components · growing-map rules 0.2 · local hotseat privacy
+        protects the screen, not the device’s stored data.
       </footer>
     </>
   );

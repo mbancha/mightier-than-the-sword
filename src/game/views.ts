@@ -5,6 +5,7 @@ export function publicView(s: GameState) {
   return {
     players: s.players.map((p) => ({
       name: p.name,
+      controller: p.controller,
       supply: p.supply,
       reserves: [...p.reserves],
       out: p.out,
@@ -18,6 +19,8 @@ export function publicView(s: GameState) {
       horseSpent: p.horseSpent,
     })),
     books: structuredClone(s.books),
+    unpublishedCount: s.unpublished.length,
+    publishing: s.jobs[0]?.type === 'publish' ? (s.unpublished[0] ?? null) : null,
     characters: structuredClone(s.characters),
     pools: structuredClone(s.pools),
     act: s.act,
@@ -48,5 +51,13 @@ export function playerView(s: GameState, p: number) {
     horse: s.players[p].horse,
     actions: currentPlayer(s) === p ? legalActions(s) : [],
     prompt: s.jobs[0]?.type ?? 'over',
+    moving:
+      s.jobs[0]?.type === 'move'
+        ? {
+            character: s.jobs[0].char ?? null,
+            remaining:
+              s.jobs[0].mode === 'any' ? null : (s.jobs[0].n ?? 1 + s.players[p].rows.curiosity),
+          }
+        : null,
   };
 }

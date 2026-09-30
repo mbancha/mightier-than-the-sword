@@ -32,3 +32,11 @@ array positions are the stable IDs for this initial release.
   seeded RNG are directly copied; architecture conventions were followed.
 - npm packages: retain upstream licenses. Repository remains private; no new
   open-source or commercial-use license is asserted.
+
+## Digital revision 0.2
+
+Latest designer instructions supersede the v15 setup: only three books initially,
+hex-grid publication after conflicts, edge-by-edge movement, optional bot seats,
+and tactile piece interactions. Component counts and card text are unchanged.
+The shared rules catalog and generated current PDF include this revision; the
+approved v15 snapshot remains an immutable historical reference.

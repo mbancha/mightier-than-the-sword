@@ -46,6 +46,23 @@ This file is for decisions, not a transcript. Date: 2026-09-29.
 ## Scope boundaries
 
 The game is automated for the imported set; tests and first browser journeys are
-not a designer sign-off. No network multiplayer, opponent AI, matchmaking, public
-hosting or published balance claims. Bots/simulations used in tests select legal
-actions for exercising code; they are not strategic balance evidence.
+not a designer sign-off. No network multiplayer, matchmaking, public
+hosting or published balance claims. Basic bots are now playable opponents; their heuristics and simulations are not strategic balance evidence.
+
+## Growing-map revision (designer confirmed)
+
+- Start with three random books: two in the top row, one centered underneath.
+  All book positions follow a hexagonal grid; orientations remain horizontal.
+- After every conflict, the winner draws the next random book, chooses an empty
+  site adjacent to at least two books, and places one supply Inkling in an
+  existing neighboring book's overflow. This includes the last conflict of an Act.
+- Crossing a touching page edge or the internal fold costs one movement point.
+  Normal movement can stop early; a legal drag uses a single step at a time.
+- Each seat can be human or a basic bot. Bots must use only their own private view.
+
+Provisional edge cases: shuffle all nine books together (no genre quota); when
+all books are published, skip publication and its bonus. No supply means no
+publication Inkling. Choosing submarine overflow erases that Inkling normally.
+Shoot-the-moon awards no publication because it is not a conflict. Publish after
+token rewards, before other full books or an Act transition. Travel Subplots count
+at most one new-book travel event per normal movement, even with several steps.

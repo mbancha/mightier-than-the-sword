@@ -1,14 +1,13 @@
 # Mightier than the Sword
 
 A shared workspace for the game design, printable prototype, and an automated
-2–4 player hotseat prototype. Current source: **printable edition v15**.
+2–4 player prototype with human and basic-bot seats. Current source: **v15 components with growing-map rules 0.2**.
 
 The first build includes all nine books, fifteen Twists, ten incremental Subplots,
 ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
 movement, memories, conflicts, Acts, card effects, private-hand handoffs, undo,
 local saves, and portable private replays. It is ready for designer testing;
-rules fidelity and balance still need human playtesting. No remote multiplayer
-or bots are included. See [known rulings](docs/DECISIONS.md).
+rules fidelity and balance still need human playtesting. No remote multiplayer is included. Basic bots can fill any seat. See [known rulings](docs/DECISIONS.md).
 
 ## Run it
 
@@ -28,6 +27,21 @@ a replay another designer can load. It contains all hands, hidden powers, and th
 shuffle seed; do not share it with opponents during a game. Undo rewinds state,
 but cannot undo knowledge. A save requires the same content/rules edition.
 
+## Playing at the table
+
+Choose Human or Basic bot for each seat (the default is you versus one bot).
+Click a starting page. Click your quill-and-inkwell to highlight adjacent pages,
+then drag it or click a highlighted page. Each step uses one move; click the
+figure again and choose **End move** when finished. Its menu offers your turn
+choices. Click an empty space to place an Inkling, a memory row to upgrade, a
+character activation space to use it, or a card in your hand to play it.
+
+Drag the empty map background to pan. Use the wheel or +/− to zoom; **Fit map**
+frames the books. After a win, click a dashed publishing position, then a touching
+book's overflow. **All legal actions** remains available for unusual card choices
+and keyboard use. Bots can be paused or sped up; undo pauses bots for inspection.
+Saves preserve seat controllers. Old 0.1 saves require their matching release.
+
 ## Start a design session
 
 1. Get the latest `main`, then create a branch for your change.
@@ -44,10 +58,10 @@ conversation or the other board-game projects. See [the editing guide](docs/EDIT
 | --- | --- |
 | `src/data/content.json` | Shared component text, rule text, balance, token/Subplot effects |
 | `src/game/engine.ts` | Turn flow, legality, choices, card interactions and scoring |
-| `src/game/topology.ts` | The 18-page movement graph |
+| `src/game/topology.ts` | Growing hex layout and page-edge adjacency |
 | `src/game/session.ts` | Save/load, replay and undo |
 | `src/game/views.ts` | Public and private information boundaries |
-| `src/App.tsx`, `src/styles.css` | Table, player boards and interaction |
+| `src/App.tsx`, `src/TableMap.tsx`, `src/styles.css` | Table, player boards and interaction |
 | `public/icons/` | Original reusable vector icons |
 | `print/source/` | Printable generator, reading the same catalog |
 | `print/outputs/` | Approved v15 PDF and latest generated edition |

@@ -2,11 +2,15 @@
   "id": "mightier-than-the-sword",
   "title": "Mightier than the Sword",
   "sourceEdition": "pnp-v15",
-  "rulesVersion": "mightier-0.1.0",
+  "rulesVersion": "mightier-0.2.0",
   "currentMaturity": "human playable",
   "targetMaturity": "playtest release",
-  "players": [2, 3, 4],
-  "mode": "local-hotseat",
+  "players": [
+    2,
+    3,
+    4
+  ],
+  "mode": "local-hotseat-and-bots",
   "expectedComponents": {
     "books": 9,
     "twists": 15,
@@ -20,7 +24,7 @@
     "Designer validation of rule fidelity and the recorded provisional rulings",
     "An unfamiliar human playthrough",
     "Balance testing beyond legal-action smoke simulations",
-    "Remote multiplayer and bots are outside the initial scope",
+    "Remote multiplayer is outside current scope",
     "Public hosting is not enabled"
   ],
   "commands": {

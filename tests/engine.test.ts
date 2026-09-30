@@ -10,7 +10,7 @@ import {
 import { createSession, advance, undo, exportSession, importSession } from '../src/game/session';
 import { publicView, playerView } from '../src/game/views';
 import { content, books, characters, twists, subplots, tokens, ROWS } from '../src/data/catalog';
-import { distance } from '../src/game/topology';
+import { distance, initialHexes } from '../src/game/topology';
 import { makeRng, nextInt } from '../src/kernel/rng';
 import type { GameState, Job } from '../src/game/types';
 const fresh = (seed = 17, n = 2) =>
@@ -22,6 +22,17 @@ const act = (s: GameState, key: string) => {
 const put = (s: GameState, p: number, b: number, k: number) => {
   s.players[p].supply--;
   s.books[b].slots[k].owner = p;
+};
+const ensureBook = (s: GameState, id: number) => {
+  const existing = s.books.findIndex((b) => b.id === id);
+  if (existing >= 0) return existing;
+  const old = s.books[0].id;
+  s.unpublished[s.unpublished.indexOf(id)] = old;
+  s.books[0].id = id;
+  s.books[0].slots = books[id].page_slots.flatMap((n, page) =>
+    Array.from({ length: n }, () => ({ page, owner: null, memory: null })),
+  );
+  return 0;
 };
 const give = (s: GameState, p: number, id: number) => {
   s.decks.character = s.decks.character.filter((x) => x !== id);
@@ -61,10 +72,12 @@ describe('Current source and topology', () => {
     }
   });
   it('connects page folds and adjoining books without row wrapping', () => {
-    expect(distance(0, 1)).toBe(1);
-    expect(distance(1, 2)).toBe(1);
-    expect(distance(5, 6)).toBe(6);
-    expect(distance(0, 6)).toBe(1);
+    expect(distance(initialHexes, 0, 1)).toBe(1);
+    expect(distance(initialHexes, 1, 2)).toBe(1);
+    expect(distance(initialHexes, 1, 4)).toBe(1);
+    expect(distance(initialHexes, 2, 5)).toBe(1);
+    expect(distance(initialHexes, 0, 4)).toBe(2);
+    expect(distance(initialHexes, 0, 6)).toBe(Infinity);
   });
 });
 describe('Determinism, privacy and resource accounting', () => {
@@ -169,7 +182,7 @@ describe('Memories and Inklings', () => {
   });
   it('drowns overflow in the submarine without losing an Inkling', () => {
     const s = fresh(),
-      b = s.books.findIndex((b) => b.id === 0);
+      b = ensureBook(s, 0);
     only(s, { type: 'place', p: 0, book: b, mode: 'overflow', n: 1 });
     act(s, 'place:null');
     expect(s.players[0].supply).toBe(4);
@@ -177,7 +190,7 @@ describe('Memories and Inklings', () => {
   });
   it('requires all slots across both pages before conflict', () => {
     const s = fresh(),
-      b = s.books.findIndex((b) => b.id === 5);
+      b = ensureBook(s, 5);
     put(s, 0, b, 0);
     expect(fullBooks(s)).not.toContain(b);
     put(s, 0, b, 1);
@@ -265,7 +278,7 @@ describe('Conflict tokens and Acts', () => {
   });
   it('cleans all book Inklings but leaves characters and memories in place', () => {
     const s = fresh(),
-      b = s.books.findIndex((b) => b.id === 5);
+      b = ensureBook(s, 5);
     s.players[0].page = b * 2;
     s.players[1].page = b * 2 + 1;
     give(s, 0, 3);
@@ -321,6 +334,9 @@ describe('Conflict tokens and Acts', () => {
     act(s, 'token:1');
     expect(s.act).toBe(1);
     act(s, 'reward:1');
+    expect(s.jobs[0].type).toBe('publish');
+    act(s, legalActions(s)[0].key);
+    act(s, legalActions(s)[0].key);
     expect(s.act).toBe(2);
     expect(s.books[0].covered).toBe(false);
     expect(s.books[0].tokens[0].strong).toBe(true);

@@ -12,46 +12,94 @@ const browser = await chromium.launch({
 const errors = [];
 let report = {};
 try {
-  const context = await browser.newContext({ viewport: { width: 1600, height: 1050 } });
-  const page = await context.newPage();
+  const context = await browser.newContext({ viewport: { width: 1600, height: 1100 } }),
+    page = await context.newPage();
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {
     if (m.type() === 'error') errors.push(m.text());
   });
   await page.goto('http://127.0.0.1:4178');
   await page.getByLabel('Shuffle seed').fill('29');
+  await page.getByLabel('Player 2 controller').selectOption('human');
   await page.screenshot({ path: 'artifacts/setup-desktop.png', fullPage: true });
   await page.getByRole('button', { name: 'Begin story', exact: true }).click();
   async function reveal() {
-    const button = page.getByRole('button', { name: /reveal my hand/ });
-    if (await button.count()) await button.click();
+    const b = page.getByRole('button', { name: /reveal my hand/ });
+    if (await b.count()) await b.click();
   }
-  async function choose(label) {
+  async function allActions() {
     await reveal();
-    const loc = label
-      ? page.locator('.actionList button').filter({ hasText: label }).first()
-      : page.locator('.actionList button').first();
-    await loc.click();
+    const d = page.locator('.fallbackActions');
+    if ((await d.count()) && (await d.getAttribute('open')) === null)
+      await d.locator('summary').click();
+  }
+  async function choose(index = 0) {
+    await allActions();
+    await page.locator('.actionList button').nth(index).click();
     await page.getByRole('button', { name: 'Confirm choice', exact: true }).click();
   }
-  // Two setup decisions, then ordinary movement; everything uses visible controls.
   await choose();
   await choose();
   await reveal();
-  await page.locator('.actionList button').first().click();
-  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  assert.equal(await page.locator('.confirmation').count(), 0);
-  await choose();
-  await choose('Place Inklings');
-  await choose();
+  assert.equal(await page.locator('.mapBook').count(), 3);
+  const coords = await page
+    .locator('.mapBook')
+    .evaluateAll((es) =>
+      es.map((e) => ({ x: parseFloat(e.style.left), y: parseFloat(e.style.top) })),
+    );
+  assert.equal(coords[0].y, coords[1].y);
+  assert.equal(coords[2].x, (coords[0].x + coords[1].x) / 2);
+  assert.ok(coords[2].y > coords[0].y);
+  // Actual pointer drag of the protagonist, then its contextual end-move menu.
+  let figure = page.getByRole('button', { name: 'Teal protagonist', exact: true });
+  await figure.click();
+  assert.ok((await page.locator('.legalPage').count()) > 0);
+  await page.getByRole('button', { name: 'Close piece menu' }).click();
+  const src = await figure.boundingBox(),
+    target = await page.locator('[data-page="1"] .pageLabel').boundingBox();
+  await page.mouse.move(src.x + src.width / 2, src.y + src.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 12 });
+  await page.mouse.up();
+  assert.equal(
+    await page
+      .locator('[data-page="1"]')
+      .getByRole('button', { name: 'Teal protagonist', exact: true })
+      .count(),
+    1,
+  );
+  await figure.click();
+  await page.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
+  await figure.click();
+  await page
+    .locator('.mapPopup')
+    .getByRole('button', { name: 'Place Inklings', exact: true })
+    .click();
+  await page.locator('.legalSlot.slot').first().click();
+  assert.equal(await page.locator('.mapBook .piece').count(), 1);
+  // Zoom and pan affect the camera, not game state.
+  const oldZoom = await page.getByLabel('Map zoom').innerText();
+  await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+  assert.notEqual(await page.getByLabel('Map zoom').innerText(), oldZoom);
+  const box = await page.locator('.mapViewport').boundingBox(),
+    before = await page.locator('.mapCanvas').getAttribute('style');
+  await page.mouse.move(box.x + 8, box.y + 8);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 75, box.y + 60, { steps: 6 });
+  await page.mouse.up();
+  assert.notEqual(await page.locator('.mapCanvas').getAttribute('style'), before);
+  await page.getByRole('button', { name: 'Fit map', exact: true }).click();
   await page.screenshot({ path: 'artifacts/table-desktop.png', fullPage: true });
   await page.getByRole('button', { name: 'Save locally', exact: true }).click();
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await reveal();
-  await choose(); // replace the undone Inkling
+  await page.locator('.legalSlot.slot').first().click();
+  // Card actions originate from the card itself, including non-playable cards.
+  await page.locator('.handCard').first().click();
+  assert.equal(await page.locator('.pieceDialog').count(), 1);
+  await page.getByRole('button', { name: 'Close menu', exact: true }).click();
   await page.getByRole('button', { name: 'Spectator view', exact: true }).click();
   assert.equal(await page.locator('.hand').count(), 0);
-  assert.equal(await page.locator('.actionList').count(), 0);
   await page.getByRole('button', { name: 'Return to players', exact: true }).click();
   await reveal();
   const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
@@ -62,77 +110,119 @@ try {
   }));
   await page.setViewportSize({ width: 820, height: 1180 });
   await page.screenshot({ path: 'artifacts/table-tablet.png', fullPage: true });
-  assert.ok(
-    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
-    'Tablet horizontal overflow',
-  );
-  await page.setViewportSize({ width: 1600, height: 1050 });
-  let choices = 0;
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  await page.setViewportSize({ width: 1600, height: 1100 });
+  let choices = 0,
+    published = false;
   while (
-    (await page.getByRole('heading', { name: 'Fin', exact: true }).count()) === 0 &&
-    choices++ < 650
+    !(await page.getByRole('heading', { name: 'Fin', exact: true }).count()) &&
+    choices++ < 900
   ) {
-    await reveal();
-    // Prefer ordinary placements and passing to run a whole game deterministically.
-    const list = page.locator('.actionList button');
-    const texts = await list.allTextContents();
+    await allActions();
+    const list = page.locator('.actionList button'),
+      texts = await list.allTextContents();
     let index = -1;
-    if ((await page.locator('.choices h2').innerText()).startsWith('Choose where')) {
-      const firstBook = page.locator('.book').first();
-      const title = await firstBook.locator('h3').innerText();
-      const sides = firstBook.locator('.page');
+    const prompt = await page.locator('.choices h2').innerText();
+    if (prompt.startsWith('Choose where')) {
+      const book = page.locator('.mapBook').first(),
+        title = await book.locator('h3').innerText();
       for (let side = 0; side < 2; side++) {
-        const empty =
-          (await sides.nth(side).locator('.slot').count()) -
-          (await sides.nth(side).locator('.piece').count());
-        if (empty) {
+        const slots = book.locator('.page').nth(side).locator('.slot');
+        if (
+          (await slots.count()) > (await book.locator('.page').nth(side).locator('.piece').count())
+        ) {
           index = texts.findIndex(
-            (t) => t.includes(title) && t.includes(side === 0 ? 'left' : 'right'),
+            (t) =>
+              !t.startsWith('Step') && t.includes(title) && t.includes(side ? 'right' : 'left'),
           );
           if (index >= 0) break;
         }
       }
+      if (index < 0) index = texts.findIndex((t) => t.startsWith('Stay'));
+    }
+    if (prompt.startsWith('Place the drawn book')) {
+      await page.getByTestId('publish-site').first().click();
+      published = true;
+      continue;
+    }
+    if (prompt.startsWith('Place an Inkling in a neighboring')) {
+      await page.locator('.overflow.legalSlot').first().click();
+      continue;
     }
     if (index < 0) index = texts.findIndex((t) => t === 'Resolve full books and end turn');
     if (index < 0) index = texts.findIndex((t) => t === 'Place Inklings');
     if (index < 0) index = texts.findIndex((t) => t === 'Pass on a Twist');
-    if (
-      index < 0 &&
-      (await page.locator('.choices h2').innerText()).startsWith('Choose an Inkling to erase')
-    )
+    if (index < 0 && prompt.startsWith('Choose an Inkling to erase'))
       index = texts.findIndex((t) => t === 'Skip this optional effect');
     if (index < 0)
       index = texts.findIndex(
         (t) => t.includes('Complete Subplot') && t.includes('draw a character'),
       );
-    if (index < 0) index = 0;
-    assert.ok(texts.length, 'No visible legal choices');
-    await list.nth(index).click();
-    await page.getByRole('button', { name: 'Confirm choice', exact: true }).click();
+    assert.ok(texts.length, `No legal choices: ${prompt}`);
+    await choose(Math.max(0, index));
   }
-  assert.ok(choices < 650, 'Whole-game browser journey did not finish');
+  assert.ok(choices < 900);
+  assert.ok(published, 'Conflict should publish a new book');
   await page.screenshot({ path: 'artifacts/result-desktop.png', fullPage: true });
   await page.locator('.log summary').click();
   const log = await page.locator('.log').innerText();
-  assert.match(
-    log,
-    /Conflict at/,
-    'Must exercise an actual conflict, not only shoot-the-moon endings',
-  );
   report = {
     ...report,
     choices,
-    result: await page.locator('.ending').innerText(),
     conflicts: (log.match(/Conflict at/g) || []).length,
-    errors,
+    books: await page.locator('.mapBook').count(),
+    result: await page.locator('.ending').innerText(),
   };
-  assert.deepEqual(errors, [], 'Browser errors');
+  // Independent real bot game: leave one human; bots proceed with private cards hidden.
+  const botPage = await context.newPage();
+  await botPage.goto('http://127.0.0.1:4178');
+  await botPage.getByLabel('Shuffle seed').fill('14');
+  await botPage.getByRole('button', { name: 'Begin story', exact: true }).click();
+  await botPage.getByLabel('Bot speed').selectOption('150');
+  await botPage.locator('[data-page="0"] .pageLabel').click();
+  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).waitFor();
+  await botPage.waitForFunction(() => !document.querySelector('.botStatus'));
+  assert.equal(await botPage.locator('.handoff').count(), 0);
+  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
+  await botPage.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
+  await botPage.getByRole('button', { name: 'Teal Inkling supply', exact: true }).click();
+  await botPage.locator('.legalSlot.slot').first().click();
+  await botPage
+    .locator('.quickChoices')
+    .getByRole('button', { name: 'Resolve full books and end turn', exact: true })
+    .click();
+  await botPage.waitForFunction(() =>
+    document.querySelector('.toolbar strong')?.textContent.includes('Turn 3'),
+  );
+  assert.equal(await botPage.locator('.hand').count(), 1);
+  assert.equal(await botPage.locator('.handoff').count(), 0);
+  await botPage.getByRole('button', { name: 'Pause bots', exact: true }).click();
+  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
+  await botPage.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
+  await botPage
+    .locator('.player')
+    .first()
+    .getByRole('button', { name: 'Valor 0/3', exact: true })
+    .click();
+  await botPage.locator('.pieceDialog button').filter({ hasText: 'Valor memory' }).first().click();
+  assert.equal(
+    await botPage
+      .locator('.player')
+      .first()
+      .getByRole('button', { name: 'Valor 1/3', exact: true })
+      .count(),
+    1,
+  );
+  assert.equal(await botPage.locator('.mapBook .memory').count(), 1);
+  await botPage.screenshot({ path: 'artifacts/bot-game.png', fullPage: true });
+  report.botTurn = true;
+  report.memoryClick = true;
+  assert.deepEqual(errors, []);
   assert.equal(
     report.accessibility.filter((v) => ['serious', 'critical'].includes(v.impact)).length,
     0,
-    'Serious accessibility violations',
   );
-  console.log(JSON.stringify(report, null, 2));
+  console.log(JSON.stringify({ ...report, errors }, null, 2));
 } finally {
   await writeFile('artifacts/browser-report.json', JSON.stringify({ ...report, errors }, null, 2));
   await browser.close();

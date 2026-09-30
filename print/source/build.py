@@ -20,7 +20,7 @@ OUT.mkdir(exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
 icons.configure();v.ASSET_DIR=ROOT.parent/'assets'/'icons'
 PDF=OUT/'Mightier_than_the_Sword_Current.pdf'
 c=canvas.Canvas(str(PDF),pagesize=(612,792))
-c.setTitle('Mightier than the Sword - Cut-down Playtest v1.5')
+c.setTitle('Mightier than the Sword - Growing-map Playtest 0.2')
 v.install_callback(c)
 INK=HexColor('#263D49');GRAY=HexColor('#66757B');LIGHT=HexColor('#D3DFE1')
 BLUE=HexColor('#237B9C');GOLD=HexColor('#A07223');TEAL=HexColor('#207E71');PURPLE=HexColor('#79539A')
@@ -52,7 +52,7 @@ def hexagon(x,y,r=17,symbol=None):
     if symbol:v.draw_icon(c,icons.SYMBOLS[symbol],x-10,y-10,20)
 def finish(label,w=612,h=792,footer=True):
     if footer:
-        txt('MIGHTIER THAN THE SWORD / v1.5',30,17,7,color=GRAY)
+        txt('MIGHTIER THAN THE SWORD / GROWING MAP 0.2',30,17,7,color=GRAY)
         txt(label,w-30-stringWidth(label,'Helvetica',7),17,7,color=GRAY)
     c.showPage();pages.append(label)
 def rich(s):
@@ -70,7 +70,7 @@ def rules():
         x=28+col*286;y=713
         for title,body in blocks:
             txt(title.upper(),x,y,9,'Helvetica-Bold',TEAL);y-=8
-            h=para(body,x,y,270,10,12,maxh=310);y-=h+13
+            h=para(body,x,y,270,9.5,11.4,maxh=360);y-=h+13
         assert y>30,('Rules column overflow',col,y)
     finish('Basic rules')
 

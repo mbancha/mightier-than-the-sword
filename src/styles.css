@@ -749,3 +749,362 @@ footer {
     transition: none !important;
   }
 }
+/* Physical table: fixed-size cards live in a camera, independent of viewport layout. */
+.table {
+  grid-template-columns: minmax(0, 1fr) 290px;
+}
+.mapShell {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid #9cad9e;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e5eadd;
+}
+.mapControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  background: #fffdf5;
+}
+.mapControls > div {
+  flex: 1;
+}
+.mapControls small {
+  display: block;
+}
+.mapControls output {
+  font-size: 12px;
+  min-width: 34px;
+}
+.mapViewport {
+  position: relative;
+  height: 72vh;
+  min-height: 580px;
+  max-height: 850px;
+  overflow: hidden;
+  touch-action: none;
+  background-color: #dfe6d8;
+  background-image: radial-gradient(#a7b4a666 1px, transparent 1px);
+  background-size: 20px 20px;
+  cursor: grab;
+}
+.mapViewport:active {
+  cursor: grabbing;
+}
+.mapCanvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+.mapConnections {
+  position: absolute;
+  overflow: visible;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.mapConnections line {
+  stroke: #879685;
+  stroke-width: 3;
+  stroke-dasharray: 6 5;
+}
+.mapBook {
+  position: absolute;
+  box-shadow: 0 5px 12px #233c302b;
+}
+.mapBook .bookTitle {
+  display: flex;
+  min-height: 108px;
+  padding: 12px;
+}
+.mapBook .bookTitle h3 {
+  font-size: 18px;
+}
+.mapBook .vpSpace {
+  margin: 0;
+  font-size: 16px;
+  max-width: 68px;
+  min-width: 62px;
+}
+.mapBook .bookEffect {
+  height: 76px;
+  min-height: 0;
+  font-size: 11px;
+  overflow: auto;
+}
+.mapBook .page {
+  padding: 6px;
+  min-height: 142px;
+}
+.mapBook .pages {
+  min-height: 0;
+}
+.mapBook .pageLabel {
+  min-height: 26px;
+  padding: 2px;
+  font-size: 11px;
+}
+.mapBook .figures {
+  height: 61px;
+  overflow: auto;
+  align-content: start;
+}
+.mapBook .figure {
+  min-height: 36px;
+  padding: 3px 5px;
+  font-size: 10px;
+  background: #fffcf3;
+  box-shadow: 0 3px 0 #85775e55;
+  cursor: pointer;
+  touch-action: none;
+}
+.mapBook .figure.protagonist {
+  border-radius: 50% 50% 8px 8px;
+}
+.mapBook .movable {
+  box-shadow: 0 0 0 3px #ebba46;
+  cursor: grab;
+}
+.mapBook .slot {
+  width: 43px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 3px;
+}
+.mapBook .slots {
+  flex-wrap: nowrap;
+}
+.mapBook .overflow {
+  min-height: 30px;
+  width: 70%;
+  margin: 7px auto;
+  font-size: 10px;
+}
+.mapBook .bookTokens {
+  height: 40px;
+  overflow: auto;
+}
+.bookTokens button {
+  font-size: 9px;
+  min-height: 28px;
+  padding: 3px 6px;
+  background: #e9dfc6;
+}
+.legalPage {
+  background: #ffedac !important;
+  box-shadow: inset 0 0 0 3px #876415;
+}
+.legalSlot {
+  background: #fff0b9 !important;
+  outline: 2px solid #876415;
+}
+.publishSite {
+  position: absolute;
+  border: 3px dashed #466b59;
+  background: #fffdf8a8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  font-size: 21px;
+}
+.publishSite:hover {
+  background: #fff2b9;
+}
+.mapPopup {
+  position: absolute;
+  z-index: 6;
+  width: 280px;
+  max-height: 240px;
+  overflow: auto;
+  background: #fffdf4;
+  border: 2px solid #526c58;
+  box-shadow: 0 8px 20px #0003;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: default;
+}
+.mapPopup > b {
+  display: block;
+  margin: 0 25px 10px 0;
+}
+.mapPopup > button:not(.popupClose) {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  text-align: left;
+}
+.mapPopup small {
+  display: block;
+}
+.popupClose {
+  float: right;
+  padding: 0;
+  min-height: 28px;
+  width: 28px;
+}
+.dragGhost {
+  position: absolute;
+  z-index: 9;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: #fffbe8;
+  padding: 10px;
+  border: 2px solid #425d52;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px #0004;
+}
+.mapHint {
+  position: absolute;
+  bottom: 9px;
+  left: 12px;
+  right: 12px;
+  text-align: center;
+  pointer-events: none;
+  background: #fffdf4ed;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.fallbackActions > summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.fallbackActions[open] > .filters {
+  margin-top: 10px;
+}
+.handCard {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #baa8c7;
+  border-top: 3px solid #9c77b1;
+  box-shadow: 0 3px 0 #b8a98d44;
+}
+.handCard:hover {
+  transform: translateY(-2px);
+  background: #fff8e4;
+}
+.tokenPool > .poolToken {
+  padding: 9px;
+  font-size: 11px;
+  text-align: left;
+  background: #f2e7ce;
+  box-shadow: 0 3px 0 #b8a98d55;
+}
+.supplyButton {
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid currentColor;
+}
+.memoryTrack {
+  padding: 5px;
+  font-size: 11px;
+  min-height: 36px;
+  clip-path: polygon(7% 0, 93% 0, 100% 50%, 93% 100%, 7% 100%, 0 50%);
+  background: #f1ebd6;
+}
+.characterActivation {
+  display: block;
+  width: 100%;
+  margin: 5px 0;
+  text-align: left;
+  font-size: 13px;
+}
+.contextBackdrop {
+  position: fixed;
+  inset: 0;
+  background: #142e2840;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+.pieceDialog {
+  background: #fffdf4;
+  border: 2px solid #526c58;
+  border-radius: 12px;
+  padding: 22px;
+  width: min(440px, 94vw);
+  max-height: 80vh;
+  overflow: auto;
+  box-shadow: 0 15px 50px #0004;
+}
+.pieceDialog > button:first-child {
+  float: right;
+}
+.pieceDialog > button:not(:first-child) {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+.pieceDialog small {
+  display: block;
+}
+.botStatus {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  background: #e7eddf;
+  border-radius: 8px;
+}
+@media (max-width: 1050px) {
+  .table {
+    display: flex;
+    flex-direction: column;
+  }
+  .actionPanel {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .choices {
+    grid-row: auto;
+    grid-column: auto;
+  }
+  .hand {
+    grid-column: 1/-1;
+  }
+  .handCard {
+    width: 220px;
+    display: inline-block;
+    vertical-align: top;
+    margin: 8px;
+  }
+  .mapViewport {
+    height: 650px;
+    min-height: 500px;
+  }
+  .mapControls small {
+    font-size: 10px;
+  }
+}
+@media (max-width: 560px) {
+  .actionPanel {
+    display: block;
+  }
+  .mapControls {
+    flex-wrap: wrap;
+  }
+  .mapControls > div {
+    flex-basis: 100%;
+  }
+  .mapViewport {
+    height: 560px;
+  }
+}
+
+.mapViewport {
+  user-select: none;
+}
+.quickChoices {
+  display: grid;
+  gap: 6px;
+}
