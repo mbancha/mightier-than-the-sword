@@ -30,8 +30,10 @@ array positions are the stable IDs for this initial release.
   re-audited for public distribution in this turn.
 - Framework: owner's local BG-Prototypes template. Only the toolchain files and
   seeded RNG are directly copied; architecture conventions were followed.
-- npm packages: retain upstream licenses. Repository remains private; no new
-  open-source or commercial-use license is asserted.
+- npm packages: retain upstream licenses. The designers chose to make the
+  repository public for GitHub Pages; this does not grant an open-source or
+  commercial-use license. Literary quotation rights for public distribution
+  have not been independently re-audited.
 
 ## Digital revision 0.2
 
