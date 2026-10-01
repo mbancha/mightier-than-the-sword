@@ -66,3 +66,7 @@ Reports retain the rules version, catalog fingerprint, bot version and seed rang
 ## Digital-only revision 0.4
 
 Latest designer edits replace all nine book effects, swap Beowulf for The Aeneid, change setup and the combined hand limit, and remove middle-space Twist rewards. Character IDs remain unchanged (there was no Beowulf character). A new original castle SVG marks Dracula’s first slot. Rules and live catalog updated; all print files deliberately unchanged pending an explicit print-sync request.
+
+## Digital revision 0.5
+
+All ten Subplot objectives replaced under the designer’s hidden-objective correction. Rewards and numeric IDs remain stable. Public event counters removed from state, engine, UI and bots. Rules and digital content updated; print source and outputs intentionally untouched. Earlier audit sections describe historical editions only.

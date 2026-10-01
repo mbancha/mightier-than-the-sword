@@ -62,19 +62,17 @@ describe('Digital 0.4 rules', () => {
     act(s, 'placeHere:1');
     expect(s.players[0].hand).toEqual(before);
   });
-  it('counts the Subplot against hand limit and permits discarding it with its progress', () => {
+  it('counts the Subplot against hand limit and permits discarding it without a replacement', () => {
     const s = fresh(2),
       p = s.players[0],
       subplot = p.subplot;
     p.hand.push(s.decks.twist.pop()!, s.decks.twist.pop()!);
-    p.progress = 1;
     trigger(s, { type: 'handLimit', p: 0 });
     expect(s.jobs[0].type).toBe('discard');
     expect(legalActions(s).filter((a) => a.key.startsWith('discard:'))).toHaveLength(3);
     act(s, 'discardSubplot');
     expect(p.subplot).not.toBeNull(); // applyAction replaces state atomically
     expect(s.players[0].subplot).toBeNull();
-    expect(s.players[0].progress).toBe(0);
     expect(s.discards.subplot).toContain(subplot);
     expect(s.jobs[0].type).toBe('turn');
   });

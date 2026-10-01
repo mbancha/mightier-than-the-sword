@@ -99,9 +99,7 @@ for playtest review. Other new movement/timing rules above are designer confirme
 
 ## Starting Subplots
 
-Every player, human or bot, begins with one distinct face-up Subplot drawn from
-the shuffled core deck, at zero progress, before choosing starting pages. The
-player board shows its objective and reward expanded by default.
+Every player, human or bot, begins with one hidden Subplot drawn from the shuffled core deck. Only its owner sees it. The former public counter system is superseded by revision 0.5 below.
 
 ## Strategic bots and simulations
 
@@ -125,10 +123,16 @@ through branches and pull requests.
 
 All edits target the digital game; print outputs change only on an explicit print-sync request. The current PDFs remain 0.3. The digital catalog and rules are 0.4, so earlier saves require their matching release.
 
-Start with 6 supply Inklings, 1 Twist and 1 Subplot. The Insight limit covers Twists plus the active face-up Subplot. Middle spaces no longer grant Twists. The nine books now use only the new designer effects; The Aeneid replaces Beowulf at its former stable book ID. No Beowulf character existed in the deck. Agamemnon and Odysseus retain two activations each and their confirmed passives.
+Start with 6 supply Inklings, 1 Twist and 1 Subplot. The Insight limit covers Twists plus the held Subplot. Middle spaces no longer grant Twists. The nine books now use only the new designer effects; The Aeneid replaces Beowulf at its former stable book ID. No Beowulf character existed in the deck. Agamemnon and Odysseus retain two activations each and their confirmed passives.
 
 Provisional defaults stated during implementation (not designer-confirmed answers): keep 3 Inklings in each later reserve (12 total); Dracula's first space is the castle; allow discarding the active Subplot, losing progress without replacement. Frankenstein erases old overflow, then moves numbered-space Inklings into overflow where they survive. Jekyll can reduce points below zero.
 
 Dracula's castle owner receives one optional erasure before Twist checks, of any Inkling on that book. Around the World placement effects include overflow and bonus placements and can move any owned figure one page; resolve these rewards before checking for conflict. Moving existing Inklings is not placement. The submarine suspends every incoming overflow Inkling, including transfers and Nemo's activation Inklings; this is not erasure. The Aeneid suspends both numbered and overflow Inklings at cleanup.
 
 Odyssey rewards the moving figure's owner when it leaves for another book, on normal or ability movement. Internal page moves and setup do not reward. Direct destination choices follow a deterministic shortest page route; step controls allow a chosen route. Ichthyosaur only leaves Odyssey when neither of its occupied pages remains there. Journey overflow contributes 2 power per Inkling. Iliad adds 1 per contributing character and protagonist, including a protagonist at Valor 0.
+
+## Hidden Subplots — digital revision 0.5
+
+Designer correction: incremental means working toward a hidden objective, not marking public event counters. All ten objectives now check simultaneous current arrangements: owned memories, track levels, protagonist/character location, Inkling occupancy, or participation in the current conflict. Existing pieces count and returned memories can break an unfinished arrangement. No historical participation counters remain. Rewards retain the character-or-alternative choice and replacement draw.
+
+Implementation rulings: fulfillment is checked automatically after each action and automatic effect, before conflict cleanup. Completed objectives are revealed; unfinished cards never enter public/opponent views. At most one completion per player per player turn, including the Horse completion power, prevents a replacement-draw loop over already fulfilled conditions. Replacements can complete from the next turn. Setup does not complete objectives. These timing and frequency rulings are provisional for playtesting. Printed artifacts are unchanged.

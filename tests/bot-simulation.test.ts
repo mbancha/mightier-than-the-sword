@@ -15,20 +15,21 @@ const fresh = () => newGame({ names: ['A', 'B'], seed: 29 });
 const score = (v: ReturnType<typeof playerView>, key: string) =>
   rankBotActions(v, 0).find((a) => a.action.key === key)!.score;
 describe('Strategic bots', () => {
-  it('prefers a book-changing move that completes the travel Subplot', () => {
+  it('moves to the page that completes a memory arrangement', () => {
     const s = fresh();
-    s.players[0].subplot = 0;
-    s.players[0].progress = 2;
+    s.players[0].subplot = 3;
+    s.books[1].slots[0].memory = { owner: 0, row: 'valor' };
+    s.books[1].slots[1].page = 0;
+    s.books[1].slots[1].memory = { owner: 0, row: 'insight' };
     s.players[0].page = 1;
     s.jobs = [{ type: 'move', p: 0, source: 'normal', origin: 1, n: 1 }];
     const a = chooseBotAction(playerView(s, 0), 0);
-    expect(a.page! >= 2).toBe(true);
+    expect(a.page).toBe(2);
   });
-  it('values a memory reward completing its Subplot over a plain space', () => {
+  it('values a useful memory reward over a plain space', () => {
     const s = fresh();
     s.players[0].page = 0;
     s.players[0].subplot = 9;
-    s.players[0].progress = 2;
     s.jobs = [{ type: 'turn', p: 0 }];
     // Seed 29 starts with Dracula: spaces 0 and 1 are on the left page.
     s.books[0].slots[1].memory = { owner: 0, row: 'insight' };
@@ -40,7 +41,6 @@ describe('Strategic bots', () => {
     const s = fresh();
     s.jobs = [{ type: 'turn', p: 0 }];
     s.players[0].subplot = 1;
-    s.players[0].progress = 2;
     s.books[0].slots[0].owner = 0;
     expect(chooseBotAction(playerView(s, 0), 0).key).toMatch(/^memoryHere:/);
   });
@@ -53,7 +53,6 @@ describe('Strategic bots', () => {
     expect(chooseBotAction(empty, 0).key).not.toBe('activate:3:1');
     s.books[0].slots[0].owner = 1;
     s.players[0].subplot = 8;
-    s.players[0].progress = 2;
     expect(chooseBotAction(playerView(s, 0), 0).key).toBe('activate:3:1');
   });
   it('seeks erasure targets with Dracula rather than empty pages', () => {
@@ -86,7 +85,7 @@ describe('Strategic bots', () => {
     v.battle.powers = [1, 4];
     expect(chooseBotAction(v, 0).key).toBe('twist:1');
   });
-  it('recognizes Odysseus replenishment and foreshadowing progress', () => {
+  it('recognizes Odysseus replenishment without obsolete foreshadow counters', () => {
     const v = playerView(fresh(), 0);
     v.prompt = 'battle';
     v.players[0].subplot = null;
@@ -110,8 +109,7 @@ describe('Strategic bots', () => {
     expect(score(v, 'twist:1')).toBeGreaterThan(before);
     const without = score(v, 'twist:10');
     v.players[0].subplot = 4;
-    v.players[0].progress = 2;
-    expect(score(v, 'twist:10')).toBeGreaterThan(without);
+    expect(score(v, 'twist:10')).toBe(without);
   });
   it('is deterministic and ignores opponent hands, hidden powers and deck order', () => {
     const s = fresh(),
@@ -155,7 +153,10 @@ describe('Headless simulations and statistics', () => {
     s.books[0].slots[0].owner = 0;
     s.players[0].supply--;
     s.players[0].subplot = 1;
-    s.players[0].progress = 2;
+    s.books[1].slots[0].memory = { owner: 0, row: 'insight' };
+    s.books[2].slots[0].memory = { owner: 0, row: 'curiosity' };
+    s.players[0].rows.insight = 1;
+    s.players[0].rows.curiosity = 1;
     expect(applyAction(s, { key: 'upgrade:0:0:valor' })).toBeNull();
     expect(s.events?.filter((e) => e.type === 'upgrade')).toHaveLength(1);
     expect(applyAction(s, { key: 'character' })).toBeNull();

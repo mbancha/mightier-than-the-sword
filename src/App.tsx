@@ -182,7 +182,7 @@ export default function App() {
     <>
       <header className="masthead">
         <div>
-          <div className="eyebrow">A shared story · digital playtest 0.4</div>
+          <div className="eyebrow">A shared story · digital playtest 0.5</div>
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
@@ -221,8 +221,8 @@ export default function App() {
           ))}
           <p>
             Digital rulings: a character between books can act on either adjoining page. Returning a
-            memory lowers its row. Subplot events from a completed card do not carry over. Opponent
-            hands and unrevealed Horse powers are hidden during handoff.
+            memory lowers its row. Subplots check current arrangements and remain private until
+            completed. Opponent hands and unrevealed Horse powers are hidden during handoff.
           </p>
           <p>
             Playtest status: first automated build; designer validation and balance testing remain.
@@ -234,7 +234,7 @@ export default function App() {
         <section className="reference">
           <h2>Component library</h2>
           <p>
-            Current digital edition 0.4. Printable sheets are updated separately when requested.
+            Current digital edition 0.5. Printable sheets are updated separately when requested.
           </p>
           <div className="library">
             {twists.map((t) => (
@@ -247,7 +247,7 @@ export default function App() {
             ))}
             {subplots.map((t) => (
               <article className="smallCard" key={'s' + t.id}>
-                <span className="eyebrow">Subplot · {t.target} steps</span>
+                <span className="eyebrow">Hidden Subplot</span>
                 <h3>{t.name}</h3>
                 <p>{t.text}</p>
                 <p>Draw a character OR {t.reward} Then draw a new Subplot.</p>
@@ -536,18 +536,20 @@ export default function App() {
                 </div>
                 <p className="muted">
                   Move {p.rows.curiosity + 1} · Power {p.rows.valor} · Combined hand limit{' '}
-                  {3 + p.rows.insight} ({p.handCount + (p.subplot === null ? 0 : 1)} cards) · Place{' '}
+                  {3 + p.rows.insight} ({p.handCount + (p.hasSubplot ? 1 : 0)} cards) · Place{' '}
                   {p.rows.resolve >= 2 ? p.rows.resolve : 1}
                   {p.rows.resolve === 1 ? ' (or discard to place 2)' : ''}
                 </p>
-                {p.subplot !== null && (
+                {p.hasSubplot && (!view || view.players[i].subplot === null) && (
+                  <p className="muted">1 hidden Subplot</p>
+                )}
+                {view?.players[i].subplot !== null && view?.players[i].subplot !== undefined && (
                   <details className="playerSubplot" open>
                     <summary>
-                      Subplot: {subplots[p.subplot].name} · {p.progress}/
-                      {subplots[p.subplot].target}
+                      Your hidden Subplot: {subplots[view.players[i].subplot!].name}
                     </summary>
-                    <p>{subplots[p.subplot].text}</p>
-                    <p>Draw a character OR {subplots[p.subplot].reward}</p>
+                    <p>{subplots[view!.players[i].subplot!].text}</p>
+                    <p>Draw a character OR {subplots[view!.players[i].subplot!].reward}</p>
                     {i === actor &&
                       view?.actions
                         .filter((a) => a.key === 'discardSubplot')
@@ -836,7 +838,7 @@ export default function App() {
         }}
       />
       <footer>
-        Shared design workspace · Digital edition 0.4 · local hotseat privacy protects the screen,
+        Shared design workspace · Digital edition 0.5 · local hotseat privacy protects the screen,
         not the device’s stored data.
       </footer>
     </>
