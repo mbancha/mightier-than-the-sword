@@ -12,7 +12,7 @@ export interface Player {
   everUpgraded: Row[];
   hand: number[];
   subplot: number | null;
-  progress: number;
+  subplotTurn: number;
   completing: boolean;
   horse: number | null;
   horseSpent: boolean;

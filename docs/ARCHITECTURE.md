@@ -42,7 +42,7 @@ replays validated actions from the seed. Changed editions reject old saves with
 an explanation. Keep a tagged release for important playtest saves.
 
 `publicView` is an allowlist. `playerView` adds only the selected player's hand,
-Horse choice, and legal choices. Handoffs unmount private cards and action lists.
+Horse choice, hidden Subplot, and legal choices. Handoffs unmount private cards and action lists.
 This is screen privacy on one trusted device, not adversarial network security.
 Private save files and browser memory intentionally retain all information.
 
@@ -111,3 +111,7 @@ terminates it; downloaded reports are the durable output. The CLI's Vite module
 loader transpiles local TypeScript with no listening HTTP/HMR server. It exits
 nonzero if any game fails. A seed reproduces a run only with the same rules,
 catalog and bot implementation; report metadata records all three versions.
+
+## Current-state objectives (0.5)
+
+`game/subplots.ts` supplies current-board predicates shared by the engine and bots. Fractional scores are planning estimates only, never stored progress. The engine checks predicates while pumping jobs and guards replacement loops with each player’s `subplotTurn`. Public views expose only `hasSubplot`; private views add the owner’s card ID. Bot candidate projections use only their private view and public pieces.

@@ -14,8 +14,8 @@ export function publicView(s: GameState) {
       rows: { ...p.rows },
       everUpgraded: [...p.everUpgraded],
       handCount: p.hand.length,
-      subplot: p.subplot,
-      progress: p.progress,
+      hasSubplot: p.subplot !== null,
+      subplot: null as number | null,
       horseSpent: p.horseSpent,
     })),
     books: structuredClone(s.books),
@@ -52,6 +52,9 @@ export function publicView(s: GameState) {
 export function playerView(s: GameState, p: number) {
   return {
     ...publicView(s),
+    players: publicView(s).players.map((pl, i) =>
+      i === p ? { ...pl, subplot: s.players[p].subplot } : pl,
+    ),
     hand: [...s.players[p].hand],
     horse: s.players[p].horse,
     actions: currentPlayer(s) === p ? legalActions(s) : [],

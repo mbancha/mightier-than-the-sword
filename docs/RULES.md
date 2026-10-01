@@ -1,10 +1,10 @@
 # Mightier than the Sword — current rules
 
-Generated from `src/data/content.json`. Source edition pnp-v15, rules mightier-0.4.0. See DECISIONS.md for digital rulings.
+Generated from `src/data/content.json`. Source edition pnp-v15, rules mightier-0.5.0. See DECISIONS.md for digital rulings.
 
 ## Setup
 
-Shuffle 9 books; start with 3 in a triangle: two side by side, one centered below. Stack the rest face down. Books use a hexagonal grid; each has 2 pages. A touching page edge or internal fold costs 1 move. Each player takes a protagonist, 12 Inklings and 12 memories (3 per row). Start at 0 points, with 6 supply Inklings, 3 reserved for Act II, 3 for Act III; cover every upgrade with a memory. Shuffle decks; deal 1 Twist and 1 face-up Subplot each. No starting characters. Place protagonists on any pages. From the base pool of 15 conflict tokens (5 per Act), randomly select 1 per player for EACH Act; set the rest aside. Display Act I's tokens. Choose a first player; turns go clockwise.
+Shuffle 9 books; start with 3 in a triangle: two side by side, one centered below. Stack the rest face down. Books use a hexagonal grid; each has 2 pages. A touching page edge or internal fold costs 1 move. Each player takes a protagonist, 12 Inklings and 12 memories (3 per row). Start at 0 points, with 6 supply Inklings, 3 reserved for Act II, 3 for Act III; cover every upgrade with a memory. Shuffle decks; deal 1 Twist and 1 hidden Subplot each. No starting characters. Place protagonists on any pages. From the base pool of 15 conflict tokens (5 per Act), randomly select 1 per player for EACH Act; set the rest aside. Display Act I's tokens. Choose a first player; turns go clockwise.
 
 ## Your turn
 
@@ -20,7 +20,7 @@ Suspend your Inkling from a numbered space without a memory; replace it with the
 
 ## Subplots
 
-Track events only while your Subplot is face up; retain progress if pieces disappear. When full, choose a character OR its alternative reward. Resolve it, discard the Subplot and draw a new one. No retroactive progress. Reshuffle Twist/Subplot discards as needed. Played conflict Twists stay aside until scoring. Your active Subplot counts as 1 card toward the same hand limit as your Twists. At your end-turn hand-limit check, you may discard Twists or your active Subplot. Discarding an unfinished Subplot loses its progress and grants no replacement or reward.
+Keep your Subplot hidden in your hand. Objectives check the current board and tracks; no counters or recorded progress are used. All stated requirements must be true together. Only your own memories count. Conflict objectives require participation in the current conflict, not earlier battles. After each action or automatic effect, reveal a fulfilled Subplot, choose a character OR its alternative reward, discard it, and draw a new hidden Subplot. At most one Subplot per player may complete in each player turn, including automatic completion effects. Setup never completes Subplots. A replacement waits until a later turn before it can complete. Existing arrangements count; removing pieces can undo an unfinished objective. Twists and Subplots share your hand limit; at the end of your turn you may discard either. An unfinished Subplot discarded for hand limit gives no reward or replacement. Reshuffle discards as needed; played conflict Twists remain aside until scoring.
 
 ## Immediate conflict
 

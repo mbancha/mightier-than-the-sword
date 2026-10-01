@@ -1,9 +1,9 @@
 # Mightier than the Sword
 
 A shared workspace for the game design, printable prototype, and an automated
-2–4 player prototype with human and strategic-bot seats. Current digital rules: **0.4**. Printable outputs are synced only when requested and currently reflect the earlier 0.3 edition.
+2–4 player prototype with human and strategic-bot seats. Current digital rules: **0.5**. Printable outputs are synced only when requested and currently reflect the earlier 0.3 edition.
 
-The first build includes all nine books, fifteen Twists, ten incremental Subplots,
+The first build includes all nine books, fifteen Twists, ten hidden board-state Subplots,
 ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
 movement, memories, conflicts, Acts, card effects, private-hand handoffs, undo,
 local saves, and portable private replays. It is ready for designer testing;
@@ -42,7 +42,7 @@ no automatic Twist reward. A full book triggers conflict immediately: play
 a card from your hand or pass when each of your occupied spaces is checked from
 left to right. Twists are only played in conflict. Player boards show every
 upgrade level and highlight its current benefit. Start with 6 supply Inklings,
-1 Twist and 1 Subplot. Your Subplot and Twists share the hand limit.
+1 Twist and 1 hidden Subplot. Your Subplot and Twists share the hand limit. Build the required memory arrangement, track levels or current conflict position; no progress counters are used. A fulfilled objective is revealed automatically (at most one per player per turn).
 
 Drag the empty map background to pan. Use the wheel or +/− to zoom; **Fit map**
 frames the books. After a win, click a dashed publishing position, then a touching

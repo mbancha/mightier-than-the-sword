@@ -83,3 +83,10 @@ live-site browser check are required before calling the hosted edition ready.
 - Print outputs and generators were not changed. They remain the previous edition
   until an explicit print-sync request. Historical simulation results remain
   labeled 0.3 and must not be treated as balance evidence for 0.4.
+
+## Digital revision 0.5 verification
+
+- 92 tests pass, including all ten current-state objectives, simultaneous requirements, returned memories, current-conflict participation, reward/replacement behavior, and private-view isolation.
+- Production build and full browser smoke pass: 169 choices, six conflicts, nine books, bot turn and browser simulation, no browser errors or accessibility violations.
+- Desktop/tablet screenshots inspected. Only the owner sees their Subplot; opponents show a hidden-card count, spectators show no objective, and public progress counters are gone.
+- Printed artifacts and generators unchanged. Previous simulation reports remain historical; objective and bot behavior now use rules 0.5 and strategic-3.

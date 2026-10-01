@@ -1,3 +1,4 @@
+import { subplotScore } from './subplots';
 import {
   books,
   characters,
@@ -97,7 +98,6 @@ function draw(s: GameState, p: number, n: number, kind: 'twist' | 'subplot') {
     else {
       s.players[p].subplot = id;
       emit(s, { type: 'subplotDraw', player: p, id });
-      s.players[p].progress = 0;
       s.players[p].completing = false;
     }
   }
@@ -106,28 +106,6 @@ function discard(s: GameState, p: number, id: number) {
   const h = s.players[p].hand;
   h.splice(h.indexOf(id), 1);
   s.discards.twist.push(id);
-}
-function progress(s: GameState, p: number, event: string, n = 1) {
-  const pl = s.players[p];
-  if (pl.subplot === null || pl.completing) return;
-  const matches = [
-    ['travel'],
-    ['upgrade'],
-    ['activate', 'upgrade'],
-    ['place'],
-    ['foreshadow'],
-    ['shared'],
-    ['twist'],
-    ['conflict'],
-    ['erase'],
-    ['memory'],
-  ];
-  if (!matches[pl.subplot].includes(event)) return;
-  pl.progress = Math.min(subplots[pl.subplot].target, pl.progress + n);
-  if (pl.progress === subplots[pl.subplot].target) {
-    pl.completing = true;
-    queue(s, job('subplot', p, { card: pl.subplot }));
-  }
 }
 function foreshadow(s: GameState, p: number, n: number) {
   const pl = s.players[p],
@@ -138,7 +116,6 @@ function foreshadow(s: GameState, p: number, n: number) {
   if (take) {
     emit(s, { type: 'foreshadow', player: p, amount: take });
     note(s, `${pl.name} foreshadows ${take} Inkling${take > 1 ? 's' : ''}.`);
-    progress(s, p, 'foreshadow', take);
   }
   if (n > take) points(s, p, n - take, 'reserve unavailable');
 }
@@ -232,10 +209,7 @@ function place(s: GameState, p: number, b: number, slot: number | null) {
       const m = spot.memory;
       emit(s, { type: 'memoryReward', player: p, row: m.row, book: s.books[b].id });
       queue(s, ...memoryJobs(p, m.row, b), ...(m.owner !== p ? memoryJobs(m.owner, m.row, b) : []));
-      progress(s, p, 'memory');
-      if (m.owner !== p) progress(s, m.owner, 'shared');
     }
-    progress(s, p, 'place');
   }
   if (s.books[b].id === 8) {
     const heads = nextInt(s.rng, 2) === 0;
@@ -261,7 +235,6 @@ function erase(
   collect(s, p);
   if (!cleanup) {
     emit(s, { type: 'erase', player: actor, book: s.books[b].id });
-    progress(s, actor, 'erase');
   }
 }
 function upgrade(s: GameState, p: number, b: number, k: number, row: Row) {
@@ -275,7 +248,6 @@ function upgrade(s: GameState, p: number, b: number, k: number, row: Row) {
   if (s.act < 3) pl.reserves[s.act]++;
   else pl.out++;
   note(s, `${pl.name} leaves a ${rowName(row)} memory; the Inkling is suspended.`);
-  progress(s, p, 'upgrade');
 }
 function finishAct(s: GameState) {
   s.battle = null;
@@ -377,7 +349,6 @@ function battleStart(s: GameState, b: number) {
       jobs.push(job('revealHorse', c.owner));
   jobs.push(job('beforeBattle', s.active));
   queue(s, ...jobs);
-  for (const p of participants) progress(s, p, 'conflict');
 }
 function cardEffect(s: GameState, p: number, id: number) {
   const b = s.battle?.book ?? bookOf(s.players[p].page),
@@ -427,13 +398,11 @@ function playTwist(s: GameState, p: number, id: number) {
   if (ownedChars(s, p, bt.book).some((c) => c.id === 6) && !abilitySuppressed(s, 6))
     draw(s, p, 1, 'twist');
   cardEffect(s, p, id);
-  progress(s, p, 'twist');
 }
 function charAction(s: GameState, p: number, c: Character, a: number) {
   c.used[a]++;
   emit(s, { type: 'activate', player: p, id: c.id });
   s.players[p].supply--;
-  progress(s, p, 'activate');
   note(s, `${s.players[p].name} activates ${characters[c.id].name}.`);
   const move = (n: number, mode?: string) =>
     job('move', p, { char: c.id, n, mode, source: 'character' });
@@ -498,8 +467,6 @@ function options(s: GameState): Option[] {
             }
           }
           if (c?.id === 5) queue(s, job('checkConflict', p, { book: bookOf(page) }));
-          if (j.source === 'normal' && bookOf(page) !== bookOf(j.origin ?? from))
-            progress(s, p, 'travel');
         },
         'Move',
         { page },
@@ -515,8 +482,6 @@ function options(s: GameState): Option[] {
         'End move',
         (state) => {
           done(state);
-          if (j.source === 'normal' && bookOf(from) !== bookOf(j.origin ?? from))
-            progress(state, p, 'travel');
         },
         'Move',
       );
@@ -848,17 +813,12 @@ function options(s: GameState): Option[] {
       });
   if (j.type === 'discard' || j.type === 'cycle') {
     if (j.type === 'discard' && pl.subplot !== null)
-      add(
-        'discardSubplot',
-        `Discard Subplot: ${subplots[pl.subplot].name} (lose its progress)`,
-        (state) => {
-          done(state);
-          state.discards.subplot.push(state.players[p].subplot!);
-          state.players[p].subplot = null;
-          state.players[p].progress = 0;
-          state.players[p].completing = false;
-        },
-      );
+      add('discardSubplot', `Discard Subplot: ${subplots[pl.subplot].name}`, (state) => {
+        done(state);
+        state.discards.subplot.push(state.players[p].subplot!);
+        state.players[p].subplot = null;
+        state.players[p].completing = false;
+      });
     for (const card of pl.hand)
       add(`discard:${card}`, `Discard ${twists[card].name}`, (s) => {
         done(s);
@@ -1029,6 +989,21 @@ function battleLimit(s: GameState, p: number) {
 }
 function pump(s: GameState) {
   for (let guard = 0; guard < 1000 && !s.over; guard++) {
+    if (!s.jobs.some((j) => j.type === 'setup')) {
+      const ready = s.players.findIndex(
+        (pl, p) =>
+          pl.subplot !== null &&
+          !pl.completing &&
+          pl.subplotTurn !== s.turn &&
+          subplotScore(s, p, pl.subplot) >= 1,
+      );
+      if (ready >= 0) {
+        const pl = s.players[ready];
+        pl.completing = true;
+        pl.subplotTurn = s.turn;
+        queue(s, job('subplot', ready, { card: pl.subplot! }));
+      }
+    }
     const j = s.jobs[0];
     if (!j) throw Error('No pending job');
     const p = j.p,
@@ -1186,8 +1161,14 @@ function pump(s: GameState) {
         for (const p of bt.tribute)
           if (p === winner) js.push(job('points', p, { n: 4, source: 'Tribute to the Gods' }));
         for (const p of bt.complete)
-          if (p === winner && s.players[p].subplot !== null && !s.players[p].completing) {
+          if (
+            p === winner &&
+            s.players[p].subplot !== null &&
+            !s.players[p].completing &&
+            s.players[p].subplotTurn !== s.turn
+          ) {
             s.players[p].completing = true;
+            s.players[p].subplotTurn = s.turn;
             js.push(job('subplot', p, { card: s.players[p].subplot! }));
           }
         for (const p of bt.revenge) if (p !== winner) js.push(job('revenge', p, { book: bt.book }));
@@ -1327,7 +1308,7 @@ export function newGame(setup: Setup, recordEvents = false): GameState {
       everUpgraded: [],
       hand: [],
       subplot: null,
-      progress: 0,
+      subplotTurn: -1,
       completing: false,
       horse: null,
       horseSpent: false,

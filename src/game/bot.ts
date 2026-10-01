@@ -1,8 +1,9 @@
-import { characters, subplots, content, CONFIG, type Row } from '../data/catalog';
+import { subplotScore } from './subplots';
+import { characters, content, CONFIG, type Row } from '../data/catalog';
 import { reachable, bookOf, adjacentBooks } from './topology';
 import type { playerView } from './views';
 import type { Choice, Character } from './types';
-export const BOT_VERSION = 'strategic-2';
+export const BOT_VERSION = 'strategic-3';
 type View = ReturnType<typeof playerView>;
 // Heuristics only: no engine simulation, deck access or opponent hand access.
 export function rankBotActions(v: View, decision: number) {
@@ -20,17 +21,12 @@ export function rankBotActions(v: View, decision: number) {
   const inks = (b: number, owner = p) =>
     v.books[b].slots.filter((s) => s.owner === owner).length + v.books[b].overflow[owner];
   const cp = (c: Character) => (c.id === 1 && c.collected === 3 ? 5 : characters[c.id].power);
-  const goal = (ids: number[], amount = 1) =>
-    me.subplot !== null && ids.includes(me.subplot)
-      ? 2 * Math.min(amount, subplots[me.subplot].target - me.progress) +
-        (me.progress + amount >= subplots[me.subplot].target ? 5 : 0)
-      : 0;
   const handSize = v.hand.length + (me.subplot === null ? 0 : 1);
   const drawValue = () => (handSize < CONFIG.baseHand + me.rows.insight ? 1.8 : 0.4);
   const forecast = (n: number) => {
     const available = v.act < 3 ? me.reserves[v.act] : 0,
       take = Math.min(n, available);
-    return take * (me.supply < 2 ? 2 : 1.1) + goal([4], take) + (n - take);
+    return take * (me.supply < 2 ? 2 : 1.1) + (n - take);
   };
   const rowValue = (row: Row) => {
     const level = me.rows[row],
@@ -68,17 +64,15 @@ export function rankBotActions(v: View, decision: number) {
       return v.books[b].id === 0 ? -9 : 1.6 + influence(b, v.books[b].id === 2 ? 2 : 1);
     const book = v.books[b],
       spot = book.slots[k];
-    let n = 3 + goal([3]) + influence(b, 1);
+    let n = 3 + influence(b, 1);
     if (book.id === 6 && k === 0) n += 1.5;
     if (book.id === 1) n += 0.7;
     if (book.id === 5) n -= 0.7;
-    if (spot.memory)
-      n += memoryValue(spot.memory.row, b) + goal([9]) - (spot.memory.owner !== p ? 0.6 : 0);
+    if (spot.memory) n += memoryValue(spot.memory.row, b) - (spot.memory.owner !== p ? 0.6 : 0);
     const empty = book.slots.filter((s) => s.owner === null).length;
     if (empty === 1 || (empty === 2 && v.characters.some((c) => c.id === 5 && at(c, b)))) {
       const mine = v.bookPowers[b][p] + 1;
       n += mine > bestEnemy(b) ? 5 + (!book.covered ? v.act : 0) : -2;
-      n += goal([7]);
     }
     return n;
   };
@@ -90,9 +84,7 @@ export function rankBotActions(v: View, decision: number) {
     );
     const upgradable = book.slots.some((s) => s.page === page % 2 && s.owner === p && !s.memory);
     return (
-      Math.max(...spots, placement(b, null), upgradable ? 3 + goal([1, 2]) : -10) +
-      (book.covered ? 0 : 0.5) +
-      (near(b) > 0.4 ? goal([7]) * 0.4 : 0)
+      Math.max(...spots, placement(b, null), upgradable ? 3 : -10) + (book.covered ? 0 : 0.5) + 0
     );
   };
   const enemiesOnPage = (page: number) =>
@@ -102,7 +94,7 @@ export function rankBotActions(v: View, decision: number) {
   const charDestination = (c: Character, page: number) => {
     const b = bookOf(page);
     let n = influence(b, cp(c)) + near(b) * 2 + (inks(b) ? 1.5 : 0);
-    if (c.id === 0) n += enemiesOnPage(page) ? 3 + goal([8]) + (me.supply > 0 ? 1 : 0) : 0;
+    if (c.id === 0) n += enemiesOnPage(page) ? 3 + (me.supply > 0 ? 1 : 0) : 0;
     if (c.id === 2) n += v.books[b].id !== 0 && me.supply > 0 ? 1 : -2;
     if (c.id === 4) n += !me.horseSpent ? near(b) * 3 : -2;
     if (c.id === 5 && v.books[b].slots.filter((s) => s.owner === null).length === 1)
@@ -113,20 +105,20 @@ export function rankBotActions(v: View, decision: number) {
   };
   const activation = (id: number, action: number) => {
     const c = own.find((c) => c.id === id)!;
-    if (id === 3 && action === 1) return enemiesOnPage(c.page) ? 5 + goal([8]) + goal([2]) : -8;
-    if (id === 9) return 3 + goal([2]) + (c.other === null ? 2 : 0);
+    if (id === 3 && action === 1) return enemiesOnPage(c.page) ? 5 : -8;
+    if (id === 9) return 3 + (c.other === null ? 2 : 0);
     const range = id === 0 || id === 2 || id === 3 ? 1 : id === 6 ? 3 : 2;
     const pages =
       id === 7 || id === 8
         ? v.books.flatMap((_, b) => [b * 2, b * 2 + 1])
         : reachable(v.books, c.page, range);
     const best = Math.max(...pages.map((page) => charDestination(c, page)));
-    let n = 1 + best - charDestination(c, c.page) + goal([2]);
-    if (id === 0) n += pages.some((page) => enemiesOnPage(page)) ? 5 + goal([8]) : -4;
+    let n = 1 + best - charDestination(c, c.page);
+    if (id === 0) n += pages.some((page) => enemiesOnPage(page)) ? 5 : -4;
     if (id === 2)
       n +=
         0.5 * (me.supply > 1 && v.books[bookOf(c.page)].id !== 0 ? 4 : 0) +
-        (enemiesOnPage(c.page) ? 1.5 + goal([8]) * 0.5 : 0);
+        (enemiesOnPage(c.page) ? 1.5 : 0);
     if (id === 7) n += near(bookOf(c.page)) * 3;
     if (id === 8) n += Math.max(...pages.map(pageValue)) - pageValue(me.page);
     return n;
@@ -151,7 +143,7 @@ export function rankBotActions(v: View, decision: number) {
                       own.reduce((n, c) => n + c.used.reduce((a, b) => a + b, 0), 0),
                     ) * 1.5
                   : e.type === 'upgrade'
-                    ? 2.8 + goal([1, 2])
+                    ? 2.8
                     : e.type === 'place'
                       ? Math.min(me.supply, e.n!) * 1.3
                       : 0),
@@ -163,7 +155,7 @@ export function rankBotActions(v: View, decision: number) {
       chars = own.filter((c) => at(c, b)),
       rivalChars = v.characters.filter((c) => c.owner !== p && at(c, b));
     let gain = id < 8 ? CONFIG.twistPower[id] : id === 8 ? 2 : id === 11 || id === 14 ? 3 : 0;
-    let extra = goal([6]);
+    let extra = 0;
     if (id === 0 && chars.length) gain += CONFIG.heroCharacterBonus;
     if (id === 2 && inks(b) === 1) gain = CONFIG.travellingSoloPower;
     if (id === 3 || id === 9)
@@ -184,11 +176,10 @@ export function rankBotActions(v: View, decision: number) {
         v.books[b].id === 0 ? 0 : Math.min(2, me.supply + (v.act < 3 ? me.reserves[v.act] : 0));
       extra += forecast(2);
     }
-    if (id === 11) extra += 2 + goal([1, 2]);
+    if (id === 11) extra += 2;
     if (id === 12) extra += v.deckCounts.character ? 2 + (4 - v.act) : 0;
     if (id === 13 && v.books[b].slots.some((s) => s.owner !== null && s.owner !== p)) {
       gain += me.supply ? 2 : 1;
-      extra += goal([8]);
     }
     if (id === 14)
       extra +=
@@ -221,6 +212,55 @@ export function rankBotActions(v: View, decision: number) {
   const score = (a: Choice) => {
     const [kind, x, y, z] = a.key.split(':');
     let n = noise(a.key);
+    if (me.subplot !== null) {
+      const projected = {
+        players: v.players.map((pl) => ({ ...pl, rows: { ...pl.rows } })),
+        books: structuredClone(v.books),
+        characters: structuredClone(v.characters),
+        battle: v.battle,
+      };
+      let changed = false;
+      if ((kind === 'memoryHere' || kind === 'upgrade') && x !== undefined) {
+        projected.books[+x].slots[+y].memory = { owner: p, row: z as Row };
+        projected.books[+x].slots[+y].owner = null;
+        projected.players[p].rows[z as Row]++;
+        changed = true;
+      }
+      if (kind === 'page') {
+        if (v.moving?.character === null || v.moving?.character === undefined)
+          projected.players[p].page = +x;
+        else projected.characters.find((c) => c.id === v.moving!.character)!.page = +x;
+        changed = true;
+      }
+      if (
+        (kind === 'placeHere' || kind === 'place') &&
+        x !== undefined &&
+        x !== 'null' &&
+        a.book !== undefined
+      ) {
+        projected.books[a.book].slots[+x].owner = p;
+        if (projected.books[a.book].slots.every((slot) => slot.owner !== null))
+          projected.battle = {
+            ...(v.battle ?? {
+              allIgnored: false,
+              powers: [],
+              winner: null,
+              space: 0,
+              spaceOwner: null,
+              spacePlayed: 0,
+            }),
+            book: a.book,
+            participants: [p],
+          };
+        changed = true;
+      }
+      if (changed) {
+        const before = subplotScore(v, p, me.subplot),
+          after = subplotScore(projected, p, me.subplot);
+        n += (after - before) * 12 + (after >= 1 && before < 1 ? 8 : 0);
+      }
+    }
+
     if (kind === 'step' || kind === 'endMove') return -100 + n; // final destination choices avoid movement loops
     if (kind === 'skip' || kind === 'pass') return n;
     if (kind === 'finish') return 1 + n;
@@ -232,7 +272,6 @@ export function rankBotActions(v: View, decision: number) {
       n += c ? charDestination(c, +x) : pageValue(+x);
       const from = c?.page ?? me.page;
       if (v.books[bookOf(from)].id === 3 && bookOf(+x) !== bookOf(from)) n += 1;
-      if (v.moving?.mandatory && bookOf(+x) !== bookOf(v.moving.origin)) n += goal([0]);
     }
     if (kind === 'placeHere' || kind === 'place') {
       if (x === undefined)
@@ -253,16 +292,16 @@ export function rankBotActions(v: View, decision: number) {
       else {
         const row = z as Row,
           book = v.books[+x];
-        n += 1.7 + rowValue(row) + goal([1, 2]) + goal([5]) * 0.35 - (me.supply < 2 ? 0.8 : 0);
+        n += 1.7 + rowValue(row) - (me.supply < 2 ? 0.8 : 0);
         if (bt?.book === +x) n -= 1.8;
       }
     }
     if (kind === 'activate') n += activation(+x, +y);
     if (kind === 'twist') n += twistValue(+x);
-    if (kind === 'boost')
-      n += me.supply >= 2 ? pageValue(me.page) + goal([3], 2) - twistValue(+x) * 0.4 : -10;
+    if (kind === 'boost') n += me.supply >= 2 ? pageValue(me.page) - twistValue(+x) * 0.4 : -10;
     if (kind === 'discard') n -= twistValue(+x);
-    if (kind === 'discardSubplot') n -= 6 + me.progress * 2;
+    if (kind === 'discardSubplot')
+      n -= 6 + (me.subplot === null ? 0 : subplotScore(v, p, me.subplot) * 4);
     if (kind === 'bookMove') n += 1;
     if (kind === 'character') n += effectsValue([{ type: 'gain' }]);
     if (kind === 'alternative' && me.subplot !== null)
@@ -289,7 +328,7 @@ export function rankBotActions(v: View, decision: number) {
       else if (owner !== p)
         n +=
           3 +
-          goal([8]) +
+          0 +
           (bt?.book === b &&
           owner === bt.participants.reduce((a, i) => (bt.powers[i] > bt.powers[a] ? i : a))
             ? 2
@@ -297,9 +336,7 @@ export function rankBotActions(v: View, decision: number) {
           (v.effect.source === 'replace' && me.supply ? placement(b, k) : 0);
       else
         n +=
-          v.effect.source === 'experiment'
-            ? 1.5 + goal([8]) - (k !== null && bt && k > bt.space ? 2 : 0)
-            : -2;
+          v.effect.source === 'experiment' ? 1.5 - (k !== null && bt && k > bt.space ? 2 : 0) : -2;
     }
     if (kind === 'publishOverflow') n += placement(a.book!, null);
     if (kind === 'publish')
@@ -322,7 +359,7 @@ export function rankBotActions(v: View, decision: number) {
               ? 3
               : +x === 3
                 ? me.subplot !== null
-                  ? subplots[me.subplot].target - me.progress
+                  ? 1 - subplotScore(v, p, me.subplot)
                   : 0
                 : v.characters.filter((c) => c.owner !== p).reduce((n, c) => n + cp(c), 0) * 0.5;
     return n;
