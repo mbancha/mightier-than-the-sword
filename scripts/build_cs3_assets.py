@@ -32,6 +32,8 @@ split_sheet("twists-faces.png", "twist", 15)
 split_sheet("subplots-faces.png", "subplot", 10)
 split_sheet("characters-faces.png", "character", 10)
 split_sheet("horse-faces.png", "horse", 5)
+for index in range(1, 6):
+    shutil.copyfile(OUT / f"horse-{index}.png", OUT / f"horse-power-{index}.png")
 
 for index in range(1, 10):
     copy(f"book-{index:02}.png", f"book-{index}.png")
