@@ -45,13 +45,19 @@ for index in range(1, 5):
     copy(f"player-{index}.png", f"player-{index}.png", f"player-board-{index}.png")
 
 for player in range(1, 5):
-    for track in range(1, 5):
+    for track, category in enumerate(("curiosity", "insight", "resolve", "valor"), start=1):
         for copy_number in range(1, 4):
             name = f"memory-p{player}-t{track}-{copy_number}.png"
             copy(name, name)
+            shutil.copyfile(
+                OUT / name,
+                OUT / f"memory-p{player}-{category}-{copy_number}.png",
+            )
 
 copy("rules.png", "rules.png", "reference-1.png")
 copy("legend.png", "legend.png", "reference-2.png")
+copy("rules.png", "reference-basic-rules.png")
+copy("legend.png", "reference-icon-legend.png")
 copy("scoreboard.png", "scoreboard.png", "scoreboard-1.png")
 
 print(f"Wrote canonical CS3 assets to {OUT}")
