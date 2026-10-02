@@ -121,7 +121,7 @@ through branches and pull requests.
 
 ## Digital revision 0.4
 
-All edits target the digital game; print outputs change only on an explicit print-sync request. The current PDFs remain 0.3. The digital catalog and rules are 0.4, so earlier saves require their matching release.
+Print outputs change only on an explicit print-sync request. They were synchronized to the shared 0.5 catalog on 2026-10-01. Earlier saves still require their matching rules release.
 
 Start with 6 supply Inklings, 1 Twist and 1 Subplot. The Insight limit covers Twists plus the held Subplot. Middle spaces no longer grant Twists. The nine books now use only the new designer effects; The Aeneid replaces Beowulf at its former stable book ID. No Beowulf character existed in the deck. Agamemnon and Odysseus retain two activations each and their confirmed passives.
 

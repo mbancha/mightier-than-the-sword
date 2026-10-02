@@ -12,15 +12,16 @@ from PIL import Image,ImageDraw
 import icons_v13 as icons
 import vector_icons_v10 as v
 from catalog import wording
-from catalog import BOOKS,TWISTS,SUBPLOTS,CHARACTERS,HORSE,TOKENS,TRACKS,RULES,SOURCES,PLAYERS
+from catalog import BOOKS,TWISTS,SUBPLOTS,CHARACTERS,HORSE,TOKENS,TRACKS,RULES,SOURCES,PLAYERS,data
 
 ROOT=Path(__file__).resolve().parent.parent
 OUT=ROOT/'outputs';QA=ROOT.parent/'artifacts'/'print'
 OUT.mkdir(exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
 icons.configure();v.ASSET_DIR=ROOT.parent/'assets'/'icons'
 PDF=OUT/'Mightier_than_the_Sword_Current.pdf'
+RULES_VERSION=data['rulesVersion'].removeprefix('mightier-')
 c=canvas.Canvas(str(PDF),pagesize=(612,792))
-c.setTitle('Mightier than the Sword - Space-check Playtest 0.3')
+c.setTitle(f'Mightier than the Sword - Space-check Playtest {RULES_VERSION}')
 v.install_callback(c)
 INK=HexColor('#263D49');GRAY=HexColor('#66757B');LIGHT=HexColor('#D3DFE1')
 BLUE=HexColor('#237B9C');GOLD=HexColor('#A07223');TEAL=HexColor('#207E71');PURPLE=HexColor('#79539A')
@@ -52,7 +53,7 @@ def hexagon(x,y,r=17,symbol=None):
     if symbol:v.draw_icon(c,icons.SYMBOLS[symbol],x-10,y-10,20)
 def finish(label,w=612,h=792,footer=True):
     if footer:
-        txt('MIGHTIER THAN THE SWORD / SPACE CHECKS 0.3',30,17,7,color=GRAY)
+        txt(f'MIGHTIER THAN THE SWORD / SPACE CHECKS {RULES_VERSION}',30,17,7,color=GRAY)
         txt(label,w-30-stringWidth(label,'Helvetica',7),17,7,color=GRAY)
     c.showPage();pages.append(label)
 def rich(s):
@@ -70,7 +71,7 @@ def rules():
         x=28+col*286;y=713
         for title,body in blocks:
             txt(title.upper(),x,y,9,'Helvetica-Bold',TEAL);y-=8
-            h=para(body,x,y,270,9.5,11.4,maxh=360);y-=h+13
+            h=para(body,x,y,270,8.2,9.6,maxh=360);y-=h+10
         assert y>30,('Rules column overflow',col,y)
     finish('Basic rules')
 
@@ -160,13 +161,13 @@ def card(kind,item,num,x,y):
         para('<link href="'+url+'">'+escape(source_title)+'</link>',10,67-hq-4,160,7,8.5,color=GRAY,maxh=26)
     elif kind=='Subplot':
         _,target,goal,reward=item
-        hg=para(goal,10,yy,160,9.5,11.6,maxh=70);yy-=hg+19
-        for j in range(target):rect(12+j*29,yy-3,18,18,None,col,.8)
-        yy-=17;txt('WHEN FULL, CHOOSE ONE',10,yy,7,'Helvetica-Bold',col)
+        txt('HIDDEN OBJECTIVE',10,yy,7,'Helvetica-Bold',col);yy-=10
+        hg=para(goal,10,yy,160,9.5,11.6,maxh=92);yy-=hg+18
+        txt('WHEN FULFILLED, CHOOSE ONE',10,yy,7,'Helvetica-Bold',col)
         hr=para('Draw 1 [character]<br/><b>OR</b> '+rich(reward),10,yy-8,160,9.7,12,maxh=61)
         assert yy-8-hr>=44,(title,'reward too low')
         line(10,39,170,39)
-        para('Then discard this and draw a new Subplot.',10,33,160,8,10,color=GRAY,maxh=20)
+        para('Reveal, resolve, discard, then draw a new hidden Subplot. At most one completion per player turn.',10,33,160,7.3,8.6,color=GRAY,maxh=28)
     elif kind=='Character':
         txt(item['genre'].upper(),10,yy,7,'Helvetica-Bold',col);yy-=12
         for count,effect in item['actions']:

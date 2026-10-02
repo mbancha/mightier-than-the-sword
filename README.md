@@ -1,7 +1,7 @@
 # Mightier than the Sword
 
 A shared workspace for the game design, printable prototype, and an automated
-2–4 player prototype with human and strategic-bot seats. Current digital rules: **0.5**. Printable outputs are synced only when requested and currently reflect the earlier 0.3 edition.
+2–4 player prototype with human and strategic-bot seats. Current digital and printable rules: **0.5**.
 
 The first build includes all nine books, fifteen Twists, ten hidden board-state Subplots,
 ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
@@ -92,6 +92,8 @@ python print/check.py
 Browser screenshots and reports are under ignored `artifacts/`. The PDF contains
 all 16 sheets together. Its books have 2 mm margins; memory hexes are 0.75 inches
 wide and conflict tokens are 1 inch square with mirrored backs.
+
+Download the current [print-and-play PDF](print/outputs/Mightier_than_the_Sword_Current.pdf).
 
 ## Sharing
 

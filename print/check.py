@@ -22,7 +22,10 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     assert 'NO printed book points' in full
     assert 'no conflict resolves without an available token' in full.lower()
     assert 'base pool of 15' in full
-    for wording in ['ending on a different page', 'Twists are played ONLY in conflict', 'Check numbered spaces ONCE, left to right', 'Agamemnon triggers with 1 space still empty', 'placing an Inkling there draws 1 Twist']:
+    assert 'SPACE CHECKS 0.5.0' in full
+    assert full.count('HIDDEN OBJECTIVE')==10
+    assert 'WHEN FULL, CHOOSE ONE' not in full
+    for wording in ['ending on a different page', 'Twists are played ONLY in conflict', 'Check numbered spaces ONCE, left to right', 'Agamemnon triggers with 1 space still empty', 'Numbered spaces have no automatic Twist reward']:
         assert wording in full, wording
     assert 'ON YOUR TURN' not in full
     assert sum(len(p.hyperlinks) for p in pdf.pages)==15
