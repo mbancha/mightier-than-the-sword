@@ -65,9 +65,9 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
             assert all(r['bottom']<middle or r['top']>middle for r in slots)
             assert abs(sum(r['bottom']<middle for r in slots)-sum(r['top']>middle for r in slots))<=1
             assert any(abs(l['top']-middle)<.01 and abs(l['width']-((612-4*72/25.4)/2-2))<.01 for l in pg.lines)
-    assert pdf.pages[19].extract_text().count('QUILL') == 4
-    assert '4 Quills, 48 Inklings, 4 score markers' in pdf.pages[19].extract_text()
-    front,back=pdf.pages[17:19]
+    assert pdf.pages[17].extract_text().count('QUILL') == 4
+    assert '4 Quills, 48 Inklings, 4 score markers' in pdf.pages[17].extract_text()
+    front,back=pdf.pages[18:20]
     fronts=[r for r in front.rects if abs(r['width']-72)<.01 and abs(r['height']-72)<.01]
     backs=[r for r in back.rects if abs(r['width']-72)<.01 and abs(r['height']-72)<.01]
     assert len(fronts)==len(backs)==15

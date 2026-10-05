@@ -91,6 +91,7 @@ def legend():
         if symbol=='[twist]':meaning='Play during your Inkling space check in conflict. Numbered spaces grant no automatic Twist reward.'
         if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into overflow on this book.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
+    para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-18 single-sided. Print conflict-token pages 19-20 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
     line(32,162,580,162,GRAY)
     rect(35,117,25,25,None,TEAL,1)
     para('<b>Activation square</b><br/>Put one of your supply inklings here to use the adjacent character action. Each square can hold one inkling.',76,150,235,9.5,12,maxh=60)
@@ -328,7 +329,7 @@ def pieces():
     finish('Player pieces / 4 Quills, 48 Inklings, 4 score markers, 1 Act marker')
 
 rules();legend();books();cards()
-boards();scoreboard();memories();tokens();pieces();c.save()
+boards();scoreboard();memories();pieces();tokens();c.save()
 assert len(pages)==20,len(pages)
 reader=PdfReader(str(PDF));assert len(reader.pages)==len(pages)
 for i,p in enumerate(reader.pages):
