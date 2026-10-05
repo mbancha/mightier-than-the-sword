@@ -663,7 +663,10 @@ export default function App() {
                             'foreshadow',
                             'character',
                             'alternative',
-                          ].includes(a.key) || a.key.startsWith('bookMove:'),
+                          ].includes(a.key) ||
+                          a.key.startsWith('bookMove:') ||
+                          a.key.startsWith('resolveOption:') ||
+                          a.key.startsWith('insight'),
                       )
                       .map((a) => (
                         <button key={a.key} onClick={() => dispatch(a)}>
