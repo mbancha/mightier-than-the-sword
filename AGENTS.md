@@ -24,7 +24,7 @@ other games by default.
   Expose newGame/applyAction/legalActions. Reject invalid actions atomically.
 - Use explicit public/player projections. Never pass decks, seed, random state,
   opponent hands, or unrevealed Horse powers to a displayed view. Saves are private.
-- Match the game's vocabulary: Inkling, foreshadow, memory, character, plot points.
+- Match the game's vocabulary: Inkling, foreshadow, memory, Quill (player piece), character (literary card), plot points.
   Actions stay readable words; preserve the existing sparse icon set.
 - Do not introduce networking, bots, a universal rules language, or framework
   redesign without a concrete designer request.

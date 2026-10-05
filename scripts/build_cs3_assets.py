@@ -8,7 +8,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "tts" / "assets"
-OUT = ROOT / "print" / "outputs" / "cs3-assets"
+OUT = ROOT / "artifacts" / "cs3-assets"
 OUT.mkdir(parents=True, exist_ok=True)
 
 

@@ -174,7 +174,7 @@ export function TableMap({
       : own
         ? actions.filter((a) =>
             cid === undefined
-              ? ['place', 'upgrade', 'finish', 'bookMove:protagonist'].includes(a.key)
+              ? ['place', 'upgrade', 'finish', 'bookMove:Quill'].includes(a.key)
               : a.key.startsWith(`activate:${cid}:`) || a.key === `bookMove:${cid}`,
           )
         : [];
@@ -367,14 +367,14 @@ export function TableMap({
                             return (
                               <button
                                 key={'p' + i}
-                                className={`figure protagonist ${isMoving ? 'movable' : ''}`}
+                                className={`figure Quill ${isMoving ? 'movable' : ''}`}
                                 style={
                                   {
                                     '--piece-color': colors[i],
                                     borderColor: colors[i],
                                   } as CSSProperties
                                 }
-                                aria-label={`${p.name} protagonist`}
+                                aria-label={`${p.name} Quill`}
                                 onPointerDown={(e) => pieceDown(e, isMoving, p.name)}
                                 onClick={(e) =>
                                   figureMenu(
@@ -387,7 +387,7 @@ export function TableMap({
                                   )
                                 }
                               >
-                                {icon('protagonist', 28)}
+                                {icon('Quill', 28)}
                                 <span>{p.name}</span>
                               </button>
                             );
@@ -424,13 +424,15 @@ export function TableMap({
                           {b.slots.map((spot, k) =>
                             spot.page === side ? (
                               <button
-                                className={`slot ${data.battle?.book === bi && data.battle.space === k && data.battle.spaceOwner !== null && data.battle.winner === null ? 'scanSlot' : ''} ${actions.some((a) => ['place:' + k, 'placeHere:' + k].includes(a.key) && a.book === bi) ? 'legalSlot' : ''}`}
+                                className={`slot ${data.battle?.book === bi && data.battle.space === k && data.battle.spaceOwner !== null && data.battle.winner === null ? 'scanSlot' : ''} ${actions.some((a) => (['place:' + k, 'placeHere:' + k].includes(a.key) || (a.key.startsWith('adjacent:') && a.key.endsWith(':place:' + k))) && a.book === bi) ? 'legalSlot' : ''}`}
                                 key={k}
                                 aria-label={`${def.title} space ${k + 1}${spot.owner !== null ? ' occupied by ' + data.players[spot.owner].name : ''}`}
                                 onClick={(e) => {
                                   const choices = actions.filter(
                                     (a) =>
-                                      (['place:' + k, 'placeHere:' + k].includes(a.key) &&
+                                      ((['place:' + k, 'placeHere:' + k].includes(a.key) ||
+                                        (a.key.startsWith('adjacent:') &&
+                                          a.key.endsWith(':place:' + k))) &&
                                         a.book === bi) ||
                                       a.key.startsWith(`upgrade:${bi}:${k}:`) ||
                                       a.key.startsWith(`memoryHere:${bi}:${k}:`) ||
@@ -490,7 +492,9 @@ export function TableMap({
                   onClick={(e) => {
                     const opts = actions.filter(
                       (a) =>
-                        (['place:null', 'placeHere:null'].includes(a.key) && a.book === bi) ||
+                        ((['place:null', 'placeHere:null'].includes(a.key) ||
+                          (a.key.startsWith('adjacent:') && a.key.endsWith(':place:null'))) &&
+                          a.book === bi) ||
                         a.key === `publishOverflow:${bi}` ||
                         a.key.startsWith(`target:${bi}:null:`),
                     );
@@ -560,7 +564,7 @@ export function TableMap({
         )}
         {drag && (
           <div className="dragGhost" style={{ left: drag.x, top: drag.y }}>
-            {icon('protagonist', 30)}
+            {icon('Quill', 30)}
             {drag.label}
           </div>
         )}

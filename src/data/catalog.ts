@@ -30,3 +30,6 @@ export const tokens = Object.entries(raw.tokens).flatMap(([act, items]) =>
   items.map(([name, text], i) => ({ id: (+act - 1) * 5 + i, act: +act, name, text })),
 );
 export const rowName = (row: Row) => row[0].toUpperCase() + row.slice(1);
+
+export const movementLimit = (level: number) => (level === 3 ? 5 : CONFIG.baseMove + level);
+export const quillPower = (level: number, inklings: number) => (level === 3 ? 2 + inklings : level);

@@ -1,5 +1,5 @@
 import { subplotScore } from './subplots';
-import { characters, content, CONFIG, type Row } from '../data/catalog';
+import { characters, content, CONFIG, quillPower, type Row } from '../data/catalog';
 import { reachable, bookOf, adjacentBooks } from './topology';
 import type { playerView } from './views';
 import type { Choice, Character } from './types';
@@ -170,7 +170,7 @@ export function rankBotActions(v: View, decision: number) {
     if (id === 5) gain += Math.min(2, inks(b)) * 2;
     if (id === 7 && bt.powers[p] + gain > Math.max(...bt.powers.filter((_, i) => i !== p)))
       extra += 2;
-    if (id === 8 && bookOf(me.page) !== b) gain += me.rows.valor;
+    if (id === 8 && bookOf(me.page) !== b) gain += quillPower(me.rows.valor, inks(b));
     if (id === 10) {
       gain +=
         v.books[b].id === 0 ? 0 : Math.min(2, me.supply + (v.act < 3 ? me.reserves[v.act] : 0));
@@ -302,6 +302,11 @@ export function rankBotActions(v: View, decision: number) {
     if (kind === 'discard') n -= twistValue(+x);
     if (kind === 'discardSubplot')
       n -= 6 + (me.subplot === null ? 0 : subplotScore(v, p, me.subplot) * 4);
+    if (kind === 'resolveOption') n += +x === 3 ? 5 : +x === 2 ? 4 : +x === 1 ? 2 : 1;
+    if (kind === 'adjacent')
+      n += placement(a.book!, a.key.endsWith(':null') ? null : +a.key.split(':').at(-1)!);
+    if (kind === 'insightTwist') n += drawValue();
+    if (kind === 'insightSubplot') n += 5;
     if (kind === 'bookMove') n += 1;
     if (kind === 'character') n += effectsValue([{ type: 'gain' }]);
     if (kind === 'alternative' && me.subplot !== null)

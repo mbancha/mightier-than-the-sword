@@ -115,3 +115,8 @@ catalog and bot implementation; report metadata records all three versions.
 ## Current-state objectives (0.5)
 
 `game/subplots.ts` supplies current-board predicates shared by the engine and bots. Fractional scores are planning estimates only, never stored progress. The engine checks predicates while pumping jobs and guards replacement loops with each player’s `subplotTurn`. Public views expose only `hasSubplot`; private views add the owner’s card ID. Bot candidate projections use only their private view and public pieces.
+
+
+## Track alternatives and end-turn refill (0.6)
+
+Movement uses the shared `movementLimit` helper; final Quill power uses `quillPower` with the live count of owned numbered/overflow Inklings. `resolveChoice` queues one available tier. `placeAdjacent` retains its origin page and shares ordinary placement handlers, so page-edge topology, book rewards, and conflict interruptions remain authoritative. Direct space placement is a shortcut for the base one-Inkling option. `insightDraw` offers a repeatable optional deck choice until combined hand size 4, preserving a single active Subplot. Normal turn end, final-token end, and shoot-the-moon end schedule refill before hand-limit cleanup and any Act transition. Print/outputs holds exactly one master PDF; rendered evidence and export intermediates are ignored artifacts.

@@ -1,3 +1,4 @@
+import { movementLimit } from '../data/catalog';
 import { currentPlayer, legalActions, power } from './engine';
 import type { GameState } from './types';
 // Explicit public allowlist: no seed, random state, decks, jobs or hidden powers.
@@ -67,7 +68,9 @@ export function playerView(s: GameState, p: number) {
             mandatory: s.jobs[0].source === 'normal',
             origin: s.jobs[0].origin ?? s.players[p].page,
             remaining:
-              s.jobs[0].mode === 'any' ? null : (s.jobs[0].n ?? 1 + s.players[p].rows.curiosity),
+              s.jobs[0].mode === 'any'
+                ? null
+                : (s.jobs[0].n ?? movementLimit(s.players[p].rows.curiosity)),
           }
         : null,
   };

@@ -52,8 +52,8 @@ try {
   assert.ok(coords[2].y > coords[0].y);
   assert.equal(await page.locator('.playerSubplot[open]').count(), 1);
   assert.equal(await page.locator('.playerSubplot p:visible').count(), 2);
-  // Actual pointer drag of the protagonist, then its contextual end-move menu.
-  let figure = page.getByRole('button', { name: 'Teal protagonist', exact: true });
+  // Actual pointer drag of the Quill, then its contextual end-move menu.
+  let figure = page.getByRole('button', { name: 'Teal Quill', exact: true });
   await figure.click();
   assert.ok((await page.locator('.legalPage').count()) > 0);
   assert.equal(
@@ -70,7 +70,7 @@ try {
   assert.equal(
     await page
       .locator('[data-page="1"]')
-      .getByRole('button', { name: 'Teal protagonist', exact: true })
+      .getByRole('button', { name: 'Teal Quill', exact: true })
       .count(),
     1,
   );
@@ -118,7 +118,7 @@ try {
   await page.setViewportSize({ width: 1600, height: 1100 });
   async function directMove(name, pageNumber) {
     await reveal();
-    const fig = page.getByRole('button', { name: name + ' protagonist', exact: true });
+    const fig = page.getByRole('button', { name: name + ' Quill', exact: true });
     await fig.click();
     await page.locator(`[data-page="${pageNumber}"] .pageLabel`).click();
     await fig.click();
@@ -232,12 +232,12 @@ try {
   await botPage.getByRole('button', { name: 'Begin story', exact: true }).click();
   await botPage.getByLabel('Bot speed').selectOption('150');
   await botPage.locator('[data-page="0"] .pageLabel').click();
-  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).waitFor();
+  await botPage.getByRole('button', { name: 'Teal Quill', exact: true }).waitFor();
   await botPage.waitForFunction(() => !document.querySelector('.botStatus'));
   assert.equal(await botPage.locator('.handoff').count(), 0);
-  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
+  await botPage.getByRole('button', { name: 'Teal Quill', exact: true }).click();
   await botPage.locator('[data-page="1"] .pageLabel').click();
-  await botPage.getByRole('button', { name: 'Teal protagonist', exact: true }).click();
+  await botPage.getByRole('button', { name: 'Teal Quill', exact: true }).click();
   await botPage.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
   await botPage.locator('.legalSlot.slot').first().click();
   await botPage

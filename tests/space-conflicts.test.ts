@@ -55,7 +55,7 @@ function start(owners = [1, 0, 1, 0]) {
   act(s, 'placeHere:4');
   return s;
 }
-describe('Mandatory protagonist movement', () => {
+describe('Mandatory Quill movement', () => {
   it('cannot stay, stop before moving, or finish a loop at the starting page', () => {
     const s = fresh();
     s.jobs = [

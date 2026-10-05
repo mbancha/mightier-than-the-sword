@@ -9,6 +9,8 @@ import {
   ROWS,
   rowName,
   content,
+  movementLimit,
+  quillPower,
   type Row,
 } from '../data/catalog';
 import { makeRng, shuffle, nextInt } from '../kernel/rng';
@@ -59,7 +61,9 @@ const abilitySuppressed = (s: GameState, id: number) =>
   id !== 4 &&
   s.characters.some((c) => c.id === id && here(c, s.battle!.book));
 export function power(s: GameState, p: number, b: number) {
-  let v = count(s, p, b) + (bookOf(s.players[p].page) === b ? s.players[p].rows.valor : 0);
+  let v =
+    count(s, p, b) +
+    (bookOf(s.players[p].page) === b ? quillPower(s.players[p].rows.valor, count(s, p, b)) : 0);
   for (const c of ownedChars(s, p, b))
     if (s.battle?.book !== b || !suppressed(s, c.id))
       v += c.id === 1 && c.collected === 3 ? 5 : characters[c.id].power;
@@ -447,7 +451,7 @@ function options(s: GameState): Option[] {
     const pages =
       j.type === 'setup' || j.mode === 'any'
         ? Array.from({ length: s.books.length * 2 }, (_, i) => i)
-        : reachable(s.books, from, j.n ?? CONFIG.baseMove + pl.rows.curiosity);
+        : reachable(s.books, from, j.n ?? movementLimit(pl.rows.curiosity));
     for (const page of pages.filter(
       (page) =>
         (j.book === undefined || bookOf(page) === j.book) &&
@@ -475,7 +479,7 @@ function options(s: GameState): Option[] {
   if (j.type === 'move') {
     const c = j.char === undefined ? null : s.characters.find((c) => c.id === j.char)!;
     const from = c ? c.page : pl.page;
-    const remaining = j.n ?? CONFIG.baseMove + pl.rows.curiosity;
+    const remaining = j.n ?? movementLimit(pl.rows.curiosity);
     if (j.source !== 'normal' || from !== (j.origin ?? from))
       add(
         'endMove',
@@ -506,8 +510,8 @@ function options(s: GameState): Option[] {
   if (j.type === 'bookMove') {
     for (const id of [undefined, ...ownedChars(s, p).map((c) => c.id)])
       add(
-        `bookMove:${id ?? 'protagonist'}`,
-        `Move ${id === undefined ? 'your protagonist' : characters[id].name} up to 1 page`,
+        `bookMove:${id ?? 'Quill'}`,
+        `Move ${id === undefined ? 'your Quill' : characters[id].name} up to 1 page`,
         (state) => {
           done(state);
           queue(state, job('move', p, { n: 1, char: id, source: 'book' }));
@@ -554,7 +558,7 @@ function options(s: GameState): Option[] {
     if (!s.acted) {
       const pj = job('place', p, {
         page: pl.page,
-        n: pl.rows.resolve >= 2 ? pl.rows.resolve : 1,
+        n: 1,
         optional: true,
       });
       if (pl.supply)
@@ -593,29 +597,10 @@ function options(s: GameState): Option[] {
         'Place Inklings',
         (s) => {
           s.acted = true;
-          queue(
-            s,
-            job('place', p, {
-              page: pl.page,
-              n: pl.rows.resolve >= 2 ? pl.rows.resolve : 1,
-              optional: true,
-            }),
-          );
+          queue(s, job('resolveChoice', p, { page: pl.page }));
         },
         'Action',
       );
-      if (pl.rows.resolve === 1)
-        for (const card of pl.hand)
-          add(
-            `boost:${card}`,
-            `Discard ${twists[card].name} to place 2`,
-            (s) => {
-              s.acted = true;
-              discard(s, p, card);
-              queue(s, job('place', p, { page: pl.page, n: 2, optional: true }));
-            },
-            'Action',
-          );
       const up = upgradeOptions(s, job('upgrade', p, { page: pl.page }));
       if (up.length)
         add(
@@ -662,6 +647,75 @@ function options(s: GameState): Option[] {
         },
         'Finish',
       );
+  }
+  if (j.type === 'insightDraw') {
+    if (pl.hand.length + (pl.subplot === null ? 0 : 1) < 4) {
+      if (s.decks.twist.length || s.discards.twist.length)
+        add(
+          'insightTwist',
+          'Draw 1 Twist',
+          (state) => {
+            draw(state, p, 1, 'twist');
+          },
+          'Insight',
+        );
+      if (pl.subplot === null && (s.decks.subplot.length || s.discards.subplot.length))
+        add(
+          'insightSubplot',
+          'Draw 1 Subplot',
+          (state) => {
+            draw(state, p, 1, 'subplot');
+          },
+          'Insight',
+        );
+    }
+    pass();
+  }
+  if (j.type === 'resolveChoice') {
+    const labels = [content.tracks[3][2], ...content.tracks[3][3]] as string[];
+    for (let level = 0; level <= pl.rows.resolve; level++)
+      add(
+        `resolveOption:${level}`,
+        labels[level],
+        (state) => {
+          done(state);
+          const page = j.page ?? pl.page;
+          if (level === 0) queue(state, job('place', p, { page, n: 1, optional: true }));
+          if (level === 1)
+            queue(
+              state,
+              job('place', p, { book: bookOf(page), mode: 'overflow', n: 2, optional: true }),
+            );
+          if (level === 2)
+            queue(
+              state,
+              job('place', p, { page, n: 1, optional: true }),
+              job('place', p, { book: bookOf(page), mode: 'overflow', n: 1, optional: true }),
+            );
+          if (level === 3) queue(state, job('placeAdjacent', p, { page, n: 3, optional: true }));
+        },
+        'Resolve',
+      );
+  }
+  if (j.type === 'placeAdjacent') {
+    const origin = j.page ?? pl.page;
+    for (const page of [origin, ...pageNeighbors(s.books, origin)]) {
+      const single = job('place', p, { page, n: 1 });
+      for (const option of options({ ...s, jobs: [single] }))
+        add(
+          `adjacent:${page}:${option.key}`,
+          option.label,
+          (state) => {
+            done(state);
+            if ((j.n ?? 1) > 1) queue(state, { ...j, n: (j.n ?? 1) - 1 });
+            state.jobs.unshift(single);
+            option.run(state);
+          },
+          'Place',
+          { page, book: bookOf(page) },
+        );
+    }
+    pass();
   }
   if (j.type === 'place') {
     const b = j.book ?? bookOf(j.page ?? pl.page),
@@ -1067,7 +1121,13 @@ function pump(s: GameState) {
       continue;
     }
     if (j.type === 'moon' && !s.pools[s.act - 1].length) {
-      finishAct(s);
+      s.jobs = [];
+      queue(
+        s,
+        ...(pl.rows.insight === 3 ? [job('insightDraw', p)] : []),
+        job('handLimit', p),
+        job('advanceAct', p),
+      );
       continue;
     }
     if (j.type === 'end') {
@@ -1076,6 +1136,7 @@ function pump(s: GameState) {
       queue(
         s,
         ...(c ? [job('move', p, { char: 1, n: 1, source: 'character' })] : []),
+        ...(pl.rows.insight === 3 ? [job('insightDraw', p)] : []),
         job('handLimit', p),
         job('next', p),
       );
@@ -1219,6 +1280,7 @@ function pump(s: GameState) {
         queue(
           s,
           ...(c ? [job('move', owner, { char: 1, n: 1, source: 'character' })] : []),
+          ...(s.players[owner].rows.insight === 3 ? [job('insightDraw', owner)] : []),
           job('handLimit', owner),
           job('advanceAct', owner),
         );
