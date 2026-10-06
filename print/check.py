@@ -3,7 +3,7 @@ from collections import Counter
 import json,math,re,zipfile
 import pdfplumber
 from pypdf import PdfReader
-from PIL import Image
+from xml.etree import ElementTree as ET
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent/'source'))
 from catalog import TOKENS,PLAYERS
@@ -82,10 +82,13 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     for pg,cells in [(front,fronts),(back,backs)]:
         for obj in pg.chars+pg.curves:
             assert any(obj['x0']>=r['x0']+1 and obj['x1']<=r['x1']-1 and obj['top']>=r['top']+1 and obj['bottom']<=r['bottom']-1 for r in cells),obj
-folder=root/'assets'/'icons'
-assert len(list(folder.glob('*.png')))==17
-for p in folder.glob('*.png'):
-    im=Image.open(p);assert im.mode=='RGBA'
-    assert im.getchannel('A').getbbox()==(0,0,*im.size)
+folder=root/'public'/'icons'
+manifest=json.loads((folder/'manifest.json').read_text())
+assert len(list(folder.glob('*.svg')))==len(manifest['assets'])==17
+for entry in manifest['assets']:
+    path=root/entry['master']
+    assert path.is_file() and entry['master']==entry['web']
+    svg=ET.parse(path).getroot()
+    assert svg.tag.endswith('svg') and svg.attrib.get('viewBox')
 
 print('PASS: 20 pages; four portrait player-board sheets; four player colors; 48 hexes at 0.75 inches wide; 15 exact 1-inch conflict fronts and long-edge mirrored backs; current memories wording; vector-only PDFs; card cut boundaries clear.')

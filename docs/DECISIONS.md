@@ -145,3 +145,8 @@ Designer-confirmed: player pieces are Quills. Named literary character cards ret
 Implementation interpretation pending designer clarification: Insight offers Twist draws and a Subplot draw only when no active Subplot is held, preserving the existing one-active-Subplot rule. It never replaces an existing objective. Draws occur after end-turn character movement, before hand-limit discard. A depleted deck without discards offers no draw. Normal Resolve placement follows the current empty-space/overflow rule; placement effects and immediate conflicts still interrupt remaining placements. Available tiers are alternatives, not cumulative benefits.
 
 The master PDF now matches the digital catalog, including all 0.4 book effects and 0.5 hidden objectives. `print/outputs/` contains only `Mightier_than_the_Sword_Current.pdf`. Old editions and Component Studio image exports are removed from tracked output; Git history retains them. Future image exports go to ignored `artifacts/`.
+
+
+## Repository cleanup (2026-10-05)
+
+Designer requested removal of obsolete folders. `assets/` duplicated all 17 active SVGs in `public/icons/`; byte equality was verified before removal. `public/icons/` is now the canonical exported icon set, with the provenance manifest moved there and its paths corrected. Print still draws the retained original vector source. The unused Component Studio exporter referenced missing `tts/assets` and is removed. Current source, documentation, print generator, tests, and GitHub workflows remain active. Print output contains only the current master PDF.
