@@ -150,3 +150,8 @@ The master PDF now matches the digital catalog, including all 0.4 book effects a
 ## Repository cleanup (2026-10-05)
 
 Designer requested removal of obsolete folders. `assets/` duplicated all 17 active SVGs in `public/icons/`; byte equality was verified before removal. `public/icons/` is now the canonical exported icon set, with the provenance manifest moved there and its paths corrected. Print still draws the retained original vector source. The unused Component Studio exporter referenced missing `tts/assets` and is removed. Current source, documentation, print generator, tests, and GitHub workflows remain active. Print output contains only the current master PDF.
+
+
+## Half-sheet player boards (2026-10-06)
+
+Designer requested two boards per Letter sheet with all details retained. Player-board rows are compacted vertically while the 0.75-inch memory slots remain full-size. Every base benefit, upgrade, memory reward, instruction and Act reserve reminder is unchanged. The single master PDF is now 18 pages; token fronts/backs are pages 17-18. Print inline-layout resources are generated in ignored artifacts from the retained vector source, so regeneration no longer depends on the removed assets folder.

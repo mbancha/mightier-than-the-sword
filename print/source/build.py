@@ -17,7 +17,13 @@ from catalog import BOOKS,TWISTS,SUBPLOTS,CHARACTERS,HORSE,TOKENS,TRACKS,RULES,S
 ROOT=Path(__file__).resolve().parent.parent
 OUT=ROOT/'outputs';QA=ROOT.parent/'artifacts'/'print'
 OUT.mkdir(exist_ok=True);QA.mkdir(parents=True,exist_ok=True)
-icons.configure();v.ASSET_DIR=ROOT.parent/'assets'/'icons'
+icons.configure()
+# Paragraph needs an image resource for inline layout. Canvas paints the actual
+# vector icon through install_callback; these placeholders never enter the PDF.
+v.ASSET_DIR=QA/'inline-layout'
+v.ASSET_DIR.mkdir(exist_ok=True)
+for key in v.DRAWINGS:
+    Image.new('RGBA',(1,1),(0,0,0,0)).save(v.ASSET_DIR/(key+'.png'))
 PDF=OUT/'Mightier_than_the_Sword_Current.pdf'
 RULES_VERSION=data['rulesVersion'].removeprefix('mightier-')
 c=canvas.Canvas(str(PDF),pagesize=(612,792))
@@ -91,7 +97,7 @@ def legend():
         if symbol=='[twist]':meaning='Play during your Inkling space check in conflict. Numbered spaces grant no automatic Twist reward.'
         if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into overflow on this book.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
-    para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-18 single-sided. Print conflict-token pages 19-20 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
+    para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-16 single-sided. Print conflict-token pages 17-18 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
     line(32,162,580,162,GRAY)
     rect(35,117,25,25,None,TEAL,1)
     para('<b>Activation square</b><br/>Put one of your supply inklings here to use the adjacent character action. Each square can hold one inkling.',76,150,235,9.5,12,maxh=60)
@@ -214,34 +220,36 @@ def player_box(index,x,y,w,h,fill=None,marks=True):
 def board(index,base_y):
     c.saveState();c.translate(0,base_y)
     player=PLAYERS[index];col=HexColor(player['color']);pale=HexColor(player['pale'])
-    player_box(index,7,7,598,778,marks=False)
-    player_mark(index,29,753,24)
-    para('Cover each row with 3 matching memories. Uncover left to right.<br/>Resolve: choose any one available placement option.',52,763,538,10,13,maxh=30)
+    player_box(index,7,7,598,382,marks=False)
+    player_mark(index,29,370,21)
+    para('Cover each row with 3 matching memories. Uncover left to right.<br/>Resolve: choose any one available placement option.',52,376,538,8.5,10.2,maxh=24)
     for i,(key,name,base,levels,reward) in enumerate(TRACKS):
-        yy=560-i*150
-        player_box(index,18,yy,576,150,pale)
-        v.draw_icon(c,icons.SYMBOLS['['+key+']'],25,yy+114,19)
-        txt(name.upper(),50,yy+123,10,'Helvetica-Bold',col)
-        para(base,26,yy+100,135,10,13,maxh=70)
+        yy=278-i*70
+        player_box(index,18,yy,576,70,pale)
+        v.draw_icon(c,icons.SYMBOLS['['+key+']'],25,yy+46,17)
+        txt(name.upper(),50,yy+55,9,'Helvetica-Bold',col)
+        para(base,26,yy+39,125,8.5,10,maxh=26)
         for j,value in enumerate(levels):
-            xx=193+j*143
-            polygon([(xx+27*math.cos(k*math.pi/3),yy+100+27*math.sin(k*math.pi/3)) for k in range(6)],white,col,1.8)
-            v.draw_icon(c,icons.SYMBOLS['['+key+']'],xx-9,yy+91,18)
-            txt(str(j+1),xx+21,yy+78,6.5,'Helvetica-Bold',col)
-            para(value,xx+33,yy+127,76,9,11,maxh=100)
-        player_box(index,24,yy+8,564,25,white)
-        txt('MEMORIES',32,yy+17,7,'Helvetica-Bold',col)
-        para(rich(reward),112,yy+25,470,10,12,maxh=13)
+            xx=183+j*140
+            polygon([(xx+27*math.cos(k*math.pi/3),yy+43+27*math.sin(k*math.pi/3)) for k in range(6)],white,col,1.8)
+            v.draw_icon(c,icons.SYMBOLS['['+key+']'],xx-9,yy+34,18)
+            txt(str(j+1),xx+21,yy+18,6.5,'Helvetica-Bold',col)
+            para(value,xx+33,yy+63,89,8,9,maxh=45)
+        player_box(index,24,yy+1,564,14,white)
+        txt('MEMORIES',32,yy+5,6.5,'Helvetica-Bold',col)
+        para(rich(reward),112,yy+12,470,8.5,10,maxh=11)
     for j,act in enumerate(('II','III')):
-        xx=18+j*290;player_box(index,xx,28,286,50,pale)
-        txt('ACT '+act+' RESERVE',xx+9,60,10,'Helvetica-Bold',col)
-        txt('3 starting Inklings + suspended Inklings',xx+9,42,10)
+        xx=18+j*290;player_box(index,xx,18,286,40,pale)
+        txt('ACT '+act+' RESERVE',xx+9,44,9,'Helvetica-Bold',col)
+        txt('3 starting Inklings + suspended Inklings',xx+9,28,8.5)
     c.restoreState()
 
 def boards():
-    for index in range(4):
-        c.setPageSize((612,792));board(index,0)
-        finish('Player board / '+str(index+1),footer=False)
+    for start in (0,2):
+        c.setPageSize((612,792))
+        board(start,396);board(start+1,0)
+        line(7,396,605,396,GRAY,.4)
+        finish('Player boards / '+str(start+1)+' and '+str(start+2),footer=False)
 
 def memories():
     c.setPageSize((612,792))
@@ -330,15 +338,18 @@ def pieces():
 
 rules();legend();books();cards()
 boards();scoreboard();memories();pieces();tokens();c.save()
-assert len(pages)==20,len(pages)
+assert len(pages)==18,len(pages)
 reader=PdfReader(str(PDF));assert len(reader.pages)==len(pages)
 for i,p in enumerate(reader.pages):
     text=p.extract_text() or ''
     assert not v.PATTERN.search(text),('Unrendered icon',i)
     assert not re.search(r'\b(bookmark|Pathos|Love|Plotline|unpublished|sidekick|exhaust)\b',text,re.I),('Obsolete term',i)
-doc=pdfium.PdfDocument(str(PDF));thumbs=[]
-for i,p in enumerate(doc):
-    im=p.render(scale=1.6).to_pil().convert('RGB');im.save(QA/f'page-{i+1:02}.png')
+thumbs=[]
+for i in range(len(pages)):
+    # Isolate each render so font-cache state cannot hide text on later sheets.
+    doc=pdfium.PdfDocument(str(PDF));p=doc[i]
+    im=p.render(scale=1.6).to_pil().convert('RGB');p.close();doc.close()
+    im.save(QA/f'page-{i+1:02}.png')
     im.thumbnail((306,396));tile=Image.new('RGB',(322,424),'#D6DADD');tile.paste(im,((322-im.width)//2,8))
     ImageDraw.Draw(tile).text((8,405),f'{i+1}: {pages[i]}',fill='black');thumbs.append(tile)
 for start in range(0,len(thumbs),6):
