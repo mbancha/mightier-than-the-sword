@@ -90,8 +90,8 @@ python print/check.py
 ```
 
 Browser screenshots and reports are under ignored `artifacts/`. The PDF contains
-all 20 sheets together. Its books have 2 mm margins; memory hexes are 0.75 inches
-wide and conflict tokens are 1 inch square with mirrored backs.
+all 18 sheets together. Its books have 2 mm margins; memory hexes are 0.75 inches
+wide and conflict tokens are 1 inch square with mirrored backs. Two player boards fit on each Letter sheet, retaining full-size memory slots and all track details. Print pages 1-16 single-sided, and pages 17-18 double-sided with long-edge flipping.
 
 Download the current [print-and-play PDF](print/outputs/Mightier_than_the_Sword_Current.pdf).
 

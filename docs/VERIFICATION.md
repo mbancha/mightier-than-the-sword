@@ -102,3 +102,8 @@ GitHub's initial shared runner timed out the deterministic two-batch simulation 
 ## Obsolete-folder cleanup
 
 Verified all 17 legacy SVG files were identical to the retained public icons. Print validation now checks the canonical SVG set and provenance paths rather than obsolete PNG exports. The master PDF was not changed by cleanup.
+
+
+## Half-sheet player-board validation (2026-10-06)
+
+Regenerated the master from the current checkout without the removed assets folder. Print checks pass for 18 vector-only pages, exactly two boards per board sheet, all four player colors, 12 full-size memory slots per board, text inside board boundaries, and exact catalog text in every base/upgrade cell. Word-count comparison against each original full-sheet board showed no added or removed words. Rendered both player-board sheets and reviewed all content, including the longest final Insight benefit and reserve reminders. Token duplex instructions and page indices are updated to 17-18.
