@@ -32,7 +32,10 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
 const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
   publishOverflow: 'Place an Inkling in a neighboring book’s overflow.',
-  setup: 'Choose a starting page for your protagonist.',
+  resolveChoice: 'Choose any available Resolve placement option.',
+  placeAdjacent: 'Place up to 3 Inklings here or on adjacent pages.',
+  insightDraw: 'You may draw cards until your combined hand has 4.',
+  setup: 'Choose a starting page for your Quill.',
   move: 'Move your figure to a highlighted page.',
   turn: 'Click an empty space to place, or your Inkling to leave a memory.',
   place: 'Choose an empty space. Full pages use shared overflow.',
@@ -51,7 +54,7 @@ const prompts: Record<string, string> = {
   nemo: 'Move activation Inklings into this book’s overflow, or skip.',
   refresh: 'Return activation Inklings to supply, or skip.',
   discard: 'Discard a Twist or Subplot to your combined hand limit.',
-  bookMove: 'You may move your protagonist or any one of your characters 1 page.',
+  bookMove: 'You may move your Quill or any one of your characters 1 page.',
   cycle: 'Discard a Twist to draw a Twist, or skip.',
   ignore: 'Choose an opposing character whose power is ignored.',
   bridge: 'Choose two adjoining pages on different books.',
@@ -182,7 +185,7 @@ export default function App() {
     <>
       <header className="masthead">
         <div>
-          <div className="eyebrow">A shared story · digital playtest 0.5</div>
+          <div className="eyebrow">A shared story · digital playtest 0.6</div>
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
@@ -233,9 +236,7 @@ export default function App() {
       {catalog && (
         <section className="reference">
           <h2>Component library</h2>
-          <p>
-            Current digital edition 0.5. Printable sheets are updated separately when requested.
-          </p>
+          <p>Current digital edition 0.6. The master print-and-play PDF uses the same rules.</p>
           <div className="library">
             {twists.map((t) => (
               <article className="smallCard" key={'t' + t.id}>
@@ -290,7 +291,7 @@ export default function App() {
       {!session ? (
         <main className="setup">
           <section>
-            <Icon name="protagonist" size={64} />
+            <Icon name="Quill" size={64} />
             <h2>Open a new chapter</h2>
             <p>
               Move between pages, leave memories, enlist literary characters, and win conflicts on a
@@ -535,10 +536,12 @@ export default function App() {
                   ))}
                 </div>
                 <p className="muted">
-                  Move {p.rows.curiosity + 1} · Power {p.rows.valor} · Combined hand limit{' '}
-                  {3 + p.rows.insight} ({p.handCount + (p.hasSubplot ? 1 : 0)} cards) · Place{' '}
-                  {p.rows.resolve >= 2 ? p.rows.resolve : 1}
-                  {p.rows.resolve === 1 ? ' (or discard to place 2)' : ''}
+                  Move {p.rows.curiosity === 3 ? 5 : p.rows.curiosity + 1} · Quill power{' '}
+                  {p.rows.valor === 3 ? '2 + your Inklings here' : p.rows.valor} · Combined hand
+                  limit {3 + p.rows.insight} ({p.handCount + (p.hasSubplot ? 1 : 0)} cards) · Place{' '}
+                  {p.rows.resolve === 3
+                    ? 'up to 3 here or adjacent'
+                    : 'choose an available Resolve option'}
                 </p>
                 {p.hasSubplot && (!view || view.players[i].subplot === null) && (
                   <p className="muted">1 hidden Subplot</p>
@@ -660,7 +663,10 @@ export default function App() {
                             'foreshadow',
                             'character',
                             'alternative',
-                          ].includes(a.key) || a.key.startsWith('bookMove:'),
+                          ].includes(a.key) ||
+                          a.key.startsWith('bookMove:') ||
+                          a.key.startsWith('resolveOption:') ||
+                          a.key.startsWith('insight'),
                       )
                       .map((a) => (
                         <button key={a.key} onClick={() => dispatch(a)}>
@@ -838,7 +844,7 @@ export default function App() {
         }}
       />
       <footer>
-        Shared design workspace · Digital edition 0.5 · local hotseat privacy protects the screen,
+        Shared design workspace · Digital edition 0.6 · local hotseat privacy protects the screen,
         not the device’s stored data.
       </footer>
     </>

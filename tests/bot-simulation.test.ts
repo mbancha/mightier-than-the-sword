@@ -184,7 +184,7 @@ describe('Headless simulations and statistics', () => {
     expect(r.tables[0].rows.map((r) => r.players)).toEqual([2, 3, 4]);
     expect(playerCSV(r).split('\n')).toHaveLength(37);
     expect(renderReport(r)).toContain('12 completed');
-  });
+  }, 30_000); // Two complete 12-game batches need headroom on shared CI runners.
   it('reports capped games as failed with their seed and replay, without contaminating averages', async () => {
     const r = await runSimulation({ games: 2, maxActions: 1 });
     expect(r.failed).toBe(2);

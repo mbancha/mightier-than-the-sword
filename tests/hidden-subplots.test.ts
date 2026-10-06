@@ -17,7 +17,7 @@ function battle(s: State, b: number) {
   return { ...s, battle: { book: b, participants: [0, 1] } };
 }
 describe('Hidden board-state Subplots', () => {
-  it('checks three distinct books and the protagonist location', () => {
+  it('checks three distinct books and the Quill location', () => {
     const s = fresh();
     memory(s, 0, 0);
     memory(s, 0, 1);
@@ -46,7 +46,7 @@ describe('Hidden board-state Subplots', () => {
     s.characters.push({ id: 3, owner: 0, page: 0, other: null, used: [0, 0], collected: 0 });
     expect(subplotScore(s, 0, 2)).toBe(1);
   });
-  it('requires different types on the same page, where the protagonist is', () => {
+  it('requires different types on the same page, where the Quill is', () => {
     const s = fresh();
     memory(s, 0, 0);
     memory(s, 0, 1);
@@ -85,7 +85,7 @@ describe('Hidden board-state Subplots', () => {
     expect(subplotScore(v, 0, 6)).toBeLessThan(1);
     expect(subplotScore(battle(s, 2), 0, 6)).toBeLessThan(1);
   });
-  it('requires protagonist, own Valor memory and participation in the same current conflict', () => {
+  it('requires Quill, own Valor memory and participation in the same current conflict', () => {
     const s = fresh();
     memory(s, 0, 0);
     expect(subplotScore(battle(s, 0), 0, 7)).toBe(1);

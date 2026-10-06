@@ -20,7 +20,7 @@ def wording(s):
         t=t.replace('until Inklings are placed there','until an Inkling is placed there')
         t=t.replace('Whenever Inklings are PLACED','Whenever an Inkling is PLACED')
         t=t.replace('the reward Inklings','the reward Inkling')
-        t=t.replace('overflow on your protagonist\'s page','overflow at your protagonist\'s book')
+        t=t.replace('overflow on your Quill\'s page','overflow at your Quill\'s book')
         t=t.replace('Suspend sends it to', 'Suspend sends an Inkling to')
         parts[i]=t
     return ''.join(parts)

@@ -90,3 +90,10 @@ live-site browser check are required before calling the hosted edition ready.
 - Production build and full browser smoke pass: 169 choices, six conflicts, nine books, bot turn and browser simulation, no browser errors or accessibility violations.
 - Desktop/tablet screenshots inspected. Only the owner sees their Subplot; opponents show a hidden-card count, spectators show no objective, and public progress counters are gone.
 - Printed artifacts and generators unchanged. Previous simulation reports remain historical; objective and bot behavior now use rules 0.5 and strategic-3.
+
+
+## Revision 0.6 local verification (2026-10-05)
+
+104 tests passed, including twelve new track cases: tier availability, overflow-only and mixed placements, adjacent-page bounds and early stop, five-step movement, final Quill power, optional four-card refill, missing Subplot and depleted-deck behavior, end-turn scheduling, final-token refill, shoot-the-moon refill, and immediate conflict interruption. Production build passed. Browser journey: 193 choices, six conflicts, nine published books, a complete three-Act game, actual drag/memory interactions, save/undo, privacy handoff, bot turn, Balance lab, desktop/tablet layout, no console or page errors, and no axe violations. Print generator/check passed: 20 vector sheets, full-size player boards, 48 correctly colored memory hexes, 15 one-inch conflict fronts with long-edge mirrored backs, all component card boundaries, current catalog/version wording, and a single master output. Rendered contact sheets plus detailed player boards and player pieces were inspected.
+
+GitHub's initial shared runner timed out the deterministic two-batch simulation test after 5 seconds while 103 assertions passed. Only that full-game batch test now allows 30 seconds; mechanics and invariants are unchanged. Token fronts/backs are the last two pages (19-20), with actual-size and long-edge duplex instructions on the legend.

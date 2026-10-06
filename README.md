@@ -1,10 +1,10 @@
 # Mightier than the Sword
 
 A shared workspace for the game design, printable prototype, and an automated
-2–4 player prototype with human and strategic-bot seats. Current digital and printable rules: **0.5**.
+2–4 player prototype with human and strategic-bot seats. Current digital and printable rules: **0.6**.
 
 The first build includes all nine books, fifteen Twists, ten hidden board-state Subplots,
-ten characters, five Trojan Horse powers, and fifteen conflict tokens. It handles
+ten character cards, five Trojan Horse powers, and fifteen conflict tokens. It handles
 movement, memories, conflicts, Acts, card effects, private-hand handoffs, undo,
 local saves, and portable private replays. It is ready for designer testing;
 rules fidelity and balance still need human playtesting. No remote multiplayer is included. Strategic bots can fill any seat. See [known rulings](docs/DECISIONS.md).
@@ -72,7 +72,7 @@ conversation or the other board-game projects. See [the editing guide](docs/EDIT
 | `src/App.tsx`, `src/TableMap.tsx`, `src/styles.css` | Table, player boards and interaction |
 | `public/icons/` | Original reusable vector icons |
 | `print/source/` | Printable generator, reading the same catalog |
-| `print/outputs/` | Approved v15 PDF and latest generated edition |
+| `print/outputs/` | One master PDF with all printable components and rules |
 | `tests/`, `scripts/smoke.mjs` | Rules and full-game browser checks |
 | `docs/` | Rules, rulings, architecture, audit and verification |
 
@@ -90,7 +90,7 @@ python print/check.py
 ```
 
 Browser screenshots and reports are under ignored `artifacts/`. The PDF contains
-all 16 sheets together. Its books have 2 mm margins; memory hexes are 0.75 inches
+all 20 sheets together. Its books have 2 mm margins; memory hexes are 0.75 inches
 wide and conflict tokens are 1 inch square with mirrored backs.
 
 Download the current [print-and-play PDF](print/outputs/Mightier_than_the_Sword_Current.pdf).

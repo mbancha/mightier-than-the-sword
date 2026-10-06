@@ -9,19 +9,19 @@ from reportlab.pdfgen import canvas
 import pypdfium2 as pdfium
 import vector_icons_v10 as v
 
-SYMBOLS={'[ink]':'inkling','[quill]':'protagonist','[character]':'character',
+SYMBOLS={'[ink]':'inkling','[quill]':'Quill','[character]':'character',
  '[twist]':'twist','[pp]':'points','[unlock]':'early-inkling',
  '[curiosity]':'curiosity','[valor]':'valor','[insight]':'insight','[resolve]':'resolve',
  '[combat]':'conflict','[passive]':'ongoing','[overflow-ink]':'overflow-ink'}
 LEGEND=[
  ('[ink]','Inkling','Your limited supply of ink. Each inkling on a book contributes 1 power.'),
- ('[quill]','Protagonist','Your quill and inkwell figure. Its power comes from Valor.'),
+ ('[quill]','Quill','Your quill and inkwell figure. Its power comes from Valor.'),
  ('[character]','Character','Draw the top character card when you gain one.'),
  ('[twist]','Twist','The shared deck of special effects.'),
  ('[pp]','Plot points','Your score. The most plot points wins.'),
  ('[unlock]','Unlock ink','Take ink from your next Act reserve into your current supply.'),
  ('[curiosity]','Curiosity','Movement row. Memory reward: place 1 inkling into overflow.'),
- ('[valor]','Valor','Protagonist power row. Memory reward: gain 1 plot point.'),
+ ('[valor]','Valor','Quill power row. Memory reward: gain 1 plot point.'),
  ('[insight]','Insight','Hand-limit row. Memory reward: draw 1 Twist.'),
  ('[resolve]','Resolve','Placement row. Memory reward: unlock 1 inkling.'),
  ('[combat]','During conflict','A passive combat ability; no activation ink required.'),
@@ -35,7 +35,7 @@ def configure():
     d.add(Rect(2,1,13,10,rx=2,ry=2,fillColor=teal,strokeColor=ink,strokeWidth=1.2))
     d.add(Rect(4,11,9,3,rx=.6,ry=.6,fillColor=paper,strokeColor=ink,strokeWidth=1.2))
     d.add(Circle(8.5,6,2.2,fillColor=gold,strokeColor=None))
-    drawings['protagonist']=d
+    drawings['Quill']=d
     d=Drawing(24,24)
     d.add(Polygon([3,21,12,23,21,21,20,10,17,5,12,1,7,5,4,10],fillColor=gold,strokeColor=ink,strokeWidth=1.3))
     d.add(Polygon([12,19,14,14,19,14,15,11,16,6,12,9,8,6,9,11,5,14,10,14],fillColor=paper,strokeColor=None))

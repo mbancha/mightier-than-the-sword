@@ -66,14 +66,19 @@ def rules():
     txt('MIGHTIER THAN THE SWORD',28,760,22,'Times-Bold')
     txt('BASIC RULES / 2-4 PLAYERS / THREE ACTS',28,741,8.5,'Helvetica-Bold',TEAL)
     line(28,729,584,729,INK)
-    # Fixed grouping makes the sequence easy to follow across two columns.
-    for col,blocks in enumerate((RULES[:4],RULES[4:])):
-        x=28+col*286;y=713
-        for title,body in blocks:
-            txt(title.upper(),x,y,9,'Helvetica-Bold',TEAL);y-=8
-            h=para(body,x,y,270,8.2,9.6,maxh=360);y-=h+10
-        assert y>30,('Rules column overflow',col,y)
-    finish('Basic rules')
+    # Full current rules in readable columns over two sheets.
+    for sheet, blocks in enumerate((RULES[:5], RULES[5:])):
+        if sheet:
+            c.setPageSize((612,792))
+            txt('MIGHTIER THAN THE SWORD / RULES CONTINUED',28,760,18,'Times-Bold')
+        groups=(blocks[:3],blocks[3:]) if sheet == 0 else (blocks[:2],blocks[2:])
+        for col, group in enumerate(groups):
+            x=28+col*286;y=713
+            for title,body in group:
+                txt(title.upper(),x,y,9,'Helvetica-Bold',TEAL);y-=8
+                h=para(body,x,y,270,9.5,11.4,maxh=650);y-=h+13
+            assert y>30,('Rules column overflow',sheet,col,y)
+        finish('Basic rules' if sheet == 0 else 'Rules continued')
 
 def legend():
     c.setPageSize((612,792))
@@ -83,9 +88,10 @@ def legend():
         x=32+(i//6)*281;y=654-(i%6)*81
         v.draw_icon(c,icons.SYMBOLS[symbol],x,y-7,30)
         txt(title,x+42,y+15,10.5,'Helvetica-Bold',TEAL)
-        if symbol=='[twist]':meaning='Play during your Inkling space check in conflict. On a book space: draw 1 Twist when placing an Inkling.'
+        if symbol=='[twist]':meaning='Play during your Inkling space check in conflict. Numbered spaces grant no automatic Twist reward.'
         if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into overflow on this book.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
+    para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-18 single-sided. Print conflict-token pages 19-20 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
     line(32,162,580,162,GRAY)
     rect(35,117,25,25,None,TEAL,1)
     para('<b>Activation square</b><br/>Put one of your supply inklings here to use the adjacent character action. Each square can hold one inkling.',76,150,235,9.5,12,maxh=60)
@@ -125,9 +131,9 @@ def book(b,x,y):
             assert xx>=side*w/2+4 and xx+54<=(side+1)*w/2-4
             rect(xx,53,54,54,None,HexColor('#000000'),.8);hexagon(xx+27,80,27)
             txt(str(n),xx+2,97,6.5,'Helvetica-Bold',GRAY)
-            if 1<n<b['slots']:v.draw_icon(c,'twist',xx+5,58,14)
+            if b['title'] == 'Dracula' and n == 1: txt('CASTLE',xx+5,58,7,'Helvetica-Bold',col)
     if b['title'].startswith('20,000'):
-        para('NO OVERFLOW / incoming overflow Inklings are erased',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
+        para('NO OVERFLOW / incoming overflow Inklings are suspended',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
     else:
         rect(w/3,9,w/3,30,None,HexColor('#000000'),.8)
         txt('OVERFLOW',w/2,21,8,'Helvetica-Bold',GRAY,True)
@@ -208,37 +214,34 @@ def player_box(index,x,y,w,h,fill=None,marks=True):
 def board(index,base_y):
     c.saveState();c.translate(0,base_y)
     player=PLAYERS[index];col=HexColor(player['color']);pale=HexColor(player['pale'])
-    player_box(index,7,7,598,382,marks=False)
-    for x,y in [(10,386),(602,386),(10,10),(602,10)]:player_mark(index,x,y,18)
-    player_mark(index,29,371,24)
-    para('Cover each row with 3 matching memories. Uncover left to right.',52,376,538,8.5,10,maxh=12)
+    player_box(index,7,7,598,778,marks=False)
+    player_mark(index,29,753,24)
+    para('Cover each row with 3 matching memories. Uncover left to right.<br/>Resolve: choose any one available placement option.',52,763,538,10,13,maxh=30)
     for i,(key,name,base,levels,reward) in enumerate(TRACKS):
-        yy=278-i*70
-        player_box(index,18,yy,576,70,pale)
-        v.draw_icon(c,icons.SYMBOLS['['+key+']'],25,yy+44,19)
-        txt(name.upper(),50,yy+53,10,'Helvetica-Bold',col)
-        para(base,26,yy+38,135,8.5,10,maxh=20)
+        yy=560-i*150
+        player_box(index,18,yy,576,150,pale)
+        v.draw_icon(c,icons.SYMBOLS['['+key+']'],25,yy+114,19)
+        txt(name.upper(),50,yy+123,10,'Helvetica-Bold',col)
+        para(base,26,yy+100,135,10,13,maxh=70)
         for j,value in enumerate(levels):
             xx=193+j*143
-            polygon([(xx+27*math.cos(k*math.pi/3),yy+45+27*math.sin(k*math.pi/3)) for k in range(6)],white,col,1.8)
-            v.draw_icon(c,icons.SYMBOLS['['+key+']'],xx-9,yy+36,18)
-            txt(str(j+1),xx+21,yy+23,6.5,'Helvetica-Bold',col)
-            para(value,xx+33,yy+63,76,8.3,9.4,maxh=37.6)
-        player_box(index,24,yy+2,564,17,white)
-        txt('MEMORIES',32,yy+7,7,'Helvetica-Bold',col)
-        para(rich(reward),112,yy+14,470,8.5,10,maxh=11)
+            polygon([(xx+27*math.cos(k*math.pi/3),yy+100+27*math.sin(k*math.pi/3)) for k in range(6)],white,col,1.8)
+            v.draw_icon(c,icons.SYMBOLS['['+key+']'],xx-9,yy+91,18)
+            txt(str(j+1),xx+21,yy+78,6.5,'Helvetica-Bold',col)
+            para(value,xx+33,yy+127,76,9,11,maxh=100)
+        player_box(index,24,yy+8,564,25,white)
+        txt('MEMORIES',32,yy+17,7,'Helvetica-Bold',col)
+        para(rich(reward),112,yy+25,470,10,12,maxh=13)
     for j,act in enumerate(('II','III')):
-        xx=18+j*290;player_box(index,xx,18,286,40,pale)
-        txt('ACT '+act+' RESERVE',xx+9,44,8,'Helvetica-Bold',col)
-        txt('3 starting ink + suspended ink',xx+9,28,8)
+        xx=18+j*290;player_box(index,xx,28,286,50,pale)
+        txt('ACT '+act+' RESERVE',xx+9,60,10,'Helvetica-Bold',col)
+        txt('3 starting Inklings + suspended Inklings',xx+9,42,10)
     c.restoreState()
 
 def boards():
-    for start in (0,2):
-        c.setPageSize((612,792))
-        board(start,396);board(start+1,0)
-        line(0,396,612,396,GRAY,.4)
-        finish('Player boards / '+str(start+1)+' and '+str(start+2),footer=False)
+    for index in range(4):
+        c.setPageSize((612,792));board(index,0)
+        finish('Player board / '+str(index+1),footer=False)
 
 def memories():
     c.setPageSize((612,792))
@@ -306,9 +309,28 @@ def tokens():
                 token_face(act,name,strong,front,x,y)
         finish('Conflict tokens / '+('fronts' if front else 'backs'),footer=False)
 
+def pieces():
+    c.setPageSize((612,792))
+    txt('Quills, Inklings and score markers',28,754,22,'Times-Bold')
+    para('Cut out and mount on card. Each player uses 1 Quill, 12 Inklings and 1 score marker. Start with 6 Inklings in supply and 3 in each later Act reserve. Use the shared Act marker on the scoreboard.',28,726,550,10,13,maxh=55)
+    for index,player in enumerate(PLAYERS):
+        y=622-index*140;col=HexColor(player['color'])
+        txt(player['label'],28,y+32,11,'Helvetica-Bold',col)
+        for k in range(12):
+            x=45+(k%6)*43;yy=y-(k//6)*43
+            c.setStrokeColor(col);c.setLineWidth(1.5);c.circle(x,yy,18,stroke=1,fill=0)
+            v.draw_icon(c,'inkling',x-9,yy-9,18);player_mark(index,x+8,yy-10,7)
+        c.setStrokeColor(col);c.circle(362,y-20,30,stroke=1,fill=0)
+        v.draw_icon(c,'Quill',346,y-30,32);player_mark(index,381,y-40,10)
+        txt('QUILL',362,y-65,8,'Helvetica-Bold',col,True)
+        c.setStrokeColor(col);c.circle(475,y-20,22,stroke=1,fill=0)
+        player_mark(index,475,y-20,24);txt('SCORE',475,y-58,8,'Helvetica-Bold',col,True)
+    rect(28,36,36,36,None,TEAL);txt('ACT',46,49,10,'Helvetica-Bold',TEAL,True)
+    finish('Player pieces / 4 Quills, 48 Inklings, 4 score markers, 1 Act marker')
+
 rules();legend();books();cards()
-boards();scoreboard();memories();tokens();c.save()
-assert len(pages)==16,len(pages)
+boards();scoreboard();memories();pieces();tokens();c.save()
+assert len(pages)==20,len(pages)
 reader=PdfReader(str(PDF));assert len(reader.pages)==len(pages)
 for i,p in enumerate(reader.pages):
     text=p.extract_text() or ''

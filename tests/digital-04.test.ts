@@ -123,12 +123,12 @@ describe('Digital 0.4 rules', () => {
     }
     expect([...outcomes].sort()).toEqual([-1, 1]);
   });
-  it('Iliad adds one power for each character and protagonist, without the old solo Twist bonus', () => {
+  it('Iliad adds one power for each character and Quill, without the old solo Twist bonus', () => {
     const s = fresh(4);
     give(s, 3);
     give(s, 6);
     put(s, 0);
-    expect(power(s, 0, 0)).toBe(9); // Inkling 1, Achilles 3+1, Odysseus 2+1, protagonist 0+1
+    expect(power(s, 0, 0)).toBe(9); // Inkling 1, Achilles 3+1, Odysseus 2+1, Quill 0+1
   });
   it('Odyssey rewards its departing figure owner on ability and step moves, not internal moves', () => {
     const s = fresh(3);
@@ -165,13 +165,13 @@ describe('Digital 0.4 rules', () => {
       );
     }
   });
-  it('World placement offers protagonist or any owned character a one-page move', () => {
+  it('World placement offers Quill or any owned character a one-page move', () => {
     const s = fresh(1);
     give(s, 3);
     s.characters[0].page = 2;
     act(s, 'placeHere:0');
     expect(legalActions(s).map((a) => a.key)).toEqual([
-      'bookMove:protagonist',
+      'bookMove:Quill',
       'bookMove:3',
       'skip',
     ]);

@@ -69,7 +69,7 @@ at most one new-book travel event per normal movement, even with several steps.
 
 ## Space-check revision 0.3 (historical; 0.4 changes below supersede it)
 
-- Normal protagonist movement is mandatory and must finish on a different page.
+- Normal Quill movement is mandatory and must finish on a different page.
   Optional movement granted by characters and effects remains optional.
 - After movement, an empty numbered space can be clicked to place directly;
   clicking your own Inkling offers a memory upgrade, suspending that Inkling.
@@ -129,10 +129,19 @@ Provisional defaults stated during implementation (not designer-confirmed answer
 
 Dracula's castle owner receives one optional erasure before Twist checks, of any Inkling on that book. Around the World placement effects include overflow and bonus placements and can move any owned figure one page; resolve these rewards before checking for conflict. Moving existing Inklings is not placement. The submarine suspends every incoming overflow Inkling, including transfers and Nemo's activation Inklings; this is not erasure. The Aeneid suspends both numbered and overflow Inklings at cleanup.
 
-Odyssey rewards the moving figure's owner when it leaves for another book, on normal or ability movement. Internal page moves and setup do not reward. Direct destination choices follow a deterministic shortest page route; step controls allow a chosen route. Ichthyosaur only leaves Odyssey when neither of its occupied pages remains there. Journey overflow contributes 2 power per Inkling. Iliad adds 1 per contributing character and protagonist, including a protagonist at Valor 0.
+Odyssey rewards the moving figure's owner when it leaves for another book, on normal or ability movement. Internal page moves and setup do not reward. Direct destination choices follow a deterministic shortest page route; step controls allow a chosen route. Ichthyosaur only leaves Odyssey when neither of its occupied pages remains there. Journey overflow contributes 2 power per Inkling. Iliad adds 1 per contributing character and Quill, including a Quill at Valor 0.
 
 ## Hidden Subplots — digital revision 0.5
 
-Designer correction: incremental means working toward a hidden objective, not marking public event counters. All ten objectives now check simultaneous current arrangements: owned memories, track levels, protagonist/character location, Inkling occupancy, or participation in the current conflict. Existing pieces count and returned memories can break an unfinished arrangement. No historical participation counters remain. Rewards retain the character-or-alternative choice and replacement draw.
+Designer correction: incremental means working toward a hidden objective, not marking public event counters. All ten objectives now check simultaneous current arrangements: owned memories, track levels, Quill/character location, Inkling occupancy, or participation in the current conflict. Existing pieces count and returned memories can break an unfinished arrangement. No historical participation counters remain. Rewards retain the character-or-alternative choice and replacement draw.
 
 Implementation rulings: fulfillment is checked automatically after each action and automatic effect, before conflict cleanup. Completed objectives are revealed; unfinished cards never enter public/opponent views. At most one completion per player per player turn, including the Horse completion power, prevents a replacement-draw loop over already fulfilled conditions. Replacements can complete from the next turn. Setup does not complete objectives. These timing and frequency rulings are provisional for playtesting. Printed artifacts are unchanged.
+
+
+## Digital and print revision 0.6 (2026-10-05)
+
+Designer-confirmed: player pieces are Quills. Named literary character cards retain their own category. Final Curiosity moves up to 5 pages; final Valor gives the Quill 2 power plus 1 for each owned Inkling in its book (numbered and overflow). Final Insight keeps combined hand limit 6 and offers optional end-turn draws until 4 combined cards. Resolve offers any available tier: one normal placement; two in local overflow; one normal plus one in local overflow; or up to three split across the Quill's page and directly adjacent pages. Tiers correspond to base plus three memory upgrades. No Twist-discard placement boost remains.
+
+Implementation interpretation pending designer clarification: Insight offers Twist draws and a Subplot draw only when no active Subplot is held, preserving the existing one-active-Subplot rule. It never replaces an existing objective. Draws occur after end-turn character movement, before hand-limit discard. A depleted deck without discards offers no draw. Normal Resolve placement follows the current empty-space/overflow rule; placement effects and immediate conflicts still interrupt remaining placements. Available tiers are alternatives, not cumulative benefits.
+
+The master PDF now matches the digital catalog, including all 0.4 book effects and 0.5 hidden objectives. `print/outputs/` contains only `Mightier_than_the_Sword_Current.pdf`. Old editions and Component Studio image exports are removed from tracked output; Git history retains them. Future image exports go to ignored `artifacts/`.

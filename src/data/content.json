@@ -15,7 +15,7 @@
       "where": "The Railway Station",
       "slots": 4,
       "timing": "ON PLACEMENT",
-      "effect": "When you place an Inkling here, you may move your protagonist or one of your characters up to 1 page.",
+      "effect": "When you place an Inkling here, you may move your Quill or one of your characters up to 1 page.",
       "page_slots": [2, 2]
     },
     {
@@ -33,7 +33,7 @@
       "where": "The Journey",
       "slots": 5,
       "timing": "PASSIVE",
-      "effect": "Whenever your protagonist or a character moves from this book to another book, gain 1 plot point.",
+      "effect": "Whenever your Quill or a character moves from this book to another book, gain 1 plot point.",
       "page_slots": [3, 2]
     },
     {
@@ -42,7 +42,7 @@
       "where": "Troy",
       "slots": 4,
       "timing": "DURING CONFLICT",
-      "effect": "Each character and protagonist here has +1 power.",
+      "effect": "Each character and Quill here has +1 power.",
       "page_slots": [2, 2]
     },
     {
@@ -136,7 +136,7 @@
     [
       "Mathematical Leap",
       "CONFLICT",
-      "Gain +2 power. Move your protagonist to either page of this book.",
+      "Gain +2 power. Move your Quill to either page of this book.",
       "Quite possible, on the contrary",
       "World"
     ],
@@ -187,7 +187,7 @@
     [
       "The Unfinished Map",
       1,
-      "Have your memories on 3 different books, with your protagonist on one of those books.",
+      "Have your memories on 3 different books, with your Quill on one of those books.",
       "Foreshadow 2 Inklings."
     ],
     [
@@ -199,14 +199,14 @@
     [
       "Traveling Companions",
       1,
-      "Have 2 of your memories on different pages of the same book, and your protagonist or one of your characters on that book.",
+      "Have 2 of your memories on different pages of the same book, and your Quill or one of your characters on that book.",
       "Erase up to 3 of your activation Inklings from character cards."
     ],
     [
       "The Gathering",
       1,
-      "Have 2 of your memories of different types on the same page, with your protagonist on that page.",
-      "Place up to 2 Inklings into overflow at your protagonist's book."
+      "Have 2 of your memories of different types on the same page, with your Quill on that page.",
+      "Place up to 2 Inklings into overflow at your Quill's book."
     ],
     [
       "Beyond the Horizon",
@@ -229,7 +229,7 @@
     [
       "Into the Fray",
       1,
-      "Participate in a conflict on your protagonist’s book with one of your Valor memories there.",
+      "Participate in a conflict on your Quill’s book with one of your Valor memories there.",
       "Gain 4 plot points."
     ],
     [
@@ -242,7 +242,7 @@
       "A Second Chance",
       1,
       "Have your Inkling on one of your memories and a second, different type of your memory on the same book.",
-      "Make 1 extra upgrade on your protagonist's page by suspending 1 of your Inklings there."
+      "Make 1 extra upgrade on your Quill's page by suspending 1 of your Inklings there."
     ]
   ],
   "characters": [
@@ -332,7 +332,7 @@
       "name": "Phileas Fogg",
       "genre": "Voyages",
       "power": 1,
-      "actions": [[3, "Move Fogg to any page. Then you may move your protagonist to any page."]],
+      "actions": [[3, "Move Fogg to any page. Then you may move your Quill to any page."]],
       "passive": null
     },
     {
@@ -410,31 +410,35 @@
       "curiosity",
       "Curiosity",
       "Move 1 page",
-      ["Move 2 pages", "Move 3 pages", "Move 4 pages"],
+      ["Move 2 pages", "Move 3 pages", "Move 5 pages."],
       "Place one Inkling into overflow."
     ],
     [
       "valor",
       "Valor",
-      "Protagonist power 0",
-      ["Power 1", "Power 2", "Power 3"],
+      "Quill power 0",
+      ["Power 1", "Power 2", "2 power, +1 power for each of your Inklings here."],
       "Gain 1 plot point."
     ],
     [
       "insight",
       "Insight",
       "Combined hand limit 3",
-      ["Combined limit 4", "Combined limit 5", "Combined limit 6"],
+      [
+        "Combined limit 4",
+        "Combined limit 5",
+        "Hand limit of 6. At the end of your turn, you may draw any cards until you have 4."
+      ],
       "Draw 1 Twist."
     ],
     [
       "resolve",
       "Resolve",
-      "Place 1 Inkling",
+      "Place 1 Inkling.",
       [
-        "Discard 1 Twist to place 2, or place 1 free",
-        "Place up to 2 Inklings",
-        "Place up to 3 Inklings"
+        "Place 2 Inklings into the overflow.",
+        "Place 1 Inkling normally and 1 into overflow.",
+        "Place up to 3 Inklings, split between here or adjacent pages."
       ],
       "Foreshadow 1 Inkling."
     ]
@@ -442,15 +446,15 @@
   "rules": [
     [
       "Setup",
-      "Shuffle 9 books; start with 3 in a triangle: two side by side, one centered below. Stack the rest face down. Books use a hexagonal grid; each has 2 pages. A touching page edge or internal fold costs 1 move. Each player takes a protagonist, 12 Inklings and 12 memories (3 per row). Start at 0 points, with 6 supply Inklings, 3 reserved for Act II, 3 for Act III; cover every upgrade with a memory. Shuffle decks; deal 1 Twist and 1 hidden Subplot each. No starting characters. Place protagonists on any pages. From the base pool of 15 conflict tokens (5 per Act), randomly select 1 per player for EACH Act; set the rest aside. Display Act I's tokens. Choose a first player; turns go clockwise."
+      "Shuffle 9 books; start with 3 in a triangle: two side by side, one centered below. Stack the rest face down. Books use a hexagonal grid; each has 2 pages. A touching page edge or internal fold costs 1 move. Each player takes a Quill, 12 Inklings and 12 memories (3 per row). Start at 0 points, with 6 supply Inklings, 3 reserved for Act II, 3 for Act III; cover every upgrade with a memory. Shuffle decks; deal 1 Twist and 1 hidden Subplot each. No starting characters. Place Quills on any pages. From the base pool of 15 conflict tokens (5 per Act), randomly select 1 per player for EACH Act; set the rest aside. Display Act I's tokens. Choose a first player; turns go clockwise."
     ],
     [
       "Your turn",
-      "With no supply Inklings at the start, shoot the moon (below). Otherwise move your protagonist at least 1 page, up to your movement limit, ending on a different page from its starting page. Then choose ONE action: place Inklings on its page using Resolve; replace one of your Inklings there with a memory; OR place 1 supply Inkling on a character's empty activation square and use its action. Characters move only through abilities and carry nothing. Twists are played ONLY in conflict. Resolve immediate conflicts before continuing any remaining placements. Finish effects, then discard to your combined hand limit (Twists plus your active Subplot) and end your turn."
+      "With no supply Inklings at the start, shoot the moon (below). Otherwise move your Quill at least 1 page, up to your movement limit, ending on a different page from its starting page. Then choose ONE action: place Inklings on its page using Resolve; replace one of your Inklings there with a memory; OR place 1 supply Inkling on a character's empty activation square and use its action. Characters move only through abilities and carry nothing. Twists are played ONLY in conflict. Resolve immediate conflicts before continuing any remaining placements. At final Insight, you may draw Twists, or a Subplot if you have none, until your combined hand has 4. Finish effects, then discard to your combined hand limit (Twists plus your active Subplot) and end your turn."
     ],
     [
       "Inklings and placement",
-      "Use empty numbered spaces on your active page; if full, use shared overflow. Numbered spaces have no automatic Twist reward. Gain any memory rewards and on-placement book effects, including on bonus placements. Moving an Inkling grants no placement rewards. Erase returns it to its owner's supply; suspend sends it to their NEXT Act reserve (out of play in Act III). Foreshadow moves Inklings from next reserve to supply; gain 1 point each if unavailable. Gain a character by drawing the top card onto your protagonist's page unless stated otherwise; empty deck gives 2 points. Figures fill no spaces, except Agamemnon's trigger exception. Characters move between adjacent pages unless stated otherwise."
+      "Resolve: choose any one available option for your placement action. Base: place 1 normally. First upgrade: place 2 into this book's overflow. Second: place 1 normally and 1 into this book's overflow. Final: place up to 3, split between the Quill's page and adjacent pages. Use empty numbered spaces on your active page; if full, use shared overflow. Numbered spaces have no automatic Twist reward. Gain any memory rewards and on-placement book effects, including on bonus placements. Moving an Inkling grants no placement rewards. Erase returns it to its owner's supply; suspend sends it to their NEXT Act reserve (out of play in Act III). Foreshadow moves Inklings from next reserve to supply; gain 1 point each if unavailable. Gain a character by drawing the top card onto your Quill's page unless stated otherwise; empty deck gives 2 points. Figures fill no spaces, except Agamemnon's trigger exception. Characters move between adjacent pages unless stated otherwise."
     ],
     [
       "Memories and upgrades",
@@ -466,7 +470,7 @@
     ],
     [
       "Scoring and rewards",
-      "After checks, total Inklings (1 each), character power, protagonist Valor and effects. Most power wins; ties favor the earliest participant clockwise from the active player. Discard all played Twists. Resolve win/loss and book after-effects, then clear Inklings according to the book: normally erase them; The Aeneid suspends them; Frankenstein erases old overflow and moves numbered-space Inklings into overflow, where they survive. Memories and figures stay. EVERY conflict takes 1 available current-Act token. Only an uncovered +3 space scores 3 times the NEW token's multiplier (x1/x2/x3); then cover it. A covered book gives NO printed book points. Gain every token's face-up reward in your chosen order: strong bonus or weak 1/2/3 points, never multiplied; flip them weak. The winner then draws and publishes a book touching at least 2 others and places 1 supply Inkling in a touching old book's overflow. No books left: skip publication and its bonus."
+      "After checks, total Inklings (1 each), character power, Quill Valor and effects. Most power wins; ties favor the earliest participant clockwise from the active player. Discard all played Twists. Resolve win/loss and book after-effects, then clear Inklings according to the book: normally erase them; The Aeneid suspends them; Frankenstein erases old overflow and moves numbered-space Inklings into overflow, where they survive. Memories and figures stay. EVERY conflict takes 1 available current-Act token. Only an uncovered +3 space scores 3 times the NEW token's multiplier (x1/x2/x3); then cover it. A covered book gives NO printed book points. Gain every token's face-up reward in your chosen order: strong bonus or weak 1/2/3 points, never multiplied; flip them weak. The winner then draws and publishes a book touching at least 2 others and places 1 supply Inkling in a touching old book's overflow. No books left: skip publication and its bonus."
     ],
     [
       "Acts and victory",
@@ -474,7 +478,7 @@
     ],
     [
       "Book effects",
-      "Dracula: mark the first numbered space with a castle. Its Inkling owner may erase any one Inkling here before Twist checks, including their own or overflow. The Odyssey rewards the moving figure’s owner each time it crosses from this book to another, including ability moves; moving between its two pages gives nothing. Around the World lets the placing player choose their protagonist or any owned character to move one page. Placement effects resolve before checking for a full book. Moving existing Inklings grants no placement rewards. Jekyll may reduce points below zero. The submarine suspends all Inklings sent to overflow, including transfers and Nemo activation Inklings."
+      "Dracula: mark the first numbered space with a castle. Its Inkling owner may erase any one Inkling here before Twist checks, including their own or overflow. The Odyssey rewards the moving figure’s owner each time it crosses from this book to another, including ability moves; moving between its two pages gives nothing. Around the World lets the placing player choose their Quill or any owned character to move one page. Placement effects resolve before checking for a full book. Moving existing Inklings grants no placement rewards. Jekyll may reduce points below zero. The submarine suspends all Inklings sent to overflow, including transfers and Nemo activation Inklings."
     ]
   ],
   "sources": {
@@ -526,8 +530,8 @@
       "label": "Violet / chevrons"
     }
   ],
-  "edition": "pnp-v15",
-  "rulesVersion": "mightier-0.5.0",
+  "edition": "digital-and-print-0.6",
+  "rulesVersion": "mightier-0.6.0",
   "balance": {
     "supply": 6,
     "reserve": 3,
