@@ -84,7 +84,7 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
             assert any(obj['x0']>=r['x0']+1 and obj['x1']<=r['x1']-1 and obj['top']>=r['top']+1 and obj['bottom']<=r['bottom']-1 for r in cells),obj
 folder=root/'public'/'icons'
 manifest=json.loads((folder/'manifest.json').read_text())
-assert len(list(folder.glob('*.svg')))==len(manifest['assets'])==17
+assert len(list(folder.glob('*.svg')))==len(manifest['assets'])==18
 for entry in manifest['assets']:
     path=root/entry['master']
     assert path.is_file() and entry['master']==entry['web']

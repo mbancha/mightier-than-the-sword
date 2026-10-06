@@ -137,6 +137,14 @@
       "type": "original-vector",
       "meaning": "valor",
       "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "castle",
+      "master": "public/icons/castle.svg",
+      "web": "public/icons/castle.svg",
+      "type": "original-vector",
+      "meaning": "Dracula castle space",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
     }
   ]
 }
