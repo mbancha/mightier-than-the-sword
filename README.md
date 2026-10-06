@@ -70,7 +70,7 @@ conversation or the other board-game projects. See [the editing guide](docs/EDIT
 | `src/game/session.ts` | Save/load, replay and undo |
 | `src/game/views.ts` | Public and private information boundaries |
 | `src/App.tsx`, `src/TableMap.tsx`, `src/styles.css` | Table, player boards and interaction |
-| `public/icons/` | Original reusable vector icons |
+| `public/icons/` | One canonical set of reusable SVG icons and their provenance manifest |
 | `print/source/` | Printable generator, reading the same catalog |
 | `print/outputs/` | One master PDF with all printable components and rules |
 | `tests/`, `scripts/smoke.mjs` | Rules and full-game browser checks |

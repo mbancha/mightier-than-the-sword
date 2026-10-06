@@ -4,7 +4,7 @@
   "assets": [
     {
       "id": "character",
-      "master": "assets/icons/character.svg",
+      "master": "public/icons/character.svg",
       "web": "public/icons/character.svg",
       "type": "original-vector",
       "meaning": "character",
@@ -12,7 +12,7 @@
     },
     {
       "id": "conflict",
-      "master": "assets/icons/conflict.svg",
+      "master": "public/icons/conflict.svg",
       "web": "public/icons/conflict.svg",
       "type": "original-vector",
       "meaning": "conflict",
@@ -20,7 +20,7 @@
     },
     {
       "id": "curiosity",
-      "master": "assets/icons/curiosity.svg",
+      "master": "public/icons/curiosity.svg",
       "web": "public/icons/curiosity.svg",
       "type": "original-vector",
       "meaning": "curiosity",
@@ -28,7 +28,7 @@
     },
     {
       "id": "early-inkling",
-      "master": "assets/icons/early-inkling.svg",
+      "master": "public/icons/early-inkling.svg",
       "web": "public/icons/early-inkling.svg",
       "type": "original-vector",
       "meaning": "early-inkling",
@@ -36,7 +36,7 @@
     },
     {
       "id": "inkling",
-      "master": "assets/icons/inkling.svg",
+      "master": "public/icons/inkling.svg",
       "web": "public/icons/inkling.svg",
       "type": "original-vector",
       "meaning": "inkling",
@@ -44,7 +44,7 @@
     },
     {
       "id": "insight",
-      "master": "assets/icons/insight.svg",
+      "master": "public/icons/insight.svg",
       "web": "public/icons/insight.svg",
       "type": "original-vector",
       "meaning": "insight",
@@ -52,7 +52,7 @@
     },
     {
       "id": "ongoing",
-      "master": "assets/icons/ongoing.svg",
+      "master": "public/icons/ongoing.svg",
       "web": "public/icons/ongoing.svg",
       "type": "original-vector",
       "meaning": "ongoing",
@@ -60,7 +60,7 @@
     },
     {
       "id": "overflow-ink",
-      "master": "assets/icons/overflow-ink.svg",
+      "master": "public/icons/overflow-ink.svg",
       "web": "public/icons/overflow-ink.svg",
       "type": "original-vector",
       "meaning": "overflow-ink",
@@ -68,7 +68,7 @@
     },
     {
       "id": "player-amber",
-      "master": "assets/icons/player-amber.svg",
+      "master": "public/icons/player-amber.svg",
       "web": "public/icons/player-amber.svg",
       "type": "original-vector",
       "meaning": "player-amber",
@@ -76,7 +76,7 @@
     },
     {
       "id": "player-rose",
-      "master": "assets/icons/player-rose.svg",
+      "master": "public/icons/player-rose.svg",
       "web": "public/icons/player-rose.svg",
       "type": "original-vector",
       "meaning": "player-rose",
@@ -84,7 +84,7 @@
     },
     {
       "id": "player-teal",
-      "master": "assets/icons/player-teal.svg",
+      "master": "public/icons/player-teal.svg",
       "web": "public/icons/player-teal.svg",
       "type": "original-vector",
       "meaning": "player-teal",
@@ -92,7 +92,7 @@
     },
     {
       "id": "player-violet",
-      "master": "assets/icons/player-violet.svg",
+      "master": "public/icons/player-violet.svg",
       "web": "public/icons/player-violet.svg",
       "type": "original-vector",
       "meaning": "player-violet",
@@ -100,23 +100,23 @@
     },
     {
       "id": "points",
-      "master": "assets/icons/points.svg",
+      "master": "public/icons/points.svg",
       "web": "public/icons/points.svg",
       "type": "original-vector",
       "meaning": "points",
       "alt": "decorative when paired with text; otherwise name the resource in the label"
     },
     {
-      "id": "protagonist",
-      "master": "assets/icons/protagonist.svg",
-      "web": "public/icons/protagonist.svg",
+      "id": "Quill",
+      "master": "public/icons/Quill.svg",
+      "web": "public/icons/Quill.svg",
       "type": "original-vector",
-      "meaning": "protagonist",
+      "meaning": "Quill",
       "alt": "decorative when paired with text; otherwise name the resource in the label"
     },
     {
       "id": "resolve",
-      "master": "assets/icons/resolve.svg",
+      "master": "public/icons/resolve.svg",
       "web": "public/icons/resolve.svg",
       "type": "original-vector",
       "meaning": "resolve",
@@ -124,7 +124,7 @@
     },
     {
       "id": "twist",
-      "master": "assets/icons/twist.svg",
+      "master": "public/icons/twist.svg",
       "web": "public/icons/twist.svg",
       "type": "original-vector",
       "meaning": "twist",
@@ -132,10 +132,18 @@
     },
     {
       "id": "valor",
-      "master": "assets/icons/valor.svg",
+      "master": "public/icons/valor.svg",
       "web": "public/icons/valor.svg",
       "type": "original-vector",
       "meaning": "valor",
+      "alt": "decorative when paired with text; otherwise name the resource in the label"
+    },
+    {
+      "id": "castle",
+      "master": "public/icons/castle.svg",
+      "web": "public/icons/castle.svg",
+      "type": "original-vector",
+      "meaning": "Dracula castle space",
       "alt": "decorative when paired with text; otherwise name the resource in the label"
     }
   ]
