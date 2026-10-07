@@ -122,3 +122,8 @@ GitHub's first integration run timed out before tests: Ubuntu's Azure package mi
 ## One memory per book — 0.7.1 (2026-10-07)
 
 110 tests pass, including second-memory rejection across pages/bonus upgrades, other-player allowance and Lasting Impression ownership/page/binding checks. Production build and full browser smoke pass (159 choices, six conflicts, all Acts; no errors or accessibility violations). Single 18-sheet PDF regenerated; print checks and visual review of revised card and rules pass.
+
+
+## Character Development memory symbols (2026-10-07)
+
+All 110 tests passed and TypeScript/Vite production build passed. Chrome browser journey exercised a placed Tension memory, completed games, and generated desktop/tablet screenshots; those previews show the four new names and reward symbols with player-colored memory borders. Its final console assertion fails on one unidentified 404 resource (not observed in page response instrumentation). This browser check is therefore not fully passing. Print output was not regenerated.

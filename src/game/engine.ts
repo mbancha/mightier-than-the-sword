@@ -588,12 +588,12 @@ function options(s: GameState): Option[] {
     if (!s.acted && pl.supply)
       add(
         'place',
-        'Choose Resolve placement',
+        'Choose Voice placement',
         (state) => {
           state.acted = true;
           queue(state, job('resolveChoice', p, { page: pl.page }));
         },
-        'Resolve',
+        'Voice',
       );
     if (!s.acted) {
       const pj = job('place', p, {
@@ -728,7 +728,7 @@ function options(s: GameState): Option[] {
           (state) => {
             draw(state, p, 1, 'twist');
           },
-          'Insight',
+          'Imagination',
         );
       if (pl.subplot === null && (s.decks.subplot.length || s.discards.subplot.length))
         add(
@@ -737,7 +737,7 @@ function options(s: GameState): Option[] {
           (state) => {
             draw(state, p, 1, 'subplot');
           },
-          'Insight',
+          'Imagination',
         );
     }
     pass();
@@ -762,7 +762,7 @@ function options(s: GameState): Option[] {
             );
           if (level === 3) queue(state, job('placeAdjacent', p, { page, n: 3, optional: true }));
         },
-        'Resolve',
+        'Voice',
       );
   }
   if (j.type === 'placeAdjacent') {

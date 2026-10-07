@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react';
-import { books, characters, content, rowName, tokens } from './data/catalog';
+import { books, characters, content, rowName, memoryIcon, tokens } from './data/catalog';
 import type { Choice } from './game/types';
 import type { publicView, playerView } from './game/views';
 import { adjacentBooks } from './game/topology';
@@ -473,7 +473,7 @@ export function TableMap({
                                     className="memory"
                                     style={{ borderColor: colors[spot.memory.owner] }}
                                   >
-                                    {icon(spot.memory.row)}
+                                    {icon(memoryIcon(spot.memory.row))}
                                   </span>
                                 )}
                                 {(spot.owner !== null || spot.neutral) && (
