@@ -161,7 +161,7 @@ describe('15 placement-triggered Subplots', () => {
   it('has fifteen concise placement cards using the new terms', () => {
     expect(subplots).toHaveLength(15);
     for (const c of subplots) {
-      expect(c.text.startsWith('Place an Inkling')).toBe(true);
+      expect(c.text).toMatch(/^(Place an Inkling|Place a Background Inkling|Trigger a conflict)/);
       expect(c.text).not.toMatch(/numbered|overflow/i);
     }
   });

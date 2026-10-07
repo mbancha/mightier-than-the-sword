@@ -66,7 +66,7 @@ export function power(s: GameState, p: number, b: number) {
     (bookOf(s.players[p].page) === b ? quillPower(s.players[p].rows.valor, count(s, p, b)) : 0);
   for (const c of ownedChars(s, p, b))
     if (s.battle?.book !== b || !suppressed(s, c.id))
-      v += c.id === 1 && c.collected === 3 ? 5 : characters[c.id].power;
+      v += c.id === 1 ? c.collected * 2 : characters[c.id].power;
   if (s.books[b].id === 2) v += s.books[b].overflow[p];
   if (s.books[b].id === 4) {
     if (bookOf(s.players[p].page) === b) v++;
@@ -167,11 +167,11 @@ function moveFigure(
   other: number | null = null,
 ) {
   const c = char === undefined ? null : s.characters.find((c) => c.id === char)!;
-  const leftOdyssey =
-    [from, c?.other].some(
+  const enteredOdyssey =
+    ![from, c?.other].some(
       (page) => page !== null && page !== undefined && s.books[bookOf(page)].id === 3,
-    ) && ![to, other].some((page) => page !== null && s.books[bookOf(page)].id === 3);
-  if (leftOdyssey) points(s, p, 1, 'leaving The Odyssey');
+    ) && [to, other].some((page) => page !== null && s.books[bookOf(page)].id === 3);
+  if (enteredOdyssey) points(s, p, 1, 'arriving at The Odyssey');
   if (char === undefined) s.players[p].page = to;
   else {
     c!.page = to;
@@ -447,10 +447,10 @@ function charAction(s: GameState, p: number, c: Character, a: number, spendInk =
       s,
       ...(heads
         ? [move(1), job('charOverflow', p, { char: c.id, n: 2 })]
-        : [job('charErase', p, { char: c.id })]),
+        : [move(1), job('charErase', p, { char: c.id })]),
     );
   }
-  if (c.id === 3) queue(s, a === 0 ? move(1) : job('charErase', p, { char: c.id }));
+  if (c.id === 3) queue(s, move(1), job('charErase', p, { char: c.id }));
   if (c.id === 4 || c.id === 5) queue(s, move(2));
   if (c.id === 6) queue(s, move(3));
   if (c.id === 7) queue(s, move(18, 'any'));
@@ -566,7 +566,7 @@ function options(s: GameState): Option[] {
           {
             ...site,
             detail:
-              'Touches at least two books. Then place an Inkling in a neighboring binding space.',
+              'Touches at least two books. Then place an Inkling in a neighboring Background.',
           },
         );
   }
@@ -575,7 +575,7 @@ function options(s: GameState): Option[] {
       if (adjacentBooks(s.books[j.book!], b))
         add(
           `publishOverflow:${bi}`,
-          `Binding space at ${books[b.id].title}`,
+          `Background at ${books[b.id].title}`,
           (state) => {
             done(state);
             place(state, p, bi, null);
@@ -658,7 +658,7 @@ function options(s: GameState): Option[] {
       if (!adjacentBooks(s.books[j.book!], b)) return;
       add(
         `bindingRedirect:${book}`,
-        `Binding space at ${books[b.id].title}`,
+        `Background at ${books[b.id].title}`,
         (state) => {
           done(state);
           if (j.source === 'placement') place(state, p, book, null);
@@ -795,7 +795,7 @@ function options(s: GameState): Option[] {
       add(
         `place:${k}`,
         k === null
-          ? `Place in binding space · ${books[s.books[b].id].title}`
+          ? `Place in Background · ${books[s.books[b].id].title}`
           : `Place in page space ${k + 1} · ${pageLabel(s, page)}`,
         (s) => {
           done(s);
@@ -835,6 +835,7 @@ function options(s: GameState): Option[] {
       const c = s.characters.find((c) => c.id === 1 && c.owner === p)!;
       c.collected++;
       s.players[p].supply--;
+      queue(s, job('move', p, { char: 1, n: 1, source: 'character' }));
     });
     pass();
   }
@@ -1011,7 +1012,7 @@ function options(s: GameState): Option[] {
   if (j.type === 'nemo') {
     const c = s.characters.find((c) => c.id === 7)!;
     for (let n = 1; n <= c.used[0]; n++)
-      add(`nemo:${n}`, `Move ${n} activation Inkling${n > 1 ? 's' : ''} into overflow`, (s) => {
+      add(`nemo:${n}`, `Move ${n} activation Inkling${n > 1 ? 's' : ''} into the Background`, (s) => {
         done(s);
         s.characters.find((c) => c.id === 7)!.used[0] -= n;
         toOverflow(s, p, j.book!, n);
@@ -1163,10 +1164,8 @@ function pump(s: GameState) {
     }
     if (j.type === 'end') {
       s.jobs.shift();
-      const c = ownedChars(s, p).find((c) => c.id === 1 && c.collected === 3);
       queue(
         s,
-        ...(c ? [job('move', p, { char: 1, n: 1, source: 'character' })] : []),
         job('draw', p, { n: pl.rows.insight + 1 }),
         job('next', p),
       );
@@ -1294,12 +1293,10 @@ function pump(s: GameState) {
       s.battle = null;
       queue(s, ...s.pendingConflicts.splice(0).map((book) => job('checkConflict', p, { book })));
       if (actTokensSpent(s)) {
-        const owner = s.active,
-          c = ownedChars(s, owner).find((c) => c.id === 1 && c.collected === 3);
+        const owner = s.active;
         s.jobs = [];
         queue(
           s,
-          ...(c ? [job('move', owner, { char: 1, n: 1, source: 'character' })] : []),
           job('draw', owner, { n: s.players[owner].rows.insight + 1 }),
           job('advanceAct', owner),
         );

@@ -36,16 +36,16 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
 }
 const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
-  publishOverflow: 'Place an Inkling in a neighboring book’s binding spaces.',
+  publishOverflow: 'Place an Inkling in a neighboring book’s Background.',
   resolveChoice: 'Choose any available Voice placement option.',
   placeAdjacent: 'Place up to 3 Inklings here or on adjacent pages.',
   setup: 'Choose a starting page for your Quill.',
   move: 'Move your figure to a highlighted page.',
   turn: 'Place Inklings, then optionally leave one memory.',
   memoryChoice: 'Choose the memory bonus or a character action.',
-  bindingRedirect: 'Choose an adjacent book’s binding space.',
+  bindingRedirect: 'Choose an adjacent book’s Background.',
   forcedConflict: 'Choose a book containing your Inklings for conflict.',
-  place: 'Choose an empty page space. Full pages use the shared binding spaces.',
+  place: 'Choose an empty page space. Full pages use the Background.',
   upgrade: 'Choose a memory. Your Inkling is suspended to the next Act.',
   returnMemory: 'Return a memory to its row to draw a character.',
   horse: 'Choose a hidden Trojan Horse power for this Act.',
@@ -54,9 +54,9 @@ const prompts: Record<string, string> = {
   resolve: 'Choose which full book resolves next.',
   takeToken: 'Choose a conflict token. Its back gives the lower repeat-conflict points.',
   erase: 'Choose an Inkling to erase, or skip.',
-  transfer: 'Move one of your Inklings from another book into binding spaces.',
+  transfer: 'Move one of your Inklings from another book into the Background.',
   collect: 'Collect the erased Inkling on Frankenstein, or leave it in supply.',
-  nemo: 'Move activation Inklings into this book’s binding spaces, or skip.',
+  nemo: 'Move adjacent Inklings into this book’s Background, or skip.',
   refresh: 'Return activation Inklings to supply, or skip.',
   bookMove: 'You may move your Quill or any one of your characters 1 page.',
   cycle: 'Discard a Twist to draw a Twist, or skip.',
@@ -776,7 +776,7 @@ export default function App() {
                 >
                   <span className="eyebrow">
                     {publicData!.players[c.owner].name} · Power{' '}
-                    {c.id === 1 && c.collected === 3 ? 5 : characters[c.id].power}
+                    {c.id === 1 ? c.collected * 2 : characters[c.id].power}
                   </span>
                   <h3>{characters[c.id].name}</h3>
                   <p className="muted">{pageLabel(state!, c.page)}</p>

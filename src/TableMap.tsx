@@ -507,11 +507,11 @@ export function TableMap({
                         a.key === `bindingRedirect:${bi}`,
                     );
                     if (opts.length === 1) choose(opts[0]);
-                    else popup(e, 'Binding spaces', opts);
+                    else popup(e, 'Background', opts);
                   }}
                 >
                   <b>
-                    {b.id === 0 ? 'Binding spaces · redirect to adjacent book' : 'Binding spaces'}
+                    {b.id === 0 ? 'Background · redirect to adjacent book' : 'Background'}
                   </b>
                   {b.overflow.map((n, p) =>
                     n ? (
@@ -582,7 +582,7 @@ export function TableMap({
           {view?.prompt === 'publish'
             ? 'Choose a dashed space for the next book.'
             : view?.prompt === 'publishOverflow'
-              ? 'Click a neighboring book’s binding spaces.'
+              ? 'Click a neighboring book’s Background.'
               : view?.moving
                 ? `Click or drag your figure · ${view.moving.remaining ?? 'any distance'} ${view.moving.remaining === null ? '' : 'steps remaining'}`
                 : data.battle

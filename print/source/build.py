@@ -83,7 +83,7 @@ def rules():
             for title,body in group:
                 txt(title.upper(),x,y,9,'Helvetica-Bold',TEAL);y-=8
                 h=para(body,x,y,270,9.5,11.4,maxh=650);y-=h+13
-            assert y>30,('Rules column Binding',sheet,col,y)
+            assert y>30,('Rules column Background',sheet,col,y)
         finish('Basic rules' if sheet == 0 else 'Rules continued')
 
 def legend():
@@ -95,7 +95,7 @@ def legend():
         v.draw_icon(c,icons.SYMBOLS[symbol],x,y-7,30)
         txt(title,x+42,y+15,10.5,'Helvetica-Bold',TEAL)
         if symbol=='[twist]':meaning='Play during your page space check in conflict. Page spaces grant no automatic Twist reward.'
-        if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into a binding space on this book.'
+        if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 Inkling into this book\'s Background.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
     para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-16 single-sided. Print conflict-token pages 17-18 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
     line(32,162,580,162,GRAY)
@@ -103,7 +103,7 @@ def legend():
     para('<b>Character action</b><br/>When your Inkling lands on a memory, you may use one action on a character you own instead of gaining the memory bonus.',76,150,235,9.5,12,maxh=60)
     hexagon(348,128,18)
     para('<b>Memory hexagon</b><br/>A memory unlocks its board row and stays on a book space. It adds no power and does not fill the space.',376,150,202,9.5,12,maxh=60)
-    para('<b>Erase</b> = return to current supply. &nbsp; <b>Suspend</b> = send to next Act reserve.<br/><b>Binding spaces</b> = extra ink on a book, outside page spaces. It adds power but never fills a space.',32,71,548,9.5,12,maxh=36)
+    para('<b>Erase</b> = return to current supply. &nbsp; <b>Suspend</b> = send to next Act reserve.<br/><b>Background</b> = extra Inklings on a book, outside page spaces. It adds power but never fills a space.',32,71,548,9.5,12,maxh=36)
     finish('Icon legend')
 
 MARGIN=2*72/25.4
@@ -139,10 +139,10 @@ def book(b,x,y):
             txt(str(n),xx+2,97,6.5,'Helvetica-Bold',GRAY)
             if b['title'] == 'Dracula' and n == 1: txt('CASTLE',xx+5,58,7,'Helvetica-Bold',col)
     if b['title'].startswith('20,000'):
-        para('BINDING / redirect incoming Inklings to an adjacent book',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
+        para('BACKGROUND / redirect incoming Inklings to an adjacent book',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
     else:
         rect(w/3,9,w/3,30,None,HexColor('#000000'),.8)
-        txt('BINDING SPACES',w/2,21,8,'Helvetica-Bold',GRAY,True)
+        txt('BACKGROUND',w/2,21,8,'Helvetica-Bold',GRAY,True)
     line(w/2,1,w/2,h-1,HexColor('#CFD5D6'),.55)
     c.restoreState()
 
@@ -193,7 +193,7 @@ def card(kind,item,num,x,y):
             yy-=9
         if item['passive']:
             symbol,effect=item['passive'];he=para('['+symbol+'] '+rich(effect),10,yy,160,9.1,11.2,maxh=108);yy-=he
-        assert yy>=20,(title,'character text Binding',yy)
+        assert yy>=20,(title,'character text Background',yy)
     else:
         txt('TROJAN HORSE / HIDDEN POWER',10,yy,6.8,'Helvetica-Bold',col)
         para('[combat] '+rich(item[1]),10,yy-13,160,10.8,13.5,maxh=120)
@@ -343,7 +343,7 @@ reader=PdfReader(str(PDF));assert len(reader.pages)==len(pages)
 for i,p in enumerate(reader.pages):
     text=p.extract_text() or ''
     assert not v.PATTERN.search(text),('Unrendered icon',i)
-    assert not re.search(r'\b(bookmark|Pathos|Love|Plotline|unpublished|sidekick|exhaust)\b',text,re.I),('Obsolete term',i)
+    assert not re.search(r'\b(bookmark|Pathos|Love|Plotline|unpublished|sidekick)\b',text,re.I),('Obsolete term',i)
 thumbs=[]
 for i in range(len(pages)):
     # Isolate each render so font-cache state cannot hide text on later sheets.

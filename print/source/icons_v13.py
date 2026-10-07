@@ -20,7 +20,7 @@ LEGEND=[
  ('[twist]','Twist','The shared deck of special effects.'),
  ('[pp]','Plot points','Your score. The most plot points wins.'),
  ('[unlock]','Unlock ink','Take ink from your next Act reserve into your current supply.'),
- ('[curiosity]','Pacing','Movement row. Memory reward: place 1 inkling into binding.'),
+ ('[curiosity]','Pacing','Movement row. Memory reward: place 1 Inkling into the Background.'),
  ('[valor]','Tension','Quill power row. Memory reward: gain 1 plot point.'),
  ('[insight]','Imagination','Twist-draw row. Memory reward: draw 1 Twist.'),
  ('[resolve]','Voice','Placement row. Memory reward: unlock 1 inkling.'),

@@ -33,13 +33,13 @@ but cannot undo knowledge. A save requires the same content/rules edition.
 
 Choose Human or Strategic bot for each seat (the default is you versus one bot).
 Click a starting page. Click your quill-and-inkwell to highlight adjacent pages,
-then drag it or click a highlighted page. Finish on a different page, then choose a Resolve placement option or click an empty page space for a base placement. After placement and immediate conflicts, you may replace one of your Inklings on your Quill's page with a memory. Landing an Inkling on a memory offers its benefit or an owned character action. Binding spaces add power but grant no Twist checks. Draw 1 plus your Insight level in Twists at turn end; there is no hand limit.
+then drag it or click a highlighted page. Finish on a different page, then choose a Voice placement option or click an empty page space for a base placement. After placement and immediate conflicts, you may replace one of your Inklings on your Quill's page with a memory. Landing an Inkling on a memory offers its benefit or an owned character action. The Background adds power but grants no Twist checks. Draw 1 plus your Imagination level in Twists at turn end; there is no hand limit.
 
 Subplots check only your fresh Inkling placements, before placement effects change the arrangement. Keep completed Subplots and played Twists for their printed end-game points. Conflict tokens score first and second place; front-side tokens publish a book and flip, while repeat uses award lower points. Ties favor the leftmost page-space Inkling. The Act ends when every selected token has flipped, or nobody has usable Inklings.
 
 Drag the empty map background to pan. Use the wheel or +/− to zoom; **Fit map**
 frames the books. After a win, click a dashed publishing position, then a touching
-book's Binding. **All legal actions** remains available for unusual card choices
+book's Background. **All legal actions** remains available for unusual card choices
 and keyboard use. Bots can be paused or sped up; undo pauses bots for inspection.
 Saves preserve seat controllers. Older saves require their matching rules release.
 

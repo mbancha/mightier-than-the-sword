@@ -108,23 +108,25 @@ describe('Digital 0.4 rules', () => {
     put(s, 0);
     expect(power(s, 0, 0)).toBe(9); // Inkling 1, Achilles 3+1, Odysseus 2+1, Quill 0+1
   });
-  it('Odyssey rewards its departing figure owner on ability and step moves, not internal moves', () => {
+  it('Odyssey rewards its arriving figure owner on ability and step moves, not internal moves', () => {
     const s = fresh(3);
     give(s, 6);
+    s.players[0].page = 2;
     s.jobs = [
       { type: 'move', p: 0, n: 3, source: 'book' },
       { type: 'turn', p: 0 },
     ];
     act(s, 'step:1');
-    expect(s.players[0].points).toBe(0);
-    act(s, 'step:2');
+    expect(s.players[0].points).toBe(1);
+    act(s, 'step:0');
     expect(s.players[0].points).toBe(1);
     act(s, 'endMove');
+    s.characters[0].page = 2;
     s.jobs = [
       { type: 'move', p: 0, char: 6, n: 3, source: 'character' },
       { type: 'turn', p: 0 },
     ];
-    act(s, 'page:2');
+    act(s, 'page:1');
     expect(s.players[0].points).toBe(2);
   });
   it('Aeneid suspends numbered and overflow Inklings, without triggering Frankenstein collection', () => {
