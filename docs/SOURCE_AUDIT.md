@@ -88,3 +88,8 @@ Reviewed source branch f2039f8 against main 232391a and integrated its rules ove
 ## One memory per book (2026-10-07)
 
 Updated stable Subplot ID 10, placement predicate and legal upgrade choices for the one-owned-memory-per-book limit. Catalog/rules edition advances to 0.7.1; print master is synced.
+
+
+## Character Development memory tokens (2026-10-07)
+
+The digital Character Development labels and memory symbols match the designer's CS3 dataset: Pacing/binding, Tension/points, Imagination/Twist, Voice/foreshadow. Player colors match all four Memories entries. Original reward SVGs are reused from public/icons; no new artwork or game mechanics.

@@ -171,3 +171,8 @@ Provisional recovery rulings: a player without supply or owned book Inklings end
 ## One memory per book (2026-10-07)
 
 Designer correction: each player may have at most one of their own memories per book. Different players may each leave one there. A Lasting Impression now requires placing an Inkling on a page containing one owned memory; placement on the memory itself is optional. All ordinary and bonus upgrades enforce the same per-player book limit.
+
+
+## Character Development memory tokens (2026-10-07)
+
+Designer confirmed Character Development names and memory action symbols to match CS3: Pacing (curiosity) places an Inkling in the binding, Tension (valor) gains 1 plot point, Imagination (insight) draws 1 Twist, and Voice (resolve) foreshadows 1 Inkling. The digital board and placed memories use the reward symbols. Teal #147F9B, Amber #AE6811, Rose #A83D55 and Violet #7154A5 already match CS3. Internal row keys and mechanics remain stable; this request does not sync print outputs.

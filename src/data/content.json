@@ -510,21 +510,21 @@
   "tracks": [
     [
       "curiosity",
-      "Curiosity",
+      "Pacing",
       "Move 1 page",
       ["Move 2 pages", "Move 3 pages", "Move 5 pages."],
       "Place one Inkling into binding space."
     ],
     [
       "valor",
-      "Valor",
+      "Tension",
       "Quill power 0",
       ["Power 1", "Power 2", "2 power, +1 power for each of your Inklings here."],
       "Gain 1 plot point."
     ],
     [
       "insight",
-      "Insight",
+      "Imagination",
       "Draw 1 Twist at end of turn",
       [
         "Draw 2 Twists at end of turn",
@@ -535,7 +535,7 @@
     ],
     [
       "resolve",
-      "Resolve",
+      "Voice",
       "Place 1 Inkling.",
       [
         "Place 2 Inklings into binding space.",
@@ -552,15 +552,15 @@
     ],
     [
       "Your turn",
-      "If you start with no supply Inklings, choose a book containing one of your Inklings and resolve a conflict there instead of taking a normal turn. If you have no Inkling on any book, end your turn. Otherwise move your Quill at least 1 page, up to your movement limit, ending on a different page. Choose an available Resolve option to place Inklings. Normal placement uses an empty page space on the destination page; if none are empty, use that book's binding spaces. After placement and any immediate conflicts, you may replace one of your Inklings there with a memory. Character actions cannot be chosen directly: landing an Inkling on a memory is the only way to use one. At the end of your turn, draw Twists equal to 1 plus your Insight level. There is no hand limit."
+      "If you start with no supply Inklings, choose a book containing one of your Inklings and resolve a conflict there instead of taking a normal turn. If you have no Inkling on any book, end your turn. Otherwise move your Quill at least 1 page, up to your movement limit, ending on a different page. Choose an available Voice option to place Inklings. Normal placement uses an empty page space on the destination page; if none are empty, use that book's binding spaces. After placement and any immediate conflicts, you may replace one of your Inklings there with a memory. Character actions cannot be chosen directly: landing an Inkling on a memory is the only way to use one. At the end of your turn, draw Twists equal to 1 plus your Imagination level. There is no hand limit."
     ],
     [
       "Inklings and placement",
-      "The spaces along each book are page spaces. Binding spaces are shared spaces outside the pages. Their Inklings add power but do not fill page spaces and receive no Twist check. Resolve upgrades may grant additional placement choices shown on the player board. Page spaces grant no automatic Twist reward. Erase returns an Inkling to supply; suspend sends it to the next Act reserve (or out of play in Act III). Foreshadow moves Inklings from the next reserve to supply; gain 1 point for each unavailable Inkling. Moving an existing Inkling grants no placement reward."
+      "The spaces along each book are page spaces. Binding spaces are shared spaces outside the pages. Their Inklings add power but do not fill page spaces and receive no Twist check. Voice upgrades may grant additional placement choices shown on the player board. Page spaces grant no automatic Twist reward. Erase returns an Inkling to supply; suspend sends it to the next Act reserve (or out of play in Act III). Foreshadow moves Inklings from the next reserve to supply; gain 1 point for each unavailable Inkling. Moving an existing Inkling grants no placement reward."
     ],
     [
       "Memories and upgrades",
-      "You may have at most 1 of your memories on each book. To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Curiosity places its bonus Inkling in this book's binding space. Returning a memory lowers its row; an Inkling on it stays."
+      "You may have at most 1 of your memories on each book. To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Pacing places its bonus Inkling in this book's binding space. Returning a memory lowers its row; an Inkling on it stays."
     ],
     [
       "Subplots",
@@ -572,7 +572,7 @@
     ],
     [
       "Scoring and rewards",
-      "After checks, total Inklings, character power, Quill Valor and effects. Most power wins. Break every tie in favor of the tied player whose Inkling is furthest left among the book's page spaces. Choose a current-Act conflict token. If it is front-side up, first and second place score 5/2 in Act I, 7/3 in Act II or 10/4 in Act III; then flip it. If it is already back-side up, first and second score 3/2, 4/2 or 5/2 respectively. Conflict tokens have no bonus effects or multipliers. A front-side conflict also publishes a new book touching at least 2 others; then place 1 supply Inkling in a touching old book's binding space. A book may conflict repeatedly in the same Act. If tied players have no page-space Inklings, their remaining tie follows clockwise order from the active player."
+      "After checks, total Inklings, character power, Quill Tension and effects. Most power wins. Break every tie in favor of the tied player whose Inkling is furthest left among the book's page spaces. Choose a current-Act conflict token. If it is front-side up, first and second place score 5/2 in Act I, 7/3 in Act II or 10/4 in Act III; then flip it. If it is already back-side up, first and second score 3/2, 4/2 or 5/2 respectively. Conflict tokens have no bonus effects or multipliers. A front-side conflict also publishes a new book touching at least 2 others; then place 1 supply Inkling in a touching old book's binding space. A book may conflict repeatedly in the same Act. If tied players have no page-space Inklings, their remaining tie follows clockwise order from the active player."
     ],
     [
       "Acts and victory",

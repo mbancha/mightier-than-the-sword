@@ -133,7 +133,7 @@ try {
   await page.locator('[data-book="0"] .slot').nth(2).click();
   await page
     .locator('.mapPopup')
-    .getByRole('button', { name: /Valor memory/ })
+    .getByRole('button', { name: /Tension memory/ })
     .click();
   assert.equal(await page.locator('.mapBook .memory').count(), 1);
   await page.screenshot({ path: 'artifacts/upgrades-desktop.png', fullPage: true });

@@ -8,6 +8,7 @@ import {
   tokens,
   ROWS,
   rowName,
+  memoryIcon,
   type Row,
 } from './data/catalog';
 import {
@@ -32,7 +33,7 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
 const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
   publishOverflow: 'Place an Inkling in a neighboring book’s binding spaces.',
-  resolveChoice: 'Choose any available Resolve placement option.',
+  resolveChoice: 'Choose any available Voice placement option.',
   placeAdjacent: 'Place up to 3 Inklings here or on adjacent pages.',
   setup: 'Choose a starting page for your Quill.',
   move: 'Move your figure to a highlighted page.',
@@ -504,7 +505,7 @@ export default function App() {
                       }}
                     >
                       <span className="trackHeading">
-                        <Icon name={row} />
+                        <Icon name={memoryIcon(row)} />
                         {rowName(row)} · level {p.rows[row]}
                       </span>
                       <span className="trackLevels">
@@ -516,7 +517,7 @@ export default function App() {
                           >
                             <span className="trackHex">
                               {level > p.rows[row] ? (
-                                <Icon name={row} size={20} />
+                                <Icon name={memoryIcon(row)} size={20} />
                               ) : level === p.rows[row] ? (
                                 '✓'
                               ) : (
@@ -543,7 +544,7 @@ export default function App() {
                   {p.rows.insight + 1} Twist{p.rows.insight ? 's' : ''} at end of turn · Place{' '}
                   {p.rows.resolve === 3
                     ? 'up to 3 here or adjacent'
-                    : 'choose an available Resolve option'}
+                    : 'choose an available Voice option'}
                 </p>
                 {p.hasSubplot && (!view || view.players[i].subplot === null) && (
                   <p className="muted">1 hidden Subplot</p>
