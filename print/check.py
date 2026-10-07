@@ -17,16 +17,15 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     full='\n'.join(p.extract_text() or '' for p in PdfReader(out/'Mightier_than_the_Sword_Current.pdf').pages)
     full=' '.join(full.split())
     assert not re.search(r'\b(protagonist|development|developed|bookmark|Pathos|Love|Plotline|unpublished|sidekick|exhaust)\b',full,re.I)
-    assert not re.search(r'\b(?:ink|unlock\w*)\b',full,re.I)
+    assert not re.search(r'\bunlock\w*\b',full,re.I)
     assert 'Return 1 of your memories from this book' in full
-    assert 'EVERY conflict takes 1 available current-Act token' in full
-    assert 'NO printed book points' in full
-    assert 'no conflict resolves without an available token' in full.lower()
-    assert 'base pool of 15' in full
+    assert 'A book may conflict repeatedly in the same Act' in full
+    assert 'first and second place score 5/2 in Act I' in full
+    assert 'There is no hand limit' in full
     assert 'SPACE CHECKS 0.6.0' in full
     assert full.count('HIDDEN OBJECTIVE')==10
     assert 'WHEN FULL, CHOOSE ONE' not in full
-    for wording in ['ending on a different page', 'Twists are played ONLY in conflict', 'Check numbered spaces ONCE, left to right', 'Agamemnon triggers with 1 space still empty', 'Numbered spaces have no automatic Twist reward']:
+    for wording in ['ending on a different page', 'Page spaces grant no automatic Twist reward', 'check occupied page spaces once from left to right', 'the only way to take a character action']:
         assert wording in full, wording
     assert 'ON YOUR TURN' not in full
     assert sum(len(p.hyperlinks) for p in pdf.pages)==15
@@ -95,12 +94,13 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     assert len(fronts)==len(backs)==15
     for r in fronts:
         assert any(abs(b['x0']-(612-r['x1']))<.01 and abs(b['top']-r['top'])<.01 for b in backs)
-    assert front.extract_text().count('x1')==5
-    assert front.extract_text().count('x2')==5
-    assert front.extract_text().count('x3')==5
+    assert front.extract_text().count('FIRST / SECOND')==15
+    assert front.extract_text().count('ADD A NEW BOOK')==15
     assert 'NEW:' not in front.extract_text()
-    # Back text is restricted to Act labels and their 1/2/3 point values.
-    words=set(back.extract_text().split());assert words<=set(['ACT','I','II','III','1','2','3']),words
+    assert back.extract_text().count('FIRST / SECOND')==15
+    assert '3 / 2 PP' in back.extract_text()
+    assert '4 / 2 PP' in back.extract_text()
+    assert '5 / 2 PP' in back.extract_text()
     for pg,cells in [(front,fronts),(back,backs)]:
         for obj in pg.chars+pg.curves:
             assert any(obj['x0']>=r['x0']+1 and obj['x1']<=r['x1']-1 and obj['top']>=r['top']+1 and obj['bottom']<=r['bottom']-1 for r in cells),obj

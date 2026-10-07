@@ -31,29 +31,26 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
 }
 const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
-  publishOverflow: 'Place an Inkling in a neighboring book’s overflow.',
+  publishOverflow: 'Place an Inkling in a neighboring book’s Binding.',
   resolveChoice: 'Choose any available Resolve placement option.',
   placeAdjacent: 'Place up to 3 Inklings here or on adjacent pages.',
-  insightDraw: 'You may draw cards until your combined hand has 4.',
   setup: 'Choose a starting page for your Quill.',
   move: 'Move your figure to a highlighted page.',
   turn: 'Click an empty space to place, or your Inkling to leave a memory.',
-  place: 'Choose an empty space. Full pages use shared overflow.',
+  place: 'Choose an empty page space. Full pages use the shared Binding.',
   upgrade: 'Choose a memory. Your Inkling is suspended to the next Act.',
   returnMemory: 'Return a memory to its row to draw a character.',
   horse: 'Choose a hidden Trojan Horse power for this Act.',
   subplot: 'Your Subplot is complete. Choose its reward.',
   battle: 'Your Inkling is being checked. Play a Twist from your hand or pass this space.',
   resolve: 'Choose which full book resolves next.',
-  takeToken: 'Choose the new conflict token. Only an uncovered book scores its multiplier.',
-  tokenRewards: 'Choose the order of this book’s token rewards.',
-  moon: 'No supply Inklings: take each remaining token’s strong bonus, then advance the Act.',
+  takeToken: 'Choose a conflict token. Its back gives the lower repeat-conflict points.',
+  forcedConflict: 'Choose a book containing one of your Inklings and start a conflict.',
   erase: 'Choose an Inkling to erase, or skip.',
-  transfer: 'Move one of your Inklings from another book into overflow.',
+  transfer: 'Move one of your Inklings from another book into Binding.',
   collect: 'Collect the erased Inkling on Frankenstein, or leave it in supply.',
-  nemo: 'Move activation Inklings into this book’s overflow, or skip.',
+  nemo: 'Move activation Inklings into this book’s Binding, or skip.',
   refresh: 'Return activation Inklings to supply, or skip.',
-  discard: 'Discard a Twist or Subplot to your combined hand limit.',
   bookMove: 'You may move your Quill or any one of your characters 1 page.',
   cycle: 'Discard a Twist to draw a Twist, or skip.',
   ignore: 'Choose an opposing character whose power is ignored.',
@@ -240,7 +237,9 @@ export default function App() {
           <div className="library">
             {twists.map((t) => (
               <article className="smallCard" key={'t' + t.id}>
-                <span className="eyebrow">Twist · {t.timing}</span>
+                <span className="eyebrow">
+                  Twist · {t.timing} · {t.endPoints} end-game PP
+                </span>
                 <h3>{t.name}</h3>
                 <p>{t.text}</p>
                 <blockquote>“{t.quote}”</blockquote>
@@ -248,10 +247,10 @@ export default function App() {
             ))}
             {subplots.map((t) => (
               <article className="smallCard" key={'s' + t.id}>
-                <span className="eyebrow">Hidden Subplot</span>
+                <span className="eyebrow">Hidden Subplot · {t.endPoints} end-game PP</span>
                 <h3>{t.name}</h3>
                 <p>{t.text}</p>
-                <p>Draw a character OR {t.reward} Then draw a new Subplot.</p>
+                <p>Draw a character OR {t.reward} Keep this card, then draw a new Subplot.</p>
               </article>
             ))}
             {characters.map((c) => (
@@ -261,9 +260,7 @@ export default function App() {
                 </span>
                 <h3>{c.name}</h3>
                 {c.actions.map(([n, t], i) => (
-                  <p key={i}>
-                    {n} activation spaces: {t}
-                  </p>
+                  <p key={i}>Action: {t}</p>
                 ))}
                 {c.passive && <p>{c.passive[1]}</p>}
               </article>
@@ -277,12 +274,10 @@ export default function App() {
             ))}
             {tokens.map((t) => (
               <article className="smallCard" key={'token' + t.id}>
-                <span className="eyebrow">
-                  Act {t.act} conflict token · ×{t.act}
-                </span>
+                <span className="eyebrow">Act {t.act} conflict token</span>
                 <h3>{t.name}</h3>
                 <p>{t.text}</p>
-                <p>Weak side: {t.act} plot points.</p>
+                <p>Back: {t.back}</p>
               </article>
             ))}
           </div>
@@ -537,8 +532,8 @@ export default function App() {
                 </div>
                 <p className="muted">
                   Move {p.rows.curiosity === 3 ? 5 : p.rows.curiosity + 1} · Quill power{' '}
-                  {p.rows.valor === 3 ? '2 + your Inklings here' : p.rows.valor} · Combined hand
-                  limit {3 + p.rows.insight} ({p.handCount + (p.hasSubplot ? 1 : 0)} cards) · Place{' '}
+                  {p.rows.valor === 3 ? '2 + your Inklings here' : p.rows.valor} · Draw{' '}
+                  {p.rows.insight + 1} Twist{p.rows.insight ? 's' : ''} at end of turn · Place{' '}
                   {p.rows.resolve === 3
                     ? 'up to 3 here or adjacent'
                     : 'choose an available Resolve option'}
@@ -620,7 +615,8 @@ export default function App() {
                       <b>{tokens[id].name}</b>
                       <p>{tokens[id].text}</p>
                       <small>
-                        Act {tokens[id].act} · ×{tokens[id].act}
+                        {publicData!.tokenStrong[id] ? 'Front' : 'Back'} ·{' '}
+                        {publicData!.tokenStrong[id] ? tokens[id].text : tokens[id].back}
                       </small>
                     </button>
                   ))}
@@ -740,6 +736,7 @@ export default function App() {
                       <span className="eyebrow">{twists[id].timing}</span>
                       <h3>{twists[id].name}</h3>
                       <p>{twists[id].text}</p>
+                      <small>{twists[id].endPoints} end-game plot points</small>
                     </button>
                   ))}
                   {view.horse !== null && (

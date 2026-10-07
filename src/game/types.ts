@@ -16,6 +16,8 @@ export interface Player {
   completing: boolean;
   horse: number | null;
   horseSpent: boolean;
+  keptTwists: number[];
+  completedSubplots: number[];
 }
 export interface Memory {
   owner: number;
@@ -25,6 +27,7 @@ export interface Slot {
   page: number;
   owner: number | null;
   memory: Memory | null;
+  neutral?: boolean;
 }
 export interface Book {
   id: number;
@@ -123,6 +126,7 @@ export interface GameState {
   decks: { twist: number[]; subplot: number[]; character: number[] };
   discards: { twist: number[]; subplot: number[] };
   pools: number[][];
+  tokenStrong: boolean[];
   act: number;
   active: number;
   turn: number;

@@ -35,18 +35,21 @@ Choose Human or Strategic bot for each seat (the default is you versus one bot).
 Click a starting page. Click your quill-and-inkwell to highlight adjacent pages,
 then drag it or click a highlighted page. Each step uses one move; click the
 figure again and choose **End move** when finished. You must move at least one
-page and finish on a different page from where you started. Then click an empty
-space to place an Inkling, or your own Inkling to choose a memory upgrade.
-Character activation spaces offer your alternative action. Numbered spaces have
-no automatic Twist reward. A full book triggers conflict immediately: play
+page and finish on a different page from where you started. Then place an Inkling
+in an empty page space, or in the book's Binding if the page is full. Landing on
+a memory lets you choose its bonus or one of your character actions; character
+actions cannot be taken any other way. Page spaces have no automatic Twist reward. A full book triggers conflict immediately: play
 a card from your hand or pass when each of your occupied spaces is checked from
 left to right. Twists are only played in conflict. Player boards show every
 upgrade level and highlight its current benefit. Start with 6 supply Inklings,
-1 Twist and 1 hidden Subplot. Your Subplot and Twists share the hand limit. Build the required memory arrangement, track levels or current conflict position; no progress counters are used. A fulfilled objective is revealed automatically (at most one per player per turn).
+1 Twist and 1 hidden Subplot. There is no hand limit: Insight draws additional
+Twists at the end of each turn. Played Twists and completed Subplots are kept for
+their printed end-game points. A fulfilled objective is revealed automatically
+(at most one per player per turn).
 
 Drag the empty map background to pan. Use the wheel or +/− to zoom; **Fit map**
 frames the books. After a win, click a dashed publishing position, then a touching
-book's overflow. **All legal actions** remains available for unusual card choices
+book's Binding. **All legal actions** remains available for unusual card choices
 and keyboard use. Bots can be paused or sped up; undo pauses bots for inspection.
 Saves preserve seat controllers. Older saves require their matching rules release.
 

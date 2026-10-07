@@ -311,7 +311,8 @@ export function rankBotActions(v: View, decision: number) {
     if (kind === 'character') n += effectsValue([{ type: 'gain' }]);
     if (kind === 'alternative' && me.subplot !== null)
       n += effectsValue(content.subplotEffects[me.subplot]);
-    if (kind === 'token' || kind === 'reward') n += effectsValue(content.tokenEffects[+x]);
+    if (kind === 'token') n += v.tokenStrong[+x] ? 20 : 1;
+    if (kind === 'reward') n += effectsValue(content.tokenEffects[+x]);
     if (kind === 'foreshadow') n += forecast(1);
     if (kind === 'refresh') n += 3 + (me.supply < 2 ? 2 : 0);
     if (kind === 'nemo') n += +x * (bt && v.books[bt.book].id === 0 ? -3 : 2);

@@ -21,11 +21,7 @@ export function subplotScore(s: Position, p: number, id: number): number {
     memories[s.battle.book].some((x) => x.memory!.row === row);
   switch (id) {
     case 0:
-      return (
-        (capped(memories.filter((m) => m.length).length, 3) * 3 +
-          Number(memories[here].length > 0)) /
-        4
-      );
+      return capped(s.books.filter((b) => b.slots.some((slot) => slot.owner === p)).length, 2);
     case 1:
       return capped(Object.values(me.rows).filter((n) => n > 0).length, 3);
     case 2:
@@ -72,20 +68,15 @@ export function subplotScore(s: Position, p: number, id: number): number {
     case 7:
       return (Number(me.rows.valor > 0) + Number(combat('valor') && s.battle!.book === here)) / 2;
     case 8:
-      return best(
-        s.books.map(
-          (b) =>
-            (Number(b.slots[0].memory?.owner === p) + Number(b.slots.at(-1)!.memory?.owner === p)) /
-            2,
+      return Number(
+        s.books.some((b) =>
+          [0, 1].some((page) => b.slots.find((slot) => slot.page === page)?.owner === p),
         ),
       );
     case 9:
-      return best(
-        memories.map(
-          (m) =>
-            (capped(new Set(m.map((x) => x.memory!.row)).size, 2) * 2 +
-              Number(m.some((x) => x.owner === p))) /
-            3,
+      return Number(
+        s.books.some((b) =>
+          [0, 1].every((page) => b.slots.find((slot) => slot.page === page)?.owner === p),
         ),
       );
     default:
