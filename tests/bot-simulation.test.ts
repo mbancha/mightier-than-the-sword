@@ -11,7 +11,11 @@ import {
   validateConfig,
 } from '../src/simulation/runner';
 import { playerCSV, renderReport } from '../src/simulation/report';
-const fresh = () => newGame({ names: ['A', 'B'], seed: 29 });
+const fresh = () => {
+  const s = newGame({ names: ['A', 'B'], seed: 29 });
+  s.books.forEach((b) => b.slots.forEach((x) => (x.neutral = false)));
+  return s;
+};
 const score = (v: ReturnType<typeof playerView>, key: string) =>
   rankBotActions(v, 0).find((a) => a.action.key === key)!.score;
 describe('Strategic bots', () => {
@@ -37,24 +41,7 @@ describe('Strategic bots', () => {
     expect(score(v, 'placeHere:1')).toBeGreaterThan(score(v, 'placeHere:0'));
     expect(chooseBotAction(v, 0).key).toBe('placeHere:1');
   });
-  it('prioritizes a memory upgrade that completes its Subplot', () => {
-    const s = fresh();
-    s.jobs = [{ type: 'turn', p: 0 }];
-    s.players[0].subplot = 1;
-    s.books[0].slots[0].owner = 0;
-    expect(chooseBotAction(playerView(s, 0), 0).key).toMatch(/^memoryHere:/);
-  });
-  it('does not spend an activation on an empty Achilles erasure', () => {
-    const s = fresh();
-    s.jobs = [{ type: 'turn', p: 0 }];
-    s.players[0].subplot = null;
-    s.characters.push({ id: 3, owner: 0, page: 0, other: null, used: [1, 0], collected: 0 });
-    const empty = playerView(s, 0);
-    expect(chooseBotAction(empty, 0).key).not.toBe('activate:3:1');
-    s.books[0].slots[0].owner = 1;
-    s.players[0].subplot = 8;
-    expect(chooseBotAction(playerView(s, 0), 0).key).toBe('activate:3:1');
-  });
+
   it('seeks erasure targets with Dracula rather than empty pages', () => {
     const s = fresh();
     s.players[0].subplot = 8;
@@ -159,8 +146,7 @@ describe('Headless simulations and statistics', () => {
     s.players[0].rows.curiosity = 1;
     expect(applyAction(s, { key: 'upgrade:0:0:valor' })).toBeNull();
     expect(s.events?.filter((e) => e.type === 'upgrade')).toHaveLength(1);
-    expect(applyAction(s, { key: 'character' })).toBeNull();
-    expect(s.events?.some((e) => e.type === 'subplotComplete' && e.id === 1)).toBe(true);
+    expect(s.events?.some((e) => e.type === 'subplotComplete')).toBe(false); // Upgrading is not an Inkling placement.
   });
   it('reproduces batch results, conserves win shares and scores, and reports each player count separately', async () => {
     const config = { ...DEFAULT_CONFIG, games: 12 },
@@ -231,7 +217,7 @@ describe('Headless simulations and statistics', () => {
     expect(c.winShare).toBe(0.5);
     const sp = r.tables
       .find((t) => t.title === 'Subplots')!
-      .rows.find((row) => row.name === 'A Name in Every Song')!;
+      .rows.find((row) => row.name === 'The Last Word')!;
     expect(sp.completers).toBe(2);
     expect(sp.completeWin).toBe(0.5);
   });

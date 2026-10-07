@@ -65,6 +65,7 @@ export interface Job {
   origin?: number;
 }
 export interface Battle {
+  ranking?: number[];
   book: number;
   participants: number[];
   bonus: number[];

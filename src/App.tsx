@@ -31,13 +31,16 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
 }
 const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
-  publishOverflow: 'Place an Inkling in a neighboring book’s Binding.',
+  publishOverflow: 'Place an Inkling in a neighboring book’s binding spaces.',
   resolveChoice: 'Choose any available Resolve placement option.',
   placeAdjacent: 'Place up to 3 Inklings here or on adjacent pages.',
   setup: 'Choose a starting page for your Quill.',
   move: 'Move your figure to a highlighted page.',
-  turn: 'Click an empty space to place, or your Inkling to leave a memory.',
-  place: 'Choose an empty page space. Full pages use the shared Binding.',
+  turn: 'Place Inklings, then optionally leave one memory.',
+  memoryChoice: 'Choose the memory bonus or a character action.',
+  bindingRedirect: 'Choose an adjacent book’s binding space.',
+  forcedConflict: 'Choose a book containing your Inklings for conflict.',
+  place: 'Choose an empty page space. Full pages use the shared binding spaces.',
   upgrade: 'Choose a memory. Your Inkling is suspended to the next Act.',
   returnMemory: 'Return a memory to its row to draw a character.',
   horse: 'Choose a hidden Trojan Horse power for this Act.',
@@ -45,11 +48,10 @@ const prompts: Record<string, string> = {
   battle: 'Your Inkling is being checked. Play a Twist from your hand or pass this space.',
   resolve: 'Choose which full book resolves next.',
   takeToken: 'Choose a conflict token. Its back gives the lower repeat-conflict points.',
-  forcedConflict: 'Choose a book containing one of your Inklings and start a conflict.',
   erase: 'Choose an Inkling to erase, or skip.',
-  transfer: 'Move one of your Inklings from another book into Binding.',
+  transfer: 'Move one of your Inklings from another book into binding spaces.',
   collect: 'Collect the erased Inkling on Frankenstein, or leave it in supply.',
-  nemo: 'Move activation Inklings into this book’s Binding, or skip.',
+  nemo: 'Move activation Inklings into this book’s binding spaces, or skip.',
   refresh: 'Return activation Inklings to supply, or skip.',
   bookMove: 'You may move your Quill or any one of your characters 1 page.',
   cycle: 'Discard a Twist to draw a Twist, or skip.',
@@ -182,7 +184,7 @@ export default function App() {
     <>
       <header className="masthead">
         <div>
-          <div className="eyebrow">A shared story · digital playtest 0.6</div>
+          <div className="eyebrow">A shared story · digital playtest 0.7</div>
           <h1>Mightier than the Sword</h1>
         </div>
         <nav>
@@ -221,8 +223,9 @@ export default function App() {
           ))}
           <p>
             Digital rulings: a character between books can act on either adjoining page. Returning a
-            memory lowers its row. Subplots check current arrangements and remain private until
-            completed. Opponent hands and unrevealed Horse powers are hidden during handoff.
+            memory lowers its row. Subplots check arrangements when you place an Inkling and remain
+            private until completed. Opponent hands and unrevealed Horse powers are hidden during
+            handoff.
           </p>
           <p>
             Playtest status: first automated build; designer validation and balance testing remain.
@@ -233,7 +236,7 @@ export default function App() {
       {catalog && (
         <section className="reference">
           <h2>Component library</h2>
-          <p>Current digital edition 0.6. The master print-and-play PDF uses the same rules.</p>
+          <p>Current digital edition 0.7. The master print-and-play PDF uses the same rules.</p>
           <div className="library">
             {twists.map((t) => (
               <article className="smallCard" key={'t' + t.id}>
@@ -475,7 +478,10 @@ export default function App() {
                   <span>
                     II: {p.reserves[1]} · III: {p.reserves[2]}
                   </span>
-                  <span>{p.handCount} Twists</span>
+                  <span>
+                    {p.handCount} Twists · {p.keptTwistCount} kept · {p.completedSubplotCount}{' '}
+                    completed Subplots
+                  </span>
                 </div>
                 <div className="rows">
                   {ROWS.map((row) => (
@@ -490,7 +496,8 @@ export default function App() {
                             title: `${rowName(row)} memory`,
                             choices: actions.filter(
                               (a) =>
-                                (a.key.startsWith('upgrade:') || a.key.startsWith('memoryHere:')) &&
+                                (a.key.startsWith('upgrade:') ||
+                                  a.key.startsWith('turn:upgrade:')) &&
                                 a.key.endsWith(':' + row),
                             ),
                           });
@@ -772,14 +779,11 @@ export default function App() {
                       key={i}
                       className="characterActivation"
                       onClick={() => {
-                        const a = actions.find((a) => a.key === `activate:${c.id}:${i}`);
+                        const a = actions.find((a) => a.key === `memoryActivate:${c.id}:${i}`);
                         setContextMenu({ title: characters[c.id].name, choices: a ? [a] : [] });
                       }}
                     >
-                      <b>
-                        {c.used[i]}/{max} occupied
-                      </b>{' '}
-                      · {t}
+                      <b>Use through a memory</b> · {t}
                     </button>
                   ))}
                   {characters[c.id].collection > 0 && <p>Collected Inklings: {c.collected}/3</p>}
@@ -841,7 +845,7 @@ export default function App() {
         }}
       />
       <footer>
-        Shared design workspace · Digital edition 0.6 · local hotseat privacy protects the screen,
+        Shared design workspace · Digital edition 0.7 · local hotseat privacy protects the screen,
         not the device’s stored data.
       </footer>
     </>

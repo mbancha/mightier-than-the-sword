@@ -22,18 +22,21 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     assert 'A book may conflict repeatedly in the same Act' in full
     assert 'first and second place score 5/2 in Act I' in full
     assert 'There is no hand limit' in full
-    assert 'SPACE CHECKS 0.6.0' in full
-    assert full.count('HIDDEN OBJECTIVE')==10
+    assert 'SPACE CHECKS 0.7.0' in full
+    assert full.count('HIDDEN OBJECTIVE')==15
     assert 'WHEN FULL, CHOOSE ONE' not in full
+    assert not re.search(r'\b(?:OVERFLOW|numbered)\b',full,re.I)
+    assert '+3' not in ' '.join(pdf.pages[i].extract_text() for i in range(3,6))
+    assert 'NEUTRAL INKLING' in pdf.pages[15].extract_text().upper()
     for wording in ['ending on a different page', 'Page spaces grant no automatic Twist reward', 'check occupied page spaces once from left to right', 'the only way to take a character action']:
         assert wording in full, wording
     assert 'ON YOUR TURN' not in full
     assert sum(len(p.hyperlinks) for p in pdf.pages)==15
-    assert Counter(a['kind'] for a in q['cards'])=={'Twist':15,'Subplot':10,'Character':10,'Horse power':5}
+    assert Counter(a['kind'] for a in q['cards'])=={'Twist':15,'Subplot':15,'Character':10,'Horse power':5}
     for i in range(6,11):
         pg=pdf.pages[i]
         cells=[r for r in pg.rects if abs(r['width']-180)<.01 and abs(r['height']-252)<.01]
-        assert len(cells)==(9 if i<10 else 4)
+        assert len(cells)==9
         for obj in pg.chars+pg.curves:
             assert any(obj['x0']>=r['x0']+1 and obj['x1']<=r['x1']-1 and obj['top']>=r['top']+1 and obj['bottom']<=r['bottom']-1 for r in cells),(i,obj)
     board_colors=[]
@@ -114,3 +117,4 @@ for entry in manifest['assets']:
     assert svg.tag.endswith('svg') and svg.attrib.get('viewBox')
 
 print('PASS: 18 pages; two half-sheet player boards per sheet; four player colors; 48 hexes at 0.75 inches wide; 15 exact 1-inch conflict fronts and long-edge mirrored backs; current memories wording; vector-only PDFs; card cut boundaries clear.')
+

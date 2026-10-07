@@ -117,17 +117,19 @@ describe('Direct spaces and memory rewards', () => {
       ];
       const n = s.players[0].hand.length;
       act(s, `place:${k}`);
+      act(s, 'memoryBonus');
       expect(s.players[0].hand).toHaveLength(n + 1);
     }
   });
   it('upgrades directly without needing a supply Inkling and leaves the space empty', () => {
     const s = fresh();
     for (let k = 0; k < 4; k++) put(s, k, 0);
-    act(s, 'memoryHere:0:0:valor');
+    s.acted = true;
+    act(s, 'turn:upgrade:0:0:valor');
     expect(s.books[0].slots[0].owner).toBeNull();
     expect(s.books[0].slots[0].memory?.row).toBe('valor');
     expect(s.players[0].reserves[1]).toBe(4);
-    expect(s.acted).toBe(true);
+    expect(s.active).toBe(1);
   });
   it('does not count a memory alone as filling a space', () => {
     const s = fresh(5);
@@ -181,11 +183,11 @@ describe('Immediate left-to-right conflicts', () => {
     hand(s, 0, 1);
     act(s, 'twist:0');
     expect(s.battle!.cursor).toBe(1);
-    expect(s.battle!.cards).toContain(0);
+    expect(s.players[0].keptTwists).toContain(0);
     act(s, 'pass');
     act(s, 'twist:1');
     expect(s.battle!.played[0]).toBe(2);
-    expect(s.battle!.cards).toContain(1);
+    expect(s.players[0].keptTwists).toContain(1);
   });
   it('uses a changed future occupant after Stolen Vitality without a middle-space draw', () => {
     const s = start([0, 1, 0, 1]);

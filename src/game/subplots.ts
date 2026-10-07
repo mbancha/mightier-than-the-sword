@@ -1,85 +1,106 @@
 import type { Book, Character } from './types';
 import type { Row } from '../data/catalog';
-
-// Current-board predicates shared by the engine and private-view bot heuristics.
-// Fractions help bots plan; they are never counters, persisted, or shown publicly.
+import { adjacentBooks, bookOf } from './topology';
 type Position = {
   players: { page: number; rows: Record<Row, number> }[];
   books: Book[];
   characters: Character[];
   battle: { book: number; participants: number[] } | null;
 };
-export function subplotScore(s: Position, p: number, id: number): number {
-  const me = s.players[p],
-    here = Math.floor(me.page / 2);
-  const memories = s.books.map((b) => b.slots.filter((x) => x.memory?.owner === p));
-  const capped = (n: number, goal: number) => Math.min(n / goal, 1);
-  const best = (values: number[]) => Math.max(0, ...values);
-  const combat = (row: Row) =>
-    s.battle !== null &&
-    s.battle.participants.includes(p) &&
-    memories[s.battle.book].some((x) => x.memory!.row === row);
+export type Placement = { book: number; slot: number | null; triggersConflict: boolean };
+// Actual placement's immediate state, before earned effects or conflict cleanup.
+export function placementFulfills(s: Position, p: number, id: number, e: Placement): boolean {
+  const b = s.books[e.book],
+    spot = e.slot === null ? null : b.slots[e.slot];
+  const own = (book: Book) => book.slots.filter((x) => x.owner === p).length + book.overflow[p];
+  const edge = (book: Book, side: number, last: boolean) => {
+    const slots = book.slots.filter((x) => x.page === side);
+    return (last ? slots.at(-1) : slots[0])?.owner === p;
+  };
+  if (id === 0 || id === 1) {
+    if (!spot) return false;
+    const pageSlots = b.slots.map((x, i) => ({ x, i })).filter(({ x }) => x.page === spot.page);
+    const endpoint = id === 1 ? pageSlots.at(-1) : pageSlots[0];
+    return (
+      endpoint?.i === e.slot &&
+      s.books.some(
+        (other, i) =>
+          i !== e.book &&
+          adjacentBooks(b, other) &&
+          [0, 1].some((side) => edge(other, side, id === 1)),
+      )
+    );
+  }
   switch (id) {
-    case 0:
-      return capped(s.books.filter((b) => b.slots.some((slot) => slot.owner === p)).length, 2);
-    case 1:
-      return capped(Object.values(me.rows).filter((n) => n > 0).length, 3);
     case 2:
-      return best(
-        memories.map(
-          (m, b) =>
-            (new Set(m.map((x) => x.page)).size +
-              Number(
-                here === b ||
-                  s.characters.some(
-                    (c) =>
-                      c.owner === p &&
-                      (Math.floor(c.page / 2) === b ||
-                        (c.other !== null && Math.floor(c.other / 2) === b)),
-                  ),
-              )) /
-            3,
-        ),
-      );
+      return b.slots[0].owner === p && b.slots.at(-1)!.owner === p;
     case 3:
-      return best(
-        memories.flatMap((m, b) =>
-          [0, 1].map(
-            (page) =>
-              (capped(new Set(m.filter((x) => x.page === page).map((x) => x.memory!.row)).size, 2) *
-                2 +
-                Number(me.page === b * 2 + page)) /
-              3,
-          ),
-        ),
-      );
+      return s.books.filter((book) => own(book) > 0).length >= 3;
     case 4:
-      return (capped(me.rows.resolve, 2) * 2 + capped(me.rows.curiosity, 1)) / 3;
+      return e.slot === null && own(b) >= 3 && b.slots.some((x) => x.owner === p);
     case 5:
-      return best(
-        memories.map(
-          (m) =>
-            (capped(m.length, 2) * 2 + Number(m.some((x) => x.owner !== null && x.owner !== p))) /
-            3,
-        ),
+      return (
+        b.overflow[p] > 0 &&
+        [0, 1].every((side) => b.slots.some((x) => x.page === side && x.owner === p))
       );
     case 6:
-      return (capped(me.rows.insight, 2) * 2 + Number(combat('insight'))) / 3;
+      return (
+        e.slot === null &&
+        s.books.some((other, i) => i !== e.book && adjacentBooks(b, other) && other.overflow[p] > 0)
+      );
     case 7:
-      return (Number(me.rows.valor > 0) + Number(combat('valor') && s.battle!.book === here)) / 2;
+      return (
+        !!spot?.memory && b.slots.filter((x) => x.page === spot.page && x.owner === p).length >= 2
+      );
     case 8:
-      return Number(
-        s.books.some((b) =>
-          [0, 1].some((page) => b.slots.find((slot) => slot.page === page)?.owner === p),
-        ),
+      return (
+        !!spot?.memory && spot.memory.owner !== p && b.slots.some((x) => x.memory?.owner === p)
       );
     case 9:
-      return Number(
-        s.books.some((b) =>
-          [0, 1].every((page) => b.slots.find((slot) => slot.page === page)?.owner === p),
-        ),
+      return (
+        !!spot?.memory &&
+        s.books.some(
+          (other, i) => i !== e.book && other.slots.some((x) => x.owner === p && x.memory),
+        )
+      );
+    case 10:
+      return (
+        !!spot && b.slots.filter((x) => x.page === spot.page && x.memory?.owner === p).length >= 2
+      );
+    case 11:
+      return (
+        e.triggersConflict &&
+        bookOf(s.players[p].page) === e.book &&
+        b.slots.some((x) => x.page !== s.players[p].page % 2 && x.memory?.owner === p)
+      );
+    case 12:
+      return e.triggersConflict && own(b) >= 3;
+    case 13:
+      return e.triggersConflict && !!spot?.memory;
+    case 14:
+      return (
+        e.triggersConflict &&
+        s.books.filter((other, i) => i !== e.book && own(other) > 0).length >= 2
       );
     default:
-      return 0;
+      return false;
   }
+}
+// Private bot planning estimate. This cannot complete a card without a placement.
+export function subplotScore(s: Position, p: number, id: number): number {
+  let best = 0;
+  s.books.forEach((b, book) => {
+    for (const slot of [null, ...b.slots.flatMap((x, i) => (x.owner === p ? [i] : []))]) {
+      const triggersConflict =
+        b.slots.every((x) => x.owner !== null || x.neutral) ||
+        (b.slots.filter((x) => x.owner === null && !x.neutral).length === 1 &&
+          s.characters.some(
+            (c) =>
+              c.id === 5 &&
+              (bookOf(c.page) === book || (c.other !== null && bookOf(c.other) === book)),
+          ));
+      if (placementFulfills(s, p, id, { book, slot, triggersConflict })) best = 1;
+    }
+  });
+  return best;
 }

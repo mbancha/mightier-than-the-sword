@@ -1,143 +1,168 @@
 import { describe, expect, it } from 'vitest';
-import { applyAction, newGame } from '../src/game/engine';
-import { subplotScore } from '../src/game/subplots';
+import { applyAction, newGame, legalActions } from '../src/game/engine';
+import { placementFulfills } from '../src/game/subplots';
 import { playerView, publicView } from '../src/game/views';
-import type { Row } from '../src/data/catalog';
-const fresh = () => newGame({ names: ['A', 'B'], seed: 29 });
-type State = ReturnType<typeof fresh>;
-function memory(s: State, b: number, k: number, row: Row = 'valor', owner = 0) {
-  s.books[b].slots[k].memory = { owner, row };
-  s.players[owner].rows[row]++;
-}
-function ink(s: State, b: number, k: number, owner = 0) {
-  s.books[b].slots[k].owner = owner;
-  s.players[owner].supply--;
-}
-function battle(s: State, b: number) {
-  return { ...s, battle: { book: b, participants: [0, 1] } };
-}
-describe('Hidden board-state Subplots', () => {
-  it('checks three distinct books and the Quill location', () => {
-    const s = fresh();
-    memory(s, 0, 0);
-    memory(s, 0, 1);
-    memory(s, 1, 0);
-    expect(subplotScore(s, 0, 0)).toBeLessThan(1);
-    memory(s, 2, 0);
-    expect(subplotScore(s, 0, 0)).toBe(1);
+import { subplots } from '../src/data/catalog';
+const fresh = () => {
+  const s = newGame({ names: ['A', 'B', 'C'], seed: 29 });
+  s.books.forEach((b) => {
+    b.slots = [0, 0, 1, 1].map((page) => ({ page, owner: null, memory: null }));
   });
-  it('requires three different tracks, not three upgrades in one track', () => {
+  s.players[0].page = 0;
+  return s;
+};
+const ownMemory = { owner: 0, row: 'valor' as const };
+const otherMemory = { owner: 1, row: 'insight' as const };
+describe('15 placement-triggered Subplots', () => {
+  it.each(Array.from({ length: 15 }, (_, i) => i))(
+    'checks card %i at its qualifying placement',
+    (id) => {
+      const s = fresh();
+      const b = s.books[0];
+      let slot: number | null = 0;
+      switch (id) {
+        case 0:
+          s.books[1].slots[0].owner = 0;
+          break;
+        case 1:
+          slot = 1;
+          s.books[1].slots[1].owner = 0;
+          break;
+        case 2:
+          slot = 3;
+          b.slots[0].owner = 0;
+          break;
+        case 3:
+          s.books[1].overflow[0] = 1;
+          s.books[2].slots[0].owner = 0;
+          break;
+        case 4:
+          slot = null;
+          b.slots[0].owner = 0;
+          b.overflow[0] = 2;
+          break;
+        case 5:
+          slot = 2;
+          b.slots[0].owner = 0;
+          b.overflow[0] = 1;
+          break;
+        case 6:
+          slot = null;
+          b.overflow[0] = 1;
+          s.books[1].overflow[0] = 1;
+          break;
+        case 7:
+          b.slots[0].memory = otherMemory;
+          b.slots[1].owner = 0;
+          break;
+        case 8:
+          b.slots[0].memory = otherMemory;
+          b.slots[2].memory = ownMemory;
+          break;
+        case 9:
+          b.slots[0].memory = otherMemory;
+          s.books[1].slots[0].owner = 0;
+          s.books[1].slots[0].memory = otherMemory;
+          break;
+        case 10:
+          b.slots[0].memory = ownMemory;
+          b.slots[1].memory = ownMemory;
+          break;
+        case 11:
+          b.slots[2].memory = ownMemory;
+          break;
+        case 12:
+          b.slots[1].owner = 0;
+          b.overflow[0] = 1;
+          break;
+        case 13:
+          b.slots[0].memory = otherMemory;
+          break;
+        case 14:
+          s.books[1].overflow[0] = 1;
+          s.books[2].overflow[0] = 1;
+          break;
+      }
+      if (slot !== null) b.slots[slot].owner = 0;
+      const e = { book: 0, slot, triggersConflict: id >= 11 };
+      expect(placementFulfills(s, 0, id, e)).toBe(true);
+      expect(placementFulfills(fresh(), 0, id, { book: 0, slot: 0, triggersConflict: false })).toBe(
+        false,
+      );
+      if (id >= 11)
+        expect(placementFulfills(s, 0, id, { ...e, triggersConflict: false })).toBe(false);
+    },
+  );
+  it('requires book adjacency for first/last/binding goals', () => {
     const s = fresh();
-    s.players[0].rows.valor = 3;
-    expect(subplotScore(s, 0, 1)).toBeLessThan(1);
-    s.players[0].rows.insight = 1;
-    s.players[0].rows.curiosity = 1;
-    expect(subplotScore(s, 0, 1)).toBe(1);
+    s.books[0].slots[0].owner = 0;
+    s.books[1].slots[0].owner = 0;
+    expect(placementFulfills(s, 0, 0, { book: 0, slot: 0, triggersConflict: false })).toBe(true);
+    s.books[1].q = 9;
+    expect(placementFulfills(s, 0, 0, { book: 0, slot: 0, triggersConflict: false })).toBe(false);
   });
-  it('requires memories on opposite pages and an own figure on that book', () => {
+  it('does not count binding spaces as either page', () => {
     const s = fresh();
-    memory(s, 0, 0);
-    memory(s, 0, 1);
-    expect(subplotScore(s, 0, 2)).toBeLessThan(1);
-    memory(s, 0, 2);
-    expect(subplotScore(s, 0, 2)).toBe(1);
-    s.players[0].page = 2;
-    expect(subplotScore(s, 0, 2)).toBeLessThan(1);
-    s.characters.push({ id: 3, owner: 0, page: 0, other: null, used: [0, 0], collected: 0 });
-    expect(subplotScore(s, 0, 2)).toBe(1);
+    s.books[0].slots[0].owner = 0;
+    s.books[0].overflow[0] = 3;
+    expect(placementFulfills(s, 0, 5, { book: 0, slot: null, triggersConflict: false })).toBe(
+      false,
+    );
   });
-  it('requires different types on the same page, where the Quill is', () => {
-    const s = fresh();
-    memory(s, 0, 0);
-    memory(s, 0, 1);
-    expect(subplotScore(s, 0, 3)).toBeLessThan(1);
-    s.books[0].slots[1].memory!.row = 'insight';
-    expect(subplotScore(s, 0, 3)).toBe(1);
-    s.players[0].page = 1;
-    expect(subplotScore(s, 0, 3)).toBeLessThan(1);
-  });
-  it('requires the specified Resolve and Curiosity levels', () => {
-    const s = fresh();
-    s.players[0].rows.resolve = 2;
-    expect(subplotScore(s, 0, 4)).toBeLessThan(1);
-    s.players[0].rows.curiosity = 1;
-    expect(subplotScore(s, 0, 4)).toBe(1);
-    s.players[0].rows.resolve = 1;
-    expect(subplotScore(s, 0, 4)).toBeLessThan(1);
-  });
-  it('requires an opponent on your memory, not just anywhere on the book', () => {
-    const s = fresh();
-    memory(s, 0, 0);
-    memory(s, 0, 1);
-    ink(s, 0, 2, 1);
-    expect(subplotScore(s, 0, 5)).toBeLessThan(1);
-    ink(s, 0, 0, 1);
-    expect(subplotScore(s, 0, 5)).toBe(1);
-  });
-  it('requires current conflict participation with Insight 2 and an Insight memory there', () => {
-    const s = fresh();
-    memory(s, 0, 0, 'insight');
-    memory(s, 1, 0, 'insight');
-    expect(subplotScore(s, 0, 6)).toBeLessThan(1);
-    const v = battle(s, 0);
-    expect(subplotScore(v, 0, 6)).toBe(1);
-    v.battle.participants = [1];
-    expect(subplotScore(v, 0, 6)).toBeLessThan(1);
-    expect(subplotScore(battle(s, 2), 0, 6)).toBeLessThan(1);
-  });
-  it('requires Quill, own Valor memory and participation in the same current conflict', () => {
-    const s = fresh();
-    memory(s, 0, 0);
-    expect(subplotScore(battle(s, 0), 0, 7)).toBe(1);
-    s.players[0].page = 2;
-    expect(subplotScore(battle(s, 0), 0, 7)).toBeLessThan(1);
-  });
-  it('requires both end spaces on one book, and loses eligibility if a memory returns', () => {
-    const s = fresh();
-    memory(s, 0, 0);
-    memory(s, 1, s.books[1].slots.length - 1);
-    expect(subplotScore(s, 0, 8)).toBeLessThan(1);
-    memory(s, 0, s.books[0].slots.length - 1);
-    expect(subplotScore(s, 0, 8)).toBe(1);
-    s.books[0].slots[0].memory = null;
-    expect(subplotScore(s, 0, 8)).toBeLessThan(1);
-  });
-  it('requires an own Inkling on an own memory with a second type on the same book', () => {
-    const s = fresh();
-    memory(s, 0, 0);
-    memory(s, 0, 1, 'insight');
-    expect(subplotScore(s, 0, 9)).toBeLessThan(1);
-    ink(s, 0, 0);
-    expect(subplotScore(s, 0, 9)).toBe(1);
-    s.books[0].slots[0].memory!.owner = 1;
-    expect(subplotScore(s, 0, 9)).toBeLessThan(1);
-  });
-  it('reveals on fulfillment, preserves reward choice, and prevents replacement reward loops', () => {
-    const s = fresh();
-    s.players[0].subplot = 1;
+  it('completes at placement before memory effects, keeps the card, and blocks replacement chains', () => {
+    const s = newGame({ names: ['A', 'B', 'C'], seed: 29 });
+    s.players[0].subplot = 3;
     s.players[1].subplot = null;
-    memory(s, 1, 0, 'curiosity');
-    memory(s, 2, 0, 'insight');
-    ink(s, 0, 0);
+    s.players[2].subplot = null;
+    s.books[1].overflow[0] = 1;
+    s.books[2].overflow[0] = 1;
+    s.players[0].supply -= 2;
+    s.players[0].page = 0;
     s.jobs = [
-      { type: 'upgrade', p: 0, page: 0 },
+      { type: 'place', p: 0, page: 0, n: 1 },
       { type: 'turn', p: 0 },
     ];
-    expect(applyAction(s, { key: 'upgrade:0:0:valor' })).toBeNull();
+    expect(applyAction(s, { key: 'place:0' })).toBeNull();
     expect(s.jobs[0].type).toBe('subplot');
-    expect(applyAction(s, { key: 'character' })).toBeNull();
-    expect(s.characters).toHaveLength(1);
-    expect(s.players[0].subplot).not.toBeNull();
+    expect(applyAction(s, { key: 'alternative' })).toBeNull();
+    expect(s.players[0].completedSubplots).toContain(3);
     expect(s.players[0].subplotTurn).toBe(s.turn);
+    s.players[0].subplot = 3;
+    s.jobs = [
+      { type: 'place', p: 0, page: 0, n: 1 },
+      { type: 'turn', p: 0 },
+    ];
+    expect(applyAction(s, { key: 'place:1' })).toBeNull();
     expect(s.jobs[0].type).not.toBe('subplot');
   });
-  it('exposes no unfinished opponent objective or counter to public, player or bot views', () => {
+  it('drawing, Quill movement and forced conflict do not complete established arrangements', () => {
+    const s = newGame({ names: ['A', 'B', 'C'], seed: 29 });
+    s.players[0].subplot = 3;
+    s.books.forEach((b) => (b.overflow[0] = 1));
+    s.players[0].supply -= 3;
+    s.jobs = [
+      { type: 'move', p: 0, n: 1, source: 'book' },
+      { type: 'turn', p: 0 },
+    ];
+    expect(applyAction(s, { key: 'endMove' })).toBeNull();
+    expect(s.jobs[0].type).toBe('turn');
+    s.jobs = [{ type: 'forcedConflict', p: 0 }];
+    expect(applyAction(s, { key: 'forcedConflict:0' })).toBeNull();
+    expect(s.jobs[0].type).not.toBe('subplot');
+  });
+  it('does not reveal an opponent objective through any projection', () => {
     const s = fresh(),
       t = structuredClone(s);
-    t.players[1].subplot = (s.players[1].subplot! + 1) % 10;
+    t.players[1].subplot = (s.players[1].subplot! + 1) % 15;
     expect(publicView(s)).toEqual(publicView(t));
     expect(playerView(s, 0)).toEqual(playerView(t, 0));
-    expect(playerView(s, 0).players[0].subplot).toBe(s.players[0].subplot);
     expect(playerView(s, 1).players[0].subplot).toBeNull();
+  });
+  it('has fifteen concise placement cards using the new terms', () => {
+    expect(subplots).toHaveLength(15);
+    for (const c of subplots) {
+      expect(c.text.startsWith('Place an Inkling')).toBe(true);
+      expect(c.text).not.toMatch(/numbered|overflow/i);
+    }
   });
 });

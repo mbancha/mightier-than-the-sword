@@ -95,7 +95,7 @@ def legend():
         v.draw_icon(c,icons.SYMBOLS[symbol],x,y-7,30)
         txt(title,x+42,y+15,10.5,'Helvetica-Bold',TEAL)
         if symbol=='[twist]':meaning='Play during your page space check in conflict. Page spaces grant no automatic Twist reward.'
-        if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into Binding on this book.'
+        if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into a binding space on this book.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
     para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-16 single-sided. Print conflict-token pages 17-18 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
     line(32,162,580,162,GRAY)
@@ -103,7 +103,7 @@ def legend():
     para('<b>Character action</b><br/>When your Inkling lands on a memory, you may use one action on a character you own instead of gaining the memory bonus.',76,150,235,9.5,12,maxh=60)
     hexagon(348,128,18)
     para('<b>Memory hexagon</b><br/>A memory unlocks its board row and stays on a book space. It adds no power and does not fill the space.',376,150,202,9.5,12,maxh=60)
-    para('<b>Erase</b> = return to current supply. &nbsp; <b>Suspend</b> = send to next Act reserve.<br/><b>Binding</b> = extra ink on a book, outside page spaces. It adds power but never fills a space.',32,71,548,9.5,12,maxh=36)
+    para('<b>Erase</b> = return to current supply. &nbsp; <b>Suspend</b> = send to next Act reserve.<br/><b>Binding spaces</b> = extra ink on a book, outside page spaces. It adds power but never fills a space.',32,71,548,9.5,12,maxh=36)
     finish('Icon legend')
 
 MARGIN=2*72/25.4
@@ -121,7 +121,7 @@ def book(b,x,y):
     txt(genre,w-10-stringWidth(genre,'Helvetica-Bold',7),h-11,7,'Helvetica-Bold',col)
     rect(w-82,h-94,72,72,None,col,.9)
     txt('CONFLICT',w-46,h-40,8,'Helvetica-Bold',col,True)
-    txt('+3 [pp]',w-46,h-69,19,'Helvetica-Bold',col,True)
+    txt('TOKEN POINTS',w-46,h-65,7,'Helvetica-Bold',col,True)
     bx=(w-214)/2
     rect(bx,133,214,57,white,col,.65)
     effect_icon='conflict' if 'CONFLICT' in b['timing'] else 'ongoing'
@@ -139,10 +139,10 @@ def book(b,x,y):
             txt(str(n),xx+2,97,6.5,'Helvetica-Bold',GRAY)
             if b['title'] == 'Dracula' and n == 1: txt('CASTLE',xx+5,58,7,'Helvetica-Bold',col)
     if b['title'].startswith('20,000'):
-        para('NO OVERFLOW / incoming Binding Inklings are suspended',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
+        para('BINDING / redirect incoming Inklings to an adjacent book',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
     else:
         rect(w/3,9,w/3,30,None,HexColor('#000000'),.8)
-        txt('OVERFLOW',w/2,21,8,'Helvetica-Bold',GRAY,True)
+        txt('BINDING SPACES',w/2,21,8,'Helvetica-Bold',GRAY,True)
     line(w/2,1,w/2,h-1,HexColor('#CFD5D6'),.55)
     c.restoreState()
 
@@ -332,7 +332,9 @@ def pieces():
         c.setStrokeColor(col);c.circle(475,y-20,22,stroke=1,fill=0)
         player_mark(index,475,y-20,24);txt('SCORE',475,y-58,8,'Helvetica-Bold',col,True)
     rect(28,36,36,36,None,TEAL);txt('ACT',46,49,10,'Helvetica-Bold',TEAL,True)
-    finish('Player pieces / 4 Quills, 48 Inklings, 4 score markers, 1 Act marker')
+    c.setStrokeColor(GRAY);c.circle(124,54,18,stroke=1,fill=0)
+    txt('N',124,49,14,'Helvetica-Bold',GRAY,True);txt('NEUTRAL INKLING',166,50,8,'Helvetica-Bold',GRAY)
+    finish('Player pieces / 4 Quills, 48 Inklings, 4 score markers, 1 Act marker, 1 neutral Inkling')
 
 rules();legend();books();cards()
 boards();scoreboard();memories();pieces();tokens();c.save()

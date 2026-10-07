@@ -107,3 +107,12 @@ Verified all 17 legacy SVG files were identical to the retained public icons. Pr
 ## Half-sheet player-board validation (2026-10-06)
 
 Regenerated the master from the current checkout without the removed assets folder. Print checks pass for 18 vector-only pages, exactly two boards per board sheet, all four player colors, 12 full-size memory slots per board, text inside board boundaries, and exact catalog text in every base/upgrade cell. Word-count comparison against each original full-sheet board showed no added or removed words. Rendered both player-board sheets and reviewed all content, including the longest final Insight benefit and reserve reminders. Token duplex instructions and page indices are updated to 17-18.
+
+
+## Rules overhaul + fifteen placement Subplots (2026-10-07)
+
+108 tests pass, including every objective's positive/negative predicate, ownership and adjacency, binding/page distinction, fresh-placement-only completion, immediate snapshot, replacement guard, opponent privacy, neutral occupancy, pre-cleanup ranking, repeated token scoring, no-supply/exhausted Act recovery and retained-card scoring. Applicable old tests remain; tests asserting superseded hand limits, shared memory payouts and old token bonuses are replaced by 0.7 coverage. Build passes.
+
+100 strategic games across 2/3/4 players complete with zero failures/caps (artifacts/simulations/edition-07-integration). Full browser smoke completes 159 choices, six conflicts, nine books and all Acts; verifies direct Quill drag, memory menu, undo, handoffs/spectator privacy, bot turn and Balance lab. No console/page errors or accessibility violations. Desktop/tablet screenshots reviewed.
+
+Single master PDF regenerated and print/check.py passes: 18 vector-only sheets, 45 cards including all fifteen objectives, two boards per sheet with full-size memory slots, 48 memories, neutral piece, and mirrored token backs. Contact sheets visually reviewed. Obsolete printed +3 book bonuses and overflow labels removed. Tests verify implementation; these simulations do not certify balance.

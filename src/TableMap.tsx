@@ -144,6 +144,9 @@ export function TableMap({
     setDrag(null);
     if (!g) return;
     suppressClick.current = g.moved;
+    setTimeout(() => {
+      suppressClick.current = false;
+    }, 0);
     if (g.kind === 'piece' && g.moved) {
       const target = document
         .elementsFromPoint(e.clientX, e.clientY)
@@ -311,13 +314,15 @@ export function TableMap({
                       popup(
                         e,
                         def.title,
-                        actions.filter((a) => a.key === `conflict:${bi}`),
+                        actions.filter(
+                          (a) => a.key === `conflict:${bi}` || a.key === `forcedConflict:${bi}`,
+                        ),
                       )
                     }
                   >
                     {icon('points')}
-                    {b.covered ? 'Covered' : '+3'}
-                    <small>{b.covered ? 'No book points' : '× new token'}</small>
+                    Conflict
+                    <small>Token points</small>
                   </button>
                 </div>
                 <p className="bookEffect">
@@ -435,7 +440,7 @@ export function TableMap({
                                           a.key.endsWith(':place:' + k))) &&
                                         a.book === bi) ||
                                       a.key.startsWith(`upgrade:${bi}:${k}:`) ||
-                                      a.key.startsWith(`memoryHere:${bi}:${k}:`) ||
+                                      a.key.startsWith(`turn:upgrade:${bi}:${k}:`) ||
                                       (a.key === `memory:${k}` &&
                                         view?.prompt === 'returnMemory' &&
                                         a.book === bi) ||
@@ -445,7 +450,7 @@ export function TableMap({
                                   else
                                     popup(
                                       e,
-                                      `Space ${k + 1}${spot.memory ? ' · ' + rowName(spot.memory.row) : ''}`,
+                                      `Page space ${k + 1}${spot.memory ? ' · ' + rowName(spot.memory.row) : ''}`,
                                       choices.length
                                         ? choices
                                         : spot.owner === data.actor
@@ -471,12 +476,14 @@ export function TableMap({
                                     {icon(spot.memory.row)}
                                   </span>
                                 )}
-                                {spot.owner !== null && (
+                                {(spot.owner !== null || spot.neutral) && (
                                   <span
                                     className="piece"
-                                    style={{ background: colors[spot.owner] }}
+                                    style={{
+                                      background: spot.neutral ? '#777' : colors[spot.owner!],
+                                    }}
                                   >
-                                    {spot.owner + 1}
+                                    {spot.neutral ? 'N' : spot.owner! + 1}
                                   </span>
                                 )}
                               </button>
@@ -496,13 +503,16 @@ export function TableMap({
                           (a.key.startsWith('adjacent:') && a.key.endsWith(':place:null'))) &&
                           a.book === bi) ||
                         a.key === `publishOverflow:${bi}` ||
-                        a.key.startsWith(`target:${bi}:null:`),
+                        a.key.startsWith(`target:${bi}:null:`) ||
+                        a.key === `bindingRedirect:${bi}`,
                     );
                     if (opts.length === 1) choose(opts[0]);
-                    else popup(e, 'Shared overflow', opts);
+                    else popup(e, 'Binding spaces', opts);
                   }}
                 >
-                  <b>{b.id === 0 ? 'Overflow · suspend Inklings' : 'Shared overflow'}</b>
+                  <b>
+                    {b.id === 0 ? 'Binding spaces · redirect to adjacent book' : 'Binding spaces'}
+                  </b>
                   {b.overflow.map((n, p) =>
                     n ? (
                       <span key={p} style={{ color: colors[p] }}>
@@ -572,7 +582,7 @@ export function TableMap({
           {view?.prompt === 'publish'
             ? 'Choose a dashed space for the next book.'
             : view?.prompt === 'publishOverflow'
-              ? 'Click a neighboring book’s overflow.'
+              ? 'Click a neighboring book’s binding spaces.'
               : view?.moving
                 ? `Click or drag your figure · ${view.moving.remaining ?? 'any distance'} ${view.moving.remaining === null ? '' : 'steps remaining'}`
                 : data.battle

@@ -6,7 +6,7 @@
       "where": "In the Submarine",
       "slots": 3,
       "timing": "ON BINDING PLACEMENT",
-      "effect": "When an Inkling would enter this Binding, place it in an adjacent book's Binding instead.",
+      "effect": "When an Inkling would enter this binding space, place it in an adjacent book's binding space instead.",
       "page_slots": [1, 2]
     },
     {
@@ -24,7 +24,7 @@
       "where": "The Underground Sea",
       "slots": 5,
       "timing": "DURING CONFLICT",
-      "effect": "Each Inkling in Binding here contributes +1 power (2 total).",
+      "effect": "Each Inkling in binding space here contributes +1 power (2 total).",
       "page_slots": [2, 3]
     },
     {
@@ -69,7 +69,7 @@
       "where": "The Laboratory",
       "slots": 5,
       "timing": "AFTER CONFLICT",
-      "effect": "Erase existing Binding Inklings, then move all Inklings in page spaces into Binding. These moved Inklings remain here.",
+      "effect": "Erase existing binding space Inklings, then move all Inklings in page spaces into binding space. These moved Inklings remain here.",
       "page_slots": [2, 3]
     },
     {
@@ -103,7 +103,7 @@
     [
       "Engines of Discovery",
       "CONFLICT",
-      "Gain +2 power. Move up to 2 of your Inklings from other books into Binding here.",
+      "Gain +2 power. Move up to 2 of your Inklings from other books into binding space here.",
       "This agent is electricity.",
       "Sea",
       2
@@ -151,7 +151,7 @@
     [
       "An Ocean Without Borders",
       "CONFLICT",
-      "Move up to 3 of your Inklings from other books into Binding here.",
+      "Move up to 3 of your Inklings from other books into binding space here.",
       "The sea is everything.",
       "Sea",
       1
@@ -159,7 +159,7 @@
     [
       "Crossing the Threshold",
       "CONFLICT",
-      "Foreshadow 2 Inklings. Then place up to 2 supply Inklings into Binding here.",
+      "Foreshadow 2 Inklings. Then place up to 2 supply Inklings into binding space here.",
       "Our real journey had now commenced.",
       "Earth",
       1
@@ -199,74 +199,109 @@
   ],
   "subplots": [
     [
-      "The Unfinished Map",
+      "Opening Lines",
       1,
-      "Have at least 1 of your Inklings on each of 2 different books.",
+      "Place an Inkling in a page's first page space, adjacent to a book where you occupy a page's first page space.",
       "Foreshadow 2 Inklings.",
       2
     ],
     [
-      "A Name in Every Song",
+      "The Last Word",
       1,
-      "Have at least 1 upgrade in each of 3 different tracks.",
+      "Place an Inkling in a page's last page space, adjacent to a book where you occupy a page's last page space.",
       "Gain 4 plot points.",
       2
     ],
     [
-      "Traveling Companions",
+      "Bookends",
       1,
-      "Have 2 of your memories on different pages of the same book, and your Quill or one of your characters on that book.",
+      "Place an Inkling so you occupy the first and last page spaces of that book.",
       "Erase up to 3 of your activation Inklings from character cards.",
       1
     ],
     [
-      "The Gathering",
+      "A Widening Story",
       1,
-      "Have 2 of your memories of different types on the same page, with your Quill on that page.",
-      "Place up to 2 Inklings into the Binding at your Quill's book.",
+      "Place an Inkling so you have Inklings on at least 3 different books.",
+      "Place up to 2 Inklings into binding space at your Quill's book.",
       2
     ],
     [
-      "Beyond the Horizon",
+      "Spilling into the Margins",
       1,
-      "Have Resolve at level 2 or higher and Curiosity at level 1 or higher.",
+      "Place an Inkling into a binding space so you have at least 3 Inklings on that book, including one in a page space.",
       "Draw 2 Twists.",
       1
     ],
     [
-      "The Shared Story",
+      "Parallel Stories",
       1,
-      "Have 2 of your memories on the same book, with another player’s Inkling occupying at least one of them.",
+      "Place an Inkling so you have an Inkling on each page and in a binding space of that book.",
       "Gain 4 plot points.",
       2
     ],
     [
-      "A Tale Worth Telling",
+      "Between the Lines",
       1,
-      "Participate in a conflict on a book with one of your Insight memories, while your Insight track is level 2 or higher.",
+      "Place an Inkling into a binding space while you have an Inkling in a binding space of an adjacent book.",
       "Foreshadow 2 Inklings.",
       3
     ],
     [
-      "Into the Fray",
+      "Familiar Ground",
       1,
-      "Participate in a conflict on your Quill’s book with one of your Valor memories there.",
+      "Place an Inkling on a memory space so you have at least 2 Inklings on that page.",
       "Gain 4 plot points.",
       3
     ],
     [
-      "The Empty House",
+      "Shared History",
       1,
-      "Have one of your Inklings in the first page space of a page.",
+      "Place an Inkling on another player's memory, on a book containing one of your memories.",
       "Draw 2 Twists.",
       1
     ],
     [
-      "A Second Chance",
+      "A Return to Remember",
       1,
-      "Have your Inklings in the first page space of both pages of the same book.",
+      "Place an Inkling on a memory space while you occupy another memory space on a different book.",
       "Make 1 extra upgrade on your Quill's page by suspending 1 of your Inklings there.",
       2
+    ],
+    [
+      "A Lasting Impression",
+      1,
+      "Place an Inkling on a page containing at least 2 of your memories.",
+      "Foreshadow 2 Inklings.",
+      2
+    ],
+    [
+      "Across the Fold",
+      1,
+      "Place an Inkling to trigger a conflict with your Quill on one page and your memory on the other.",
+      "Gain 4 plot points.",
+      2
+    ],
+    [
+      "Strength in Numbers",
+      1,
+      "Place an Inkling to trigger a conflict with at least 3 of your Inklings on that book.",
+      "Draw 2 Twists.",
+      2
+    ],
+    [
+      "History Repeats",
+      1,
+      "Place an Inkling on a memory space to trigger a conflict.",
+      "Gain 4 plot points.",
+      3
+    ],
+    [
+      "An Unfinished Chapter",
+      1,
+      "Place an Inkling to trigger a conflict while you have Inklings on at least 2 other books.",
+      "Foreshadow 2 Inklings.",
+      3
     ]
   ],
   "characters": [
@@ -300,7 +335,7 @@
       "actions": [
         [
           3,
-          "Flip a coin. Heads: move Jekyll up to 1 page, then place up to 2 Inklings into Binding here. Tails: erase 1 opposing Inkling here."
+          "Flip a coin. Heads: move Jekyll up to 1 page, then place up to 2 Inklings into binding space here. Tails: erase 1 opposing Inkling here."
         ]
       ],
       "passive": null
@@ -349,7 +384,7 @@
       "actions": [[3, "Move Nemo to any page."]],
       "passive": [
         "combat",
-        "Before Twists are played, you may move any activation Inklings from this card into Binding at Nemo's book. This empties those activation spaces."
+        "Before Twists are played, you may move any activation Inklings from this card into binding space at Nemo's book. This empties those activation spaces."
       ]
     },
     {
@@ -371,7 +406,10 @@
     }
   ],
   "horse": [
-    ["Secret Army", "Before Twists, place up to 3 Inklings from your supply into Binding here."],
+    [
+      "Secret Army",
+      "Before Twists, place up to 3 Inklings from your supply into binding space here."
+    ],
     [
       "Strategists",
       "Once this conflict, play 2 Twists at one of your page space checks instead of 1. Does not stack with Agamemnon."
@@ -475,7 +513,7 @@
       "Curiosity",
       "Move 1 page",
       ["Move 2 pages", "Move 3 pages", "Move 5 pages."],
-      "Place one Inkling into Binding."
+      "Place one Inkling into binding space."
     ],
     [
       "valor",
@@ -489,9 +527,9 @@
       "Insight",
       "Draw 1 Twist at end of turn",
       [
-        "Draw up to 2 Twists at end of turn",
-        "Draw up to 3 Twists at end of turn",
-        "Draw up to 4 Twists at end of turn"
+        "Draw 2 Twists at end of turn",
+        "Draw 3 Twists at end of turn",
+        "Draw 4 Twists at end of turn"
       ],
       "Draw 1 Twist."
     ],
@@ -500,8 +538,8 @@
       "Resolve",
       "Place 1 Inkling.",
       [
-        "Place 2 Inklings into the Binding.",
-        "Place 1 Inkling normally and 1 into Binding.",
+        "Place 2 Inklings into binding space.",
+        "Place 1 Inkling normally and 1 into binding space.",
         "Place up to 3 Inklings, split between here or adjacent pages."
       ],
       "Foreshadow 1 Inkling."
@@ -514,35 +552,35 @@
     ],
     [
       "Your turn",
-      "If you start with no supply Ink, choose a book containing one of your Inklings and resolve a conflict there instead of taking a normal turn. Otherwise move your Quill at least 1 page, up to your movement limit, ending on a different page. Place an Inkling in an empty page space on the destination page; if none are empty, place it in that book's Binding. You may then replace one of your Inklings there with a memory. Character actions cannot be chosen directly: landing an Inkling on a memory is the only way to use one. At the end of your turn, draw Twists equal to 1 plus your Insight level. There is no hand limit."
+      "If you start with no supply Inklings, choose a book containing one of your Inklings and resolve a conflict there instead of taking a normal turn. If you have no Inkling on any book, end your turn. Otherwise move your Quill at least 1 page, up to your movement limit, ending on a different page. Choose an available Resolve option to place Inklings. Normal placement uses an empty page space on the destination page; if none are empty, use that book's binding spaces. After placement and any immediate conflicts, you may replace one of your Inklings there with a memory. Character actions cannot be chosen directly: landing an Inkling on a memory is the only way to use one. At the end of your turn, draw Twists equal to 1 plus your Insight level. There is no hand limit."
     ],
     [
       "Inklings and placement",
-      "The spaces along each book are page spaces. Binding is the shared Binding area outside them: Binding Inklings add power but do not fill page spaces and receive no Twist check. Resolve upgrades may grant additional placement choices shown on the player board. Page spaces grant no automatic Twist reward. Erase returns an Inkling to supply; suspend sends it to the next Act reserve (or out of play in Act III). Foreshadow moves Inklings from the next reserve to supply; gain 1 point for each unavailable Inkling. Moving an existing Inkling grants no placement reward."
+      "The spaces along each book are page spaces. Binding spaces are shared spaces outside the pages. Their Inklings add power but do not fill page spaces and receive no Twist check. Resolve upgrades may grant additional placement choices shown on the player board. Page spaces grant no automatic Twist reward. Erase returns an Inkling to supply; suspend sends it to the next Act reserve (or out of play in Act III). Foreshadow moves Inklings from the next reserve to supply; gain 1 point for each unavailable Inkling. Moving an existing Inkling grants no placement reward."
     ],
     [
       "Memories and upgrades",
-      "To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Curiosity places its bonus Inkling in this book's Binding. Returning a memory lowers its row; an Inkling on it stays."
+      "To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Curiosity places its bonus Inkling in this book's binding space. Returning a memory lowers its row; an Inkling on it stays."
     ],
     [
       "Subplots",
-      "Keep your active Subplot hidden. Its objective checks the current board and may include Inkling positions. When fulfilled, reveal it and choose a character or its alternative reward, then keep the completed card for its printed 1–3 end-game plot points and draw a new hidden Subplot. At most one Subplot per player may complete in each player turn. Played Twists are also kept for their printed 1–3 end-game plot points; these points are not added to the scoreboard during play."
+      "Keep your active Subplot hidden. Check its objective only when you place an Inkling, using the board immediately after placement and before rewards or conflict effects. Moving an existing Inkling, leaving a memory, drawing a card and forced conflicts do not complete objectives. Memory spaces are page spaces with a memory of any type; ownership matters only where stated. Binding spaces belong to the book, not either page. Adjacent books share an edge. A placement triggers conflict when it fills the book, including Agamemnon's one-empty-space exception. When fulfilled, reveal the card, choose a character or its alternative reward, keep it for its printed end-game points and draw a new hidden Subplot. At most one Subplot per player may complete in each player turn; a replacement waits until a later turn. Played Twists are also kept for their printed end-game points. The Trojan Horse power All Part of the Plan still explicitly overrides objective conditions."
     ],
     [
       "Immediate conflict",
-      "Finish placement rewards, then immediately fight when the last page space gains an Inkling. All players with Inklings or figures there participate. Resolve start effects, then check occupied page spaces once from left to right. At each space, its current Inkling owner may play 1 Twist or pass. Skip empty, memory-only and neutral spaces; Binding grants no checks. Keep each played Twist for end-game scoring. Other full books wait until this conflict finishes."
+      "Finish placement rewards, then immediately fight when the last page space gains an Inkling. All players with Inklings or figures there participate. Resolve start effects, then check occupied page spaces once from left to right. At each space, its current Inkling owner may play 1 Twist or pass. Skip empty, memory-only and neutral spaces; binding space grants no checks. Keep each played Twist for end-game scoring. Other full books wait until this conflict finishes."
     ],
     [
       "Scoring and rewards",
-      "After checks, total Inklings, character power, Quill Valor and effects. Most power wins. Break every tie in favor of the tied player whose Inkling is furthest left among the book's page spaces. Choose a current-Act conflict token. If it is front-side up, first and second place score 5/2 in Act I, 7/3 in Act II or 10/4 in Act III; then flip it. If it is already back-side up, first and second score 3/2, 4/2 or 5/2 respectively. Conflict tokens have no bonus effects or multipliers. A front-side conflict also publishes a new book touching at least 2 others; then place 1 supply Inkling in a touching old book's Binding. A book may conflict repeatedly in the same Act."
+      "After checks, total Inklings, character power, Quill Valor and effects. Most power wins. Break every tie in favor of the tied player whose Inkling is furthest left among the book's page spaces. Choose a current-Act conflict token. If it is front-side up, first and second place score 5/2 in Act I, 7/3 in Act II or 10/4 in Act III; then flip it. If it is already back-side up, first and second score 3/2, 4/2 or 5/2 respectively. Conflict tokens have no bonus effects or multipliers. A front-side conflict also publishes a new book touching at least 2 others; then place 1 supply Inkling in a touching old book's binding space. A book may conflict repeatedly in the same Act. If tied players have no page-space Inklings, their remaining tie follows clockwise order from the active player."
     ],
     [
       "Acts and victory",
-      "When every current-Act conflict token has been used on its front side, finish that conflict and end the Act. Clear and reset the conflict tokens; return character-card Inklings to supply; release the next reserve; prepare the Horse and display the next Act's tokens. Book Inklings and memories stay. After Act III, add the printed end-game points on every kept Twist and completed Subplot to each player's scoreboard points. Highest total wins; ties share victory."
+      "When every current-Act conflict token has been used on its front side, finish that conflict and end the Act. Clear and reset the conflict tokens; return character-card Inklings to supply; release the next reserve; prepare the Horse and display the next Act's tokens. Book Inklings and memories stay. After Act III, add the printed end-game points on every kept Twist and completed Subplot to each player's scoreboard points. Highest total wins; ties share victory. If no player has supply Inklings or an Inkling on a book at turn start, end the Act to release the next reserve; after Act III, score the game."
     ],
     [
       "Book effects",
-      "Dracula marks the first page space with a castle. The Odyssey rewards a figure for leaving its book. Around the World moves an owned figure after placement. Jekyll may reduce points below zero. Twenty Thousand Leagues redirects an Inkling that would enter its Binding to an adjacent book's Binding instead."
+      "Dracula marks the first page space with a castle. The Odyssey rewards a figure for leaving its book. Around the World moves an owned figure after placement. Jekyll may reduce points below zero. Twenty Thousand Leagues redirects an Inkling that would enter its binding space to an adjacent book's binding space instead."
     ]
   ],
   "sources": {
@@ -594,8 +632,8 @@
       "label": "Violet / chevrons"
     }
   ],
-  "edition": "digital-and-print-0.6",
-  "rulesVersion": "mightier-0.6.0",
+  "edition": "digital-and-print-0.7",
+  "rulesVersion": "mightier-0.7.0",
   "balance": {
     "supply": 6,
     "reserve": 3,
@@ -768,7 +806,7 @@
       {
         "type": "place",
         "n": 2,
-        "mode": "Binding"
+        "mode": "binding space"
       }
     ],
     [
@@ -805,6 +843,36 @@
       {
         "type": "upgrade",
         "source": "bonus"
+      }
+    ],
+    [
+      {
+        "type": "foreshadow",
+        "n": 2
+      }
+    ],
+    [
+      {
+        "type": "points",
+        "n": 4
+      }
+    ],
+    [
+      {
+        "type": "draw",
+        "n": 2
+      }
+    ],
+    [
+      {
+        "type": "points",
+        "n": 4
+      }
+    ],
+    [
+      {
+        "type": "foreshadow",
+        "n": 2
       }
     ]
   ]

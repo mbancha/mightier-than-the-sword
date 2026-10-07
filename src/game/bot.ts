@@ -1,9 +1,9 @@
-import { subplotScore } from './subplots';
+import { subplotScore, placementFulfills } from './subplots';
 import { characters, content, CONFIG, quillPower, type Row } from '../data/catalog';
 import { reachable, bookOf, adjacentBooks } from './topology';
 import type { playerView } from './views';
 import type { Choice, Character } from './types';
-export const BOT_VERSION = 'strategic-3';
+export const BOT_VERSION = 'strategic-4';
 type View = ReturnType<typeof playerView>;
 // Heuristics only: no engine simulation, deck access or opponent hand access.
 export function rankBotActions(v: View, decision: number) {
@@ -52,7 +52,8 @@ export function rankBotActions(v: View, decision: number) {
             : 1.7;
   const bestEnemy = (b: number) => Math.max(0, ...v.bookPowers[b].filter((_, i) => i !== p));
   const near = (b: number) =>
-    1 - v.books[b].slots.filter((s) => s.owner === null).length / v.books[b].slots.length;
+    1 -
+    v.books[b].slots.filter((s) => s.owner === null && !s.neutral).length / v.books[b].slots.length;
   const influence = (b: number, added: number) => {
     const mine = v.bookPowers[b][p],
       enemy = bestEnemy(b);
@@ -69,7 +70,7 @@ export function rankBotActions(v: View, decision: number) {
     if (book.id === 1) n += 0.7;
     if (book.id === 5) n -= 0.7;
     if (spot.memory) n += memoryValue(spot.memory.row, b) - (spot.memory.owner !== p ? 0.6 : 0);
-    const empty = book.slots.filter((s) => s.owner === null).length;
+    const empty = book.slots.filter((s) => s.owner === null && !s.neutral).length;
     if (empty === 1 || (empty === 2 && v.characters.some((c) => c.id === 5 && at(c, b)))) {
       const mine = v.bookPowers[b][p] + 1;
       n += mine > bestEnemy(b) ? 5 + (!book.covered ? v.act : 0) : -2;
@@ -80,7 +81,7 @@ export function rankBotActions(v: View, decision: number) {
     const b = bookOf(page),
       book = v.books[b];
     const spots = book.slots.flatMap((s, k) =>
-      s.page === page % 2 && s.owner === null ? [placement(b, k)] : [],
+      s.page === page % 2 && s.owner === null && !s.neutral ? [placement(b, k)] : [],
     );
     const upgradable = book.slots.some((s) => s.page === page % 2 && s.owner === p && !s.memory);
     return (
@@ -97,7 +98,7 @@ export function rankBotActions(v: View, decision: number) {
     if (c.id === 0) n += enemiesOnPage(page) ? 3 + (me.supply > 0 ? 1 : 0) : 0;
     if (c.id === 2) n += v.books[b].id !== 0 && me.supply > 0 ? 1 : -2;
     if (c.id === 4) n += !me.horseSpent ? near(b) * 3 : -2;
-    if (c.id === 5 && v.books[b].slots.filter((s) => s.owner === null).length === 1)
+    if (c.id === 5 && v.books[b].slots.filter((s) => s.owner === null && !s.neutral).length === 1)
       n += v.bookPowers[b][p] + (at(c, b) ? 0 : cp(c)) > bestEnemy(b) ? 6 : -6;
     if (c.id === 6) n += inks(b) && v.hand.length ? 2.5 : 0;
     if (c.id === 7) n += v.books[b].id === 0 ? -4 : Math.min(3, c.used[0] + 1) * (0.5 + near(b));
@@ -210,7 +211,9 @@ export function rankBotActions(v: View, decision: number) {
     );
   };
   const score = (a: Choice) => {
-    const [kind, x, y, z] = a.key.split(':');
+    const parts = a.key.split(':');
+    if (parts[0] === 'turn' && parts[1] === 'upgrade') parts.shift();
+    const [kind, x, y, z] = parts;
     let n = noise(a.key);
     if (me.subplot !== null) {
       const projected = {
@@ -254,10 +257,36 @@ export function rankBotActions(v: View, decision: number) {
           };
         changed = true;
       }
-      if (changed) {
-        const before = subplotScore(v, p, me.subplot),
-          after = subplotScore(projected, p, me.subplot);
-        n += (after - before) * 12 + (after >= 1 && before < 1 ? 8 : 0);
+      if (changed && (kind === 'page' || kind === 'upgrade' || kind === 'memoryHere')) {
+        n += (subplotScore(projected, p, me.subplot) - subplotScore(v, p, me.subplot)) * 3;
+      }
+      if (
+        ['placeHere', 'place', 'adjacent', 'publishOverflow', 'bindingRedirect'].includes(kind) &&
+        a.book !== undefined &&
+        x !== undefined
+      ) {
+        const slotText = kind === 'adjacent' ? a.key.split(':').at(-1)! : x;
+        const slot =
+          ['publishOverflow', 'bindingRedirect'].includes(kind) || slotText === 'null'
+            ? null
+            : Number(slotText);
+        const b = structuredClone(v.books);
+        if (slot === null) b[a.book].overflow[p]++;
+        else b[a.book].slots[slot].owner = p;
+        const empty = b[a.book].slots.filter((s) => s.owner === null && !s.neutral).length;
+        const triggersConflict =
+          slot !== null &&
+          (empty === 0 ||
+            (empty === 1 && v.characters.some((c) => c.id === 5 && at(c, a.book!)))) &&
+          v.battle?.book !== a.book;
+        if (
+          placementFulfills({ ...projected, books: b }, p, me.subplot, {
+            book: a.book,
+            slot,
+            triggersConflict,
+          })
+        )
+          n += 20;
       }
     }
 
@@ -296,6 +325,14 @@ export function rankBotActions(v: View, decision: number) {
         if (bt?.book === +x) n -= 1.8;
       }
     }
+    if (kind === 'memoryBonus')
+      n += memoryValue(
+        v.books[v.effect.book!].slots.find((s) => s.owner === p && s.memory)?.memory?.row ??
+          'valor',
+        v.effect.book!,
+      );
+    if (kind === 'forcedConflict') n += +x === +x ? influence(+x, 0) : 0;
+    if (kind === 'memoryActivate') n += activation(+x, +y) + 1;
     if (kind === 'activate') n += activation(+x, +y);
     if (kind === 'twist') n += twistValue(+x);
     if (kind === 'boost') n += me.supply >= 2 ? pageValue(me.page) - twistValue(+x) * 0.4 : -10;
