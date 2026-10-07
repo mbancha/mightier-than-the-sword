@@ -5,9 +5,9 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "tts" / "assets"
-OUTPUT = ASSETS / "memories-deck-7x10.png"
-COLS = 7
-ROWS = 10
+OUTPUT = ASSETS / "memories-deck-10x7.png"
+COLS = 10
+ROWS = 7
 CELL = 240
 
 
