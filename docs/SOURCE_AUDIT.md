@@ -83,3 +83,8 @@ The 2026-10-06 print-only layout revision packs two player boards per sheet. All
 ## 2026-10-07 integration
 
 Reviewed source branch f2039f8 against main 232391a and integrated its rules overhaul with the fifteen designer-approved placement objectives. Shared content is the digital/print authority; rules and the single master PDF are regenerated. Stable IDs 0-9 are replaced in place; 10-14 are appended. Old hidden-state/hand-limit/token tests are migrated to the superseding rules, while applicable prior tests remain. Added focused objective, ranking, neutral, turn ordering, retained-card, draw and deadlock regressions.
+
+
+## One memory per book (2026-10-07)
+
+Updated stable Subplot ID 10, placement predicate and legal upgrade choices for the one-owned-memory-per-book limit. Catalog/rules edition advances to 0.7.1; print master is synced.

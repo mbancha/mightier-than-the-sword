@@ -66,7 +66,6 @@ describe('15 placement-triggered Subplots', () => {
           break;
         case 10:
           b.slots[0].memory = ownMemory;
-          b.slots[1].memory = ownMemory;
           break;
         case 11:
           b.slots[2].memory = ownMemory;

@@ -65,7 +65,7 @@ export function placementFulfills(s: Position, p: number, id: number, e: Placeme
       );
     case 10:
       return (
-        !!spot && b.slots.filter((x) => x.page === spot.page && x.memory?.owner === p).length >= 2
+        !!spot && b.slots.filter((x) => x.page === spot.page && x.memory?.owner === p).length >= 1
       );
     case 11:
       return (

@@ -1,6 +1,6 @@
 # Mightier than the Sword — current rules
 
-Generated from `src/data/content.json`. Source edition digital-and-print-0.7, rules mightier-0.7.0. See DECISIONS.md for digital rulings.
+Generated from `src/data/content.json`. Source edition digital-and-print-0.7.1, rules mightier-0.7.1. See DECISIONS.md for digital rulings.
 
 ## Setup
 
@@ -16,7 +16,7 @@ The spaces along each book are page spaces. Binding spaces are shared spaces out
 
 ## Memories and upgrades
 
-To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Curiosity places its bonus Inkling in this book's binding space. Returning a memory lowers its row; an Inkling on it stays.
+You may have at most 1 of your memories on each book. To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Curiosity places its bonus Inkling in this book's binding space. Returning a memory lowers its row; an Inkling on it stays.
 
 ## Subplots
 
