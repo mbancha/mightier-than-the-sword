@@ -116,3 +116,5 @@ Regenerated the master from the current checkout without the removed assets fold
 100 strategic games across 2/3/4 players complete with zero failures/caps (artifacts/simulations/edition-07-integration). Full browser smoke completes 159 choices, six conflicts, nine books and all Acts; verifies direct Quill drag, memory menu, undo, handoffs/spectator privacy, bot turn and Balance lab. No console/page errors or accessibility violations. Desktop/tablet screenshots reviewed.
 
 Single master PDF regenerated and print/check.py passes: 18 vector-only sheets, 45 cards including all fifteen objectives, two boards per sheet with full-size memory slots, 48 memories, neutral piece, and mirrored token backs. Contact sheets visually reviewed. Obsolete printed +3 book bonuses and overflow labels removed. Tests verify implementation; these simulations do not certify balance.
+
+GitHub's first integration run timed out before tests: Ubuntu's Azure package mirror stalled during Playwright dependency installation. CI now selects the responsive HTTPS Ubuntu mirror on mirror-list runners and runs tests/build before browser installation. The same smoke check remains required.

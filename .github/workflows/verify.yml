@@ -13,8 +13,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Use responsive Ubuntu package mirror
+        run: |
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            printf '%s\n' 'https://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt
+          fi
       - run: npx playwright install --with-deps chromium
-      - run: npm run verify
+      - run: npm run smoke
       - name: Browser evidence
         if: always()
         uses: actions/upload-artifact@v4
