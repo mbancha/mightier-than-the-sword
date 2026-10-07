@@ -14,7 +14,11 @@ import { distance, initialHexes } from '../src/game/topology';
 import { makeRng, nextInt } from '../src/kernel/rng';
 import type { GameState, Job } from '../src/game/types';
 const fresh = (seed = 17, n = 2) =>
-  newGame({ names: ['Teal', 'Amber', 'Rose', 'Violet'].slice(0, n), seed });
+  (() => {
+    const s = newGame({ names: ['Teal', 'Amber', 'Rose', 'Violet'].slice(0, n), seed });
+    s.books.forEach((b) => b.slots.forEach((x) => (x.neutral = false)));
+    return s;
+  })();
 const act = (s: GameState, key: string) => {
   const error = applyAction(s, { key });
   expect(error, key).toBeNull();
@@ -64,7 +68,7 @@ describe('Current source and topology', () => {
       characters.length,
       tokens.length,
       content.horse.length,
-    ]).toEqual([9, 15, 10, 10, 15, 5]);
+    ]).toEqual([9, 15, 15, 10, 15, 5]);
     expect(JSON.stringify(content)).not.toMatch(/\b(?:ink|unlock\w*|sidekick|bookmark)\b/i);
     for (const b of books) {
       expect(b.slots).toBe(b.page_slots[0] + b.page_slots[1]);
@@ -153,13 +157,14 @@ describe('Memories and Inklings', () => {
     expect(s.players[0].rows.valor).toBe(1);
     expect(power(s, 0, 0)).toBe(1);
   });
-  it('shares memory reward with placer and owner exactly once each', () => {
+  it('offers only the placer a memory reward choice', () => {
     const s = fresh();
     s.players[0].rows.valor = 1;
     s.books[0].slots[0].memory = { owner: 0, row: 'valor' };
     only(s, { type: 'place', p: 1, page: s.books[0].slots[0].page, n: 1 });
     act(s, 'place:0');
-    expect(s.players[0].points).toBe(1);
+    act(s, 'memoryBonus');
+    expect(s.players[0].points).toBe(0);
     expect(s.players[1].points).toBe(1);
   });
   it('does not double-pay when placer owns the memory', () => {
@@ -168,6 +173,7 @@ describe('Memories and Inklings', () => {
     s.books[0].slots[0].memory = { owner: 0, row: 'valor' };
     only(s, { type: 'place', p: 0, page: s.books[0].slots[0].page, n: 1 });
     act(s, 'place:0');
+    act(s, 'memoryBonus');
     expect(s.players[0].points).toBe(1);
   });
   it('returns a memory as An Unlikely Champion cost and keeps the occupant', () => {
@@ -200,13 +206,14 @@ describe('Memories and Inklings', () => {
     expect(s.players[0].reserves[2]).toBe(3);
     expect(s.players[0].points).toBe(1);
   });
-  it('suspends overflow in the submarine to the next reserve', () => {
+  it('redirects submarine binding placement to an adjacent book', () => {
     const s = fresh(),
       b = ensureBook(s, 0);
     only(s, { type: 'place', p: 0, book: b, mode: 'overflow', n: 1 });
     act(s, 'place:null');
+    act(s, legalActions(s).find((a) => a.key.startsWith('bindingRedirect:'))!.key);
     expect(s.players[0].supply).toBe(5);
-    expect(s.players[0].reserves[1]).toBe(4);
+    expect(s.players[0].reserves[1]).toBe(3);
     expect(s.books[b].overflow[0]).toBe(0);
   });
   it('requires all slots across both pages before conflict', () => {
@@ -220,13 +227,16 @@ describe('Memories and Inklings', () => {
   });
 });
 describe('Characters and card-specific decisions', () => {
-  it('activation consumes supply and observes capacity', () => {
+  it('memory activation uses no additional supply', () => {
     const s = fresh();
     give(s, 0, 3);
-    s.jobs = [{ type: 'turn', p: 0 }];
-    act(s, 'activate:3:0');
-    expect(s.players[0].supply).toBe(5);
-    expect(s.characters[0].used[0]).toBe(1);
+    s.jobs = [
+      { type: 'memoryChoice', p: 0, book: 0, row: 'valor' },
+      { type: 'turn', p: 0 },
+    ];
+    act(s, 'memoryActivate:3:0');
+    expect(s.players[0].supply).toBe(6);
+    expect(s.characters[0].used[0]).toBe(0);
     act(s, 'page:0');
     s.acted = false;
     expect(legalActions(s).some((a) => a.key === 'activate:3:0')).toBe(false);
@@ -234,10 +244,13 @@ describe('Characters and card-specific decisions', () => {
   it('Jekyll coin flips replay deterministically', () => {
     const s = fresh();
     give(s, 0, 2);
-    s.jobs = [{ type: 'turn', p: 0 }];
+    s.jobs = [
+      { type: 'memoryChoice', p: 0, book: 0, row: 'valor' },
+      { type: 'turn', p: 0 },
+    ];
     const t = structuredClone(s);
-    act(s, 'activate:2:0');
-    act(t, 'activate:2:0');
+    act(s, 'memoryActivate:2:0');
+    act(t, 'memoryActivate:2:0');
     expect(s).toEqual(t);
   });
   it('Frankenstein collection conserves Inklings and becomes 5 power', () => {
@@ -297,7 +310,7 @@ describe('Conflict tokens and Acts', () => {
     s.battle!.winner = null;
     s.jobs = [{ type: 'battle', p: 0 }];
     act(s, 'twist:1');
-    expect(s.battle!.cards).toEqual([1]);
+    expect(s.players[0].keptTwists).toEqual([1]);
     expect(s.players[0].hand).not.toContain(1);
     expect(s.discards.twist).not.toContain(1);
   });
@@ -321,63 +334,6 @@ describe('Conflict tokens and Acts', () => {
     expect(s.books[b].slots[0].memory).toEqual({ owner: 0, row: 'valor' });
     expect(s.characters[0].page).toBe(b * 2);
     expect(s.players[0].supply).toBe(4);
-  });
-  it('can collect strong rewards of previous Acts without reapplying their multiplier', () => {
-    const s = rewardState(false);
-    s.act = 2;
-    s.pools[1] = [5, 6];
-    s.books[0].tokens = [{ id: 1, strong: true }];
-    act(s, 'token:5');
-    expect(s.players[0].points).toBe(6);
-    act(s, 'reward:1');
-    expect(s.players[0].points).toBe(6);
-    expect(s.players[0].reserves[2]).toBe(1);
-  });
-  it('every conflict consumes a token, but covered books award no printed points', () => {
-    for (const covered of [true, false]) {
-      const s = rewardState(covered);
-      act(s, 'token:1');
-      expect(s.players[0].points).toBe(covered ? 0 : 3);
-      expect(s.pools[0]).toEqual([0]);
-      act(s, 'reward:1');
-      expect(s.books[0].tokens[0].strong).toBe(false);
-    }
-  });
-  it('older tokens award face-up benefit without multiplying points', () => {
-    const s = rewardState(false);
-    s.books[0].tokens = [{ id: 6, strong: false }];
-    act(s, 'token:1');
-    act(s, 'reward:6');
-    expect(s.players[0].points).toBe(5);
-    act(s, 'reward:1');
-    expect(s.players[0].points).toBe(5);
-  });
-  it('last token ends Act after rewards, flips old tokens and uncovers books', () => {
-    const s = rewardState(false);
-    s.pools[0] = [1];
-    act(s, 'token:1');
-    expect(s.act).toBe(1);
-    act(s, 'reward:1');
-    expect(s.jobs[0].type).toBe('publish');
-    act(s, legalActions(s)[0].key);
-    act(s, legalActions(s)[0].key);
-    expect(s.act).toBe(2);
-    expect(s.books[0].covered).toBe(false);
-    expect(s.books[0].tokens[0].strong).toBe(true);
-    expect(s.players[0].reserves[1]).toBe(0);
-    expect(s.active).toBe(1);
-  });
-  it('shoot the moon awards bonuses without book multiplier and reaches next Act', () => {
-    const s = fresh();
-    for (let i = 0; i < 4; i++) put(s, 0, 0, i % s.books[0].slots.length); // use overflow below instead to conserve on a 3-slot book
-    s.books[0].slots.forEach((x) => (x.owner = null));
-    s.books[0].overflow[0] = 4;
-    s.pools[0] = [1];
-    s.jobs = [{ type: 'moon', p: 0 }];
-    act(s, 'token:1');
-    expect(s.act).toBe(2);
-    expect(s.players[0].points).toBe(0);
-    expect(s.books[0].tokens.length).toBe(0);
   });
 });
 describe('Bounded randomized legal play', () => {

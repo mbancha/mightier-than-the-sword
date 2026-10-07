@@ -83,7 +83,7 @@ def rules():
             for title,body in group:
                 txt(title.upper(),x,y,9,'Helvetica-Bold',TEAL);y-=8
                 h=para(body,x,y,270,9.5,11.4,maxh=650);y-=h+13
-            assert y>30,('Rules column overflow',sheet,col,y)
+            assert y>30,('Rules column Binding',sheet,col,y)
         finish('Basic rules' if sheet == 0 else 'Rules continued')
 
 def legend():
@@ -94,16 +94,16 @@ def legend():
         x=32+(i//6)*281;y=654-(i%6)*81
         v.draw_icon(c,icons.SYMBOLS[symbol],x,y-7,30)
         txt(title,x+42,y+15,10.5,'Helvetica-Bold',TEAL)
-        if symbol=='[twist]':meaning='Play during your Inkling space check in conflict. Numbered spaces grant no automatic Twist reward.'
-        if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into overflow on this book.'
+        if symbol=='[twist]':meaning='Play during your page space check in conflict. Page spaces grant no automatic Twist reward.'
+        if symbol=='[curiosity]':meaning='Movement row. Memory reward: [overflow-ink] place 1 inkling into a binding space on this book.'
         para(meaning,x+42,y+5,216,9.5,12,maxh=60)
     para('<b>PRINTING</b> / Use actual size (100%). Print pages 1-16 single-sided. Print conflict-token pages 17-18 together, double-sided, flip on the long edge.',32,199,548,9.5,12,maxh=30)
     line(32,162,580,162,GRAY)
     rect(35,117,25,25,None,TEAL,1)
-    para('<b>Activation square</b><br/>Put one of your supply inklings here to use the adjacent character action. Each square can hold one inkling.',76,150,235,9.5,12,maxh=60)
+    para('<b>Character action</b><br/>When your Inkling lands on a memory, you may use one action on a character you own instead of gaining the memory bonus.',76,150,235,9.5,12,maxh=60)
     hexagon(348,128,18)
     para('<b>Memory hexagon</b><br/>A memory unlocks its board row and stays on a book space. It adds no power and does not fill the space.',376,150,202,9.5,12,maxh=60)
-    para('<b>Erase</b> = return to current supply. &nbsp; <b>Suspend</b> = send to next Act reserve.<br/><b>Overflow</b> = extra ink on a book, outside numbered spaces. It adds power but never fills a space.',32,71,548,9.5,12,maxh=36)
+    para('<b>Erase</b> = return to current supply. &nbsp; <b>Suspend</b> = send to next Act reserve.<br/><b>Binding spaces</b> = extra ink on a book, outside page spaces. It adds power but never fills a space.',32,71,548,9.5,12,maxh=36)
     finish('Icon legend')
 
 MARGIN=2*72/25.4
@@ -121,7 +121,7 @@ def book(b,x,y):
     txt(genre,w-10-stringWidth(genre,'Helvetica-Bold',7),h-11,7,'Helvetica-Bold',col)
     rect(w-82,h-94,72,72,None,col,.9)
     txt('CONFLICT',w-46,h-40,8,'Helvetica-Bold',col,True)
-    txt('+3 [pp]',w-46,h-69,19,'Helvetica-Bold',col,True)
+    txt('TOKEN POINTS',w-46,h-65,7,'Helvetica-Bold',col,True)
     bx=(w-214)/2
     rect(bx,133,214,57,white,col,.65)
     effect_icon='conflict' if 'CONFLICT' in b['timing'] else 'ongoing'
@@ -139,10 +139,10 @@ def book(b,x,y):
             txt(str(n),xx+2,97,6.5,'Helvetica-Bold',GRAY)
             if b['title'] == 'Dracula' and n == 1: txt('CASTLE',xx+5,58,7,'Helvetica-Bold',col)
     if b['title'].startswith('20,000'):
-        para('NO OVERFLOW / incoming overflow Inklings are suspended',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
+        para('BINDING / redirect incoming Inklings to an adjacent book',10,29,w-20,8.2,10,color=col,align=1,maxh=12)
     else:
         rect(w/3,9,w/3,30,None,HexColor('#000000'),.8)
-        txt('OVERFLOW',w/2,21,8,'Helvetica-Bold',GRAY,True)
+        txt('BINDING SPACES',w/2,21,8,'Helvetica-Bold',GRAY,True)
     line(w/2,1,w/2,h-1,HexColor('#CFD5D6'),.55)
     c.restoreState()
 
@@ -164,7 +164,8 @@ def card(kind,item,num,x,y):
     title=item['name'] if kind=='Character' else item[0]
     ht=para(escape(title),10,210,160,15.5,17,'Times-Bold',maxh=51);yy=210-ht-10
     if kind=='Twist':
-        _,timing,effect,quote,source=item
+        _,timing,effect,quote,source,end_points=item
+        txt(str(end_points)+' END-GAME PP',170-stringWidth(str(end_points)+' END-GAME PP','Helvetica-Bold',7),234,7,'Helvetica-Bold',col)
         txt(timing,10,yy,7.5,'Helvetica-Bold',col)
         he=para(rich(effect),10,yy-9,160,10.2,12.8,maxh=116)
         assert yy-9-he>=77,(title,'effect/quote collision')
@@ -172,19 +173,19 @@ def card(kind,item,num,x,y):
         source_title,url=SOURCES[source]
         para('<link href="'+url+'">'+escape(source_title)+'</link>',10,67-hq-4,160,7,8.5,color=GRAY,maxh=26)
     elif kind=='Subplot':
-        _,target,goal,reward=item
+        _,target,goal,reward,end_points=item
+        txt(str(end_points)+' END-GAME PP',170-stringWidth(str(end_points)+' END-GAME PP','Helvetica-Bold',7),234,7,'Helvetica-Bold',col)
         txt('HIDDEN OBJECTIVE',10,yy,7,'Helvetica-Bold',col);yy-=10
         hg=para(goal,10,yy,160,9.5,11.6,maxh=92);yy-=hg+18
         txt('WHEN FULFILLED, CHOOSE ONE',10,yy,7,'Helvetica-Bold',col)
         hr=para('Draw 1 [character]<br/><b>OR</b> '+rich(reward),10,yy-8,160,9.7,12,maxh=61)
         assert yy-8-hr>=44,(title,'reward too low')
         line(10,39,170,39)
-        para('Reveal, resolve, discard, then draw a new hidden Subplot. At most one completion per player turn.',10,33,160,7.3,8.6,color=GRAY,maxh=28)
+        para('Reveal, resolve and keep for end-game points; then draw a new hidden Subplot. At most one completion per player turn.',10,33,160,7.3,8.6,color=GRAY,maxh=28)
     elif kind=='Character':
         txt(item['genre'].upper(),10,yy,7,'Helvetica-Bold',col);yy-=12
         for count,effect in item['actions']:
-            for j in range(count):rect(10+j*25,yy-17,18,18,None,col,.8)
-            yy-=24
+            txt('ACTION',10,yy,6.8,'Helvetica-Bold',col);yy-=12
             he=para(rich(effect),10,yy,160,9.3,11.4,maxh=72);yy-=he+12
         if item.get('collection'):
             txt('COLLECT YOUR ERASED INK',10,yy,7,'Helvetica-Bold',col);yy-=24
@@ -192,7 +193,7 @@ def card(kind,item,num,x,y):
             yy-=9
         if item['passive']:
             symbol,effect=item['passive'];he=para('['+symbol+'] '+rich(effect),10,yy,160,9.1,11.2,maxh=108);yy-=he
-        assert yy>=20,(title,'character text overflow',yy)
+        assert yy>=20,(title,'character text Binding',yy)
     else:
         txt('TROJAN HORSE / HIDDEN POWER',10,yy,6.8,'Helvetica-Bold',col)
         para('[combat] '+rich(item[1]),10,yy-13,160,10.8,13.5,maxh=120)
@@ -285,9 +286,9 @@ def scoreboard():
         rect(30+i*72,206,61,49,None,GRAY);txt(['I','II','III'][i],60+i*72,224,17,'Helvetica-Bold',center=True)
     txt('AVAILABLE TOKENS / CURRENT ACT',330,279,10,'Helvetica-Bold',TEAL)
     for i in range(4):rect(330+i*94,193,72,72,None,GRAY)
-    para('Every conflict takes 1 token from this pool. Its last token ends the Act.',330,182,424,9,12,maxh=26)
-    para('<b>CONFLICT REWARDS</b><br/>Uncovered book: +3 [pp] times the new token\'s multiplier.<br/>Covered book: no printed book points.<br/>Gain the new bonus and each older token\'s face-up reward; flip all to their backs.',30,155,367,10,14,maxh=98)
-    para('<b>END OF ACT</b><br/>Last token used, or a player starts with no ink.<br/>Flip book tokens strong; uncover book VP spaces.<br/>Erase character-card ink; unlock the next reserve.<br/>Prepare Trojan Horse and the next Act\'s token pool.',415,155,347,10,14,maxh=98)
+    para('Choose a token after every conflict. Fronts give first-conflict points; backs give lower repeat-conflict points.',330,182,424,9,12,maxh=26)
+    para('<b>CONFLICT REWARDS</b><br/>Front: first / second scores 5/2, 7/3 or 10/4 by Act; flip it.<br/>Back: first / second scores 3/2, 4/2 or 5/2.<br/>Front-side conflicts also add a new book. Tokens have no multiplier or bonus effect.',30,155,367,10,14,maxh=98)
+    para('<b>END OF ACT</b><br/>After every token has been used on its front.<br/>Clear and reset conflict tokens.<br/>Return character-card Inklings; release the next reserve.<br/>Prepare Trojan Horse and the next Act\'s token pool.',415,155,347,10,14,maxh=98)
     finish('Scoreboard',792,612)
 
 def token_face(act,name,effect,front,x,y):
@@ -296,16 +297,13 @@ def token_face(act,name,effect,front,x,y):
     if front:
         rect(x+.7,y+58,70.6,13.3,HexColor(['#EEF6F7','#EEF7F2','#FAF4E8'][act-1]),None)
         txt('ACT '+['I','II','III'][act-1],x+36,y+62,6.8,'Helvetica-Bold',col,True)
-        hn=para(escape(name),x+4,y+54,64,7.2,8,'Times-Bold',col,maxh=16)
-        compact=effect.replace(' from your character cards','')
-        compact=re.sub(r'\bTwists?\b','[twist]',compact)
-        compact=compact.replace('activation Inklings','activation [ink]')
-        he=para(rich(compact),x+4,y+51-hn,64,6.8,7.6,maxh=30.4)
-        assert 51-hn-he>=16,('Token effect overlaps multiplier',name,he)
-        txt('x'+str(act),x+36,y+5,9,'Helvetica-Bold',col,True)
+        txt('FIRST / SECOND',x+36,y+45,6.5,'Helvetica-Bold',col,True)
+        txt(['5 / 2','7 / 3','10 / 4'][act-1]+' PP',x+36,y+21,13,'Helvetica-Bold',col,True)
+        txt('ADD A NEW BOOK',x+36,y+6,5.5,'Helvetica-Bold',col,True)
     else:
         txt('ACT '+['I','II','III'][act-1],x+36,y+51,9,'Helvetica-Bold',col,True)
-        txt(str(act)+' [pp]',x+36,y+23,17,'Helvetica-Bold',col,True)
+        txt('FIRST / SECOND',x+36,y+39,6.5,'Helvetica-Bold',col,True)
+        txt(['3 / 2','4 / 2','5 / 2'][act-1]+' PP',x+36,y+17,13,'Helvetica-Bold',col,True)
 
 def tokens():
     for front in (True,False):
@@ -334,7 +332,9 @@ def pieces():
         c.setStrokeColor(col);c.circle(475,y-20,22,stroke=1,fill=0)
         player_mark(index,475,y-20,24);txt('SCORE',475,y-58,8,'Helvetica-Bold',col,True)
     rect(28,36,36,36,None,TEAL);txt('ACT',46,49,10,'Helvetica-Bold',TEAL,True)
-    finish('Player pieces / 4 Quills, 48 Inklings, 4 score markers, 1 Act marker')
+    c.setStrokeColor(GRAY);c.circle(124,54,18,stroke=1,fill=0)
+    txt('N',124,49,14,'Helvetica-Bold',GRAY,True);txt('NEUTRAL INKLING',166,50,8,'Helvetica-Bold',GRAY)
+    finish('Player pieces / 4 Quills, 48 Inklings, 4 score markers, 1 Act marker, 1 neutral Inkling')
 
 rules();legend();books();cards()
 boards();scoreboard();memories();pieces();tokens();c.save()

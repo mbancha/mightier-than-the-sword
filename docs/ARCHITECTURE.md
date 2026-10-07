@@ -120,3 +120,8 @@ catalog and bot implementation; report metadata records all three versions.
 ## Track alternatives and end-turn refill (0.6)
 
 Movement uses the shared `movementLimit` helper; final Quill power uses `quillPower` with the live count of owned numbered/overflow Inklings. `resolveChoice` queues one available tier. `placeAdjacent` retains its origin page and shares ordinary placement handlers, so page-edge topology, book rewards, and conflict interruptions remain authoritative. Direct space placement is a shortcut for the base one-Inkling option. `insightDraw` offers a repeatable optional deck choice until combined hand size 4, preserving a single active Subplot. Normal turn end, final-token end, and shoot-the-moon end schedule refill before hand-limit cleanup and any Act transition. Print/outputs holds exactly one master PDF; rendered evidence and export intermediates are ignored artifacts.
+
+
+## Placement predicates and overhaul 0.7
+
+placementFulfills receives the actual book/slot and whether that placement newly meets the conflict trigger. The engine invokes it only from place, captures success and queues a reward; pump no longer scans current-board predicates. subplotScore is bot planning only. bindingRedirect distinguishes fresh placement (supply remains pending until destination chosen) from transfer (in-transit pieces counted by invariants). Battle ranking is latched before cleanup and used for token payouts. Completed Subplots and played Twists are retained; final scoring consumes their catalog endPoints. All current-Act tokens remain selectable; tokenStrong controls front/back behavior. Setup neutral occupancy is represented independently of owner.

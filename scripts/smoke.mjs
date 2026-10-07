@@ -77,7 +77,7 @@ try {
   await figure.click();
   await page.locator('.mapPopup').getByRole('button', { name: 'End move', exact: true }).click();
   await page.locator('.legalSlot.slot').first().click();
-  assert.equal(await page.locator('.mapBook .piece').count(), 1);
+  assert.equal(await page.locator('.mapBook .piece').count(), 2); // Includes the neutral Inkling.
   assert.equal(await page.locator('.trackLevel').count(), 32);
   assert.equal(await page.locator('.slotReward').count(), 0);
   // Zoom and pan affect the camera, not game state.
@@ -130,30 +130,11 @@ try {
       .getByRole('button', { name: 'End turn', exact: true })
       .click();
   }
-  await finishTurn();
-  await directMove('Amber', 3);
-  await page.locator('[data-book="1"] .slot').nth(1).click();
-  await finishTurn();
-  await directMove('Teal', 0);
-  await page.locator('[data-book="0"] .slot').nth(0).click();
-  await finishTurn();
-  await directMove('Amber', 2);
-  await page.locator('[data-book="1"] .slot').nth(0).click();
-  await finishTurn();
-  await directMove('Teal', 1);
   await page.locator('[data-book="0"] .slot').nth(2).click();
   await page
     .locator('.mapPopup')
     .getByRole('button', { name: /Valor memory/ })
     .click();
-  assert.equal(
-    await page
-      .locator('.player')
-      .first()
-      .getByRole('button', { name: 'Valor 1/3', exact: true })
-      .count(),
-    1,
-  );
   assert.equal(await page.locator('.mapBook .memory').count(), 1);
   await page.screenshot({ path: 'artifacts/upgrades-desktop.png', fullPage: true });
   report.memoryClick = true;
@@ -200,6 +181,8 @@ try {
       await page.locator('.overflow.legalSlot').first().click();
       continue;
     }
+    if (prompt.startsWith('Choose a conflict token'))
+      index = texts.findIndex((t) => t.includes('Front:'));
     if (index < 0) index = texts.findIndex((t) => t === 'End turn');
     if (index < 0) index = texts.findIndex((t) => t === 'Place Inklings');
     if (index < 0) index = texts.findIndex((t) => t === 'Pass this space');

@@ -62,29 +62,7 @@ describe('Digital 0.4 rules', () => {
     act(s, 'placeHere:1');
     expect(s.players[0].hand).toEqual(before);
   });
-  it('counts the Subplot against hand limit and permits discarding it without a replacement', () => {
-    const s = fresh(2),
-      p = s.players[0],
-      subplot = p.subplot;
-    p.hand.push(s.decks.twist.pop()!, s.decks.twist.pop()!);
-    trigger(s, { type: 'handLimit', p: 0 });
-    expect(s.jobs[0].type).toBe('discard');
-    expect(legalActions(s).filter((a) => a.key.startsWith('discard:'))).toHaveLength(3);
-    act(s, 'discardSubplot');
-    expect(p.subplot).not.toBeNull(); // applyAction replaces state atomically
-    expect(s.players[0].subplot).toBeNull();
-    expect(s.discards.subplot).toContain(subplot);
-    expect(s.jobs[0].type).toBe('turn');
-  });
-  it('can retain the Subplot by discarding a Twist instead', () => {
-    const s = fresh(2);
-    s.players[0].hand.push(s.decks.twist.pop()!, s.decks.twist.pop()!);
-    trigger(s, { type: 'handLimit', p: 0 });
-    act(s, `discard:${s.players[0].hand[0]}`);
-    expect(s.players[0].hand).toHaveLength(2);
-    expect(s.players[0].subplot).not.toBeNull();
-    expect(s.jobs[0].type).toBe('turn');
-  });
+
   it('Dracula offers only the castle owner one erasure, including any own Inkling', () => {
     const s = fresh(6);
     [1, 0, 0, 1].forEach((p, k) => put(s, k, p));
@@ -170,16 +148,12 @@ describe('Digital 0.4 rules', () => {
     give(s, 3);
     s.characters[0].page = 2;
     act(s, 'placeHere:0');
-    expect(legalActions(s).map((a) => a.key)).toEqual([
-      'bookMove:Quill',
-      'bookMove:3',
-      'skip',
-    ]);
+    expect(legalActions(s).map((a) => a.key)).toEqual(['bookMove:Quill', 'bookMove:3', 'skip']);
     act(s, 'bookMove:3');
     act(s, 'page:3');
     expect(s.characters[0].page).toBe(3);
   });
-  it('the submarine suspends Nemo activation Inklings as well as new placements', () => {
+  it('the submarine redirects Nemo transfers without treating them as new placements', () => {
     const s = fresh(0);
     give(s, 7);
     s.characters[0].used[0] = 2;
@@ -189,7 +163,9 @@ describe('Digital 0.4 rules', () => {
       { type: 'turn', p: 0 },
     ];
     act(s, 'nemo:2');
-    expect(s.players[0].reserves[1]).toBe(5);
+    act(s, legalActions(s).find((a) => a.key.startsWith('bindingRedirect:'))!.key);
+    expect(s.players[0].reserves[1]).toBe(3);
+    expect(s.books.slice(1).reduce((n, b) => n + b.overflow[0], 0)).toBe(2);
     expect(s.books[0].overflow[0]).toBe(0);
     expect(s.characters[0].used[0]).toBe(0);
   });

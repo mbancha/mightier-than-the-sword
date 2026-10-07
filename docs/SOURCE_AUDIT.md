@@ -78,3 +78,8 @@ The designer request in this task supersedes earlier player-piece terminology an
 
 
 The 2026-10-06 print-only layout revision packs two player boards per sheet. All four boards were compared against the previous master by extracted word counts: no words added or removed. The source catalog and digital game are unchanged.
+
+
+## 2026-10-07 integration
+
+Reviewed source branch f2039f8 against main 232391a and integrated its rules overhaul with the fifteen designer-approved placement objectives. Shared content is the digital/print authority; rules and the single master PDF are regenerated. Stable IDs 0-9 are replaced in place; 10-14 are appended. Old hidden-state/hand-limit/token tests are migrated to the superseding rules, while applicable prior tests remain. Added focused objective, ranking, neutral, turn ordering, retained-card, draw and deadlock regressions.

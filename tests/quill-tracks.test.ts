@@ -5,6 +5,7 @@ import { pageNeighbors } from '../src/game/topology';
 import type { GameState } from '../src/game/types';
 function fresh() {
   const s = newGame({ names: ['A', 'B'], seed: 20 });
+  s.books.forEach((b) => b.slots.forEach((x) => (x.neutral = false)));
   s.players[0].page = 0;
   // Prevent unrelated objective completion while testing the track jobs.
   s.players.forEach((p) => (p.subplotTurn = s.turn));
@@ -106,83 +107,10 @@ describe('Quill tracks 0.6', () => {
     s.players[0].page = 2;
     expect(power(s, 0, 0)).toBe(3);
   });
-  it('optional Insight refill counts the active Subplot, stops at 4, and allows early stop', () => {
-    const s = fresh();
-    s.players[0].rows.insight = 3;
-    s.jobs = [
-      { type: 'insightDraw', p: 0 },
-      { type: 'turn', p: 0 },
-    ];
-    expect(legalActions(s).some((a) => a.key === 'insightSubplot')).toBe(false);
-    act(s, 'insightTwist');
-    act(s, 'insightTwist');
-    expect(s.players[0].hand.length + 1).toBe(4);
-    expect(legalActions(s).map((a) => a.key)).toEqual(['skip']);
-    act(s, 'skip');
-    const t = fresh();
-    t.jobs = [
-      { type: 'insightDraw', p: 0 },
-      { type: 'turn', p: 0 },
-    ];
-    act(t, 'skip');
-    expect(t.players[0].hand).toHaveLength(1);
-  });
-  it('Insight can draw a missing Subplot and exhausted piles have no draw action', () => {
-    const s = fresh();
-    s.players[0].subplot = null;
-    s.jobs = [
-      { type: 'insightDraw', p: 0 },
-      { type: 'turn', p: 0 },
-    ];
-    act(s, 'insightSubplot');
-    expect(s.players[0].subplot).not.toBeNull();
-    s.decks.twist = [];
-    s.discards.twist = [];
-    expect(legalActions(s).map((a) => a.key)).toEqual(['skip']);
-  });
-  it('end-turn refill is present only at final Insight', () => {
-    for (const level of [2, 3]) {
-      const s = fresh();
-      s.players[0].rows.insight = level;
-      s.jobs = [
-        { type: 'move', p: 0, n: 1, source: 'book' },
-        { type: 'end', p: 0 },
-      ];
-      act(s, 'endMove');
-      expect(s.jobs[0].type).toBe(level === 3 ? 'insightDraw' : 'move');
-    }
-  });
 });
 
 // Final-Act and shoot-the-moon paths also count as end of turn.
 describe('Insight at Act boundaries', () => {
-  it('offers refill before a final-token transition and preserves the old Act until finished', () => {
-    const s = fresh();
-    s.players[0].rows.insight = 3;
-    s.pools[s.act - 1] = [];
-    s.jobs = [
-      { type: 'move', p: 0, n: 1, source: 'book' },
-      { type: 'afterRewards', p: 0 },
-    ];
-    act(s, 'endMove');
-    expect(s.jobs[0].type).toBe('insightDraw');
-    expect(s.act).toBe(1);
-    act(s, 'skip');
-    expect(s.act).toBe(2);
-  });
-  it('offers refill at the end of shoot-the-moon', () => {
-    const s = fresh();
-    s.players[0].rows.insight = 3;
-    s.pools[0] = [];
-    s.jobs = [
-      { type: 'move', p: 0, n: 1, source: 'book' },
-      { type: 'moon', p: 0 },
-    ];
-    act(s, 'endMove');
-    expect(s.jobs[0].type).toBe('insightDraw');
-    act(s, 'skip');
-    expect(s.act).toBe(2);
-  });
   it('interrupts adjacent placements with an immediate conflict', () => {
     const s = fresh();
     s.players[0].rows.resolve = 3;
