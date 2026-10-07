@@ -22,7 +22,7 @@ with pdfplumber.open(out/'Mightier_than_the_Sword_Current.pdf') as pdf:
     assert 'A book may conflict repeatedly in the same Act' in full
     assert 'first and second place score 5/2 in Act I' in full
     assert 'There is no hand limit' in full
-    assert 'SPACE CHECKS 0.7.0' in full
+    assert 'SPACE CHECKS 0.7.1' in full
     assert full.count('HIDDEN OBJECTIVE')==15
     assert 'WHEN FULL, CHOOSE ONE' not in full
     assert not re.search(r'\b(?:OVERFLOW|numbered)\b',full,re.I)

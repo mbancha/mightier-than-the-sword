@@ -118,3 +118,7 @@ Regenerated the master from the current checkout without the removed assets fold
 Single master PDF regenerated and print/check.py passes: 18 vector-only sheets, 45 cards including all fifteen objectives, two boards per sheet with full-size memory slots, 48 memories, neutral piece, and mirrored token backs. Contact sheets visually reviewed. Obsolete printed +3 book bonuses and overflow labels removed. Tests verify implementation; these simulations do not certify balance.
 
 GitHub's first integration run timed out before tests: Ubuntu's Azure package mirror stalled during Playwright dependency installation. CI now selects the responsive HTTPS Ubuntu mirror on mirror-list runners and runs tests/build before browser installation. The same smoke check remains required.
+
+## One memory per book — 0.7.1 (2026-10-07)
+
+110 tests pass, including second-memory rejection across pages/bonus upgrades, other-player allowance and Lasting Impression ownership/page/binding checks. Production build and full browser smoke pass (159 choices, six conflicts, all Acts; no errors or accessibility violations). Single 18-sheet PDF regenerated; print checks and visual review of revised card and rules pass.

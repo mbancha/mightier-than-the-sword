@@ -1060,6 +1060,7 @@ function upgradeOptions(s: GameState, j: Job): Option[] {
       if (
         spot.owner !== p ||
         spot.memory ||
+        b.slots.some((x) => x.memory?.owner === p) ||
         (j.book !== undefined && j.book !== i) ||
         (j.page !== undefined && (bookOf(j.page) !== i || spot.page !== j.page % 2))
       )

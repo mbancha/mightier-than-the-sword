@@ -166,3 +166,8 @@ The supplied overhaul changes normal turns to placement followed by an optional 
 Review fixes: neutral spaces reject placement; the neutral piece is visible and printable; Resolve menu is reachable; submarine placement and transfer redirects preserve resources; conflict ranking is captured before cleanup; source edition and save compatibility advance to 0.7. End-turn draws follow the supplied Your turn rule (1 plus Insight), so track text drops the inconsistent 'up to'.
 
 Provisional recovery rulings: a player without supply or owned book Inklings ends their turn. If every player lacks both at turn start, end the Act and release the next reserve (or finish Act III), avoiding a reproduced suspended-Inkling deadlock. If tied participants both lack page-space Inklings, use the existing clockwise-from-active fallback. Neutral Inkling remains in its setup space through cleanup, consistent with book pieces staying between Acts. These rulings need designer playtesting.
+
+
+## One memory per book (2026-10-07)
+
+Designer correction: each player may have at most one of their own memories per book. Different players may each leave one there. A Lasting Impression now requires placing an Inkling on a page containing one owned memory; placement on the memory itself is optional. All ordinary and bonus upgrades enforce the same per-player book limit.
