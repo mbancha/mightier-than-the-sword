@@ -3,6 +3,38 @@
   "status": "Owner project assets; no external art license asserted",
   "assets": [
     {
+      "id": "pacing",
+      "master": "public/icons/pacing.svg",
+      "web": "public/icons/pacing.svg",
+      "type": "original-vector",
+      "meaning": "Pacing character-development track",
+      "alt": "decorative when paired with the Pacing label"
+    },
+    {
+      "id": "imagination",
+      "master": "public/icons/imagination.svg",
+      "web": "public/icons/imagination.svg",
+      "type": "original-vector",
+      "meaning": "Imagination character-development track",
+      "alt": "decorative when paired with the Imagination label"
+    },
+    {
+      "id": "tension",
+      "master": "public/icons/tension.svg",
+      "web": "public/icons/tension.svg",
+      "type": "original-vector",
+      "meaning": "Tension character-development track",
+      "alt": "decorative when paired with the Tension label"
+    },
+    {
+      "id": "voice",
+      "master": "public/icons/voice.svg",
+      "web": "public/icons/voice.svg",
+      "type": "original-vector",
+      "meaning": "Voice character-development track",
+      "alt": "decorative when paired with the Voice label"
+    },
+    {
       "id": "character",
       "master": "public/icons/character.svg",
       "web": "public/icons/character.svg",

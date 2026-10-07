@@ -166,3 +166,10 @@ The supplied overhaul changes normal turns to placement followed by an optional 
 Review fixes: neutral spaces reject placement; the neutral piece is visible and printable; Resolve menu is reachable; submarine placement and transfer redirects preserve resources; conflict ranking is captured before cleanup; source edition and save compatibility advance to 0.7. End-turn draws follow the supplied Your turn rule (1 plus Insight), so track text drops the inconsistent 'up to'.
 
 Provisional recovery rulings: a player without supply or owned book Inklings ends their turn. If every player lacks both at turn start, end the Act and release the next reserve (or finish Act III), avoiding a reproduced suspended-Inkling deadlock. If tied participants both lack page-space Inklings, use the existing clockwise-from-active fallback. Neutral Inkling remains in its setup space through cleanup, consistent with book pieces staying between Acts. These rulings need designer playtesting.
+
+
+## Character Development player-board revision (2026-10-07)
+
+Designer-confirmed player-board terminology is Pacing (movement), Imagination (Twist draws), Tension (power), and Voice (Inkling placement). The board uses the supplied chevrons, lightbulb, lightning-bolt, and speech-bubble icons. Its four levels read: Pacing 1/2/3/5 pages; Tension 0/1/2/2 plus 1 per Inkling here; Imagination draws after losing combat, after every combat, then refills to 2 or 4 after every combat; Voice places 1, 1 plus a background Inkling, up to 2, or up to 3 between here and adjacent pages. Internal row keys remain stable for save compatibility.
+
+This request updates the player-board content and presentation. The new Imagination timing and the meaning of a background Inkling still require a focused engine ruling before replacing the existing automated end-turn draw and placement behavior.

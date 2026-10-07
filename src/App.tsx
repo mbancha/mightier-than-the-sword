@@ -8,6 +8,7 @@ import {
   tokens,
   ROWS,
   rowName,
+  rowIcon,
   type Row,
 } from './data/catalog';
 import {
@@ -26,13 +27,17 @@ import { chooseBotAction } from './game/bot';
 import type { Choice } from './game/types';
 
 const colors = content.players.map((p) => p.color);
+const trackAbility = (index: number, level: number) =>
+  level === 0
+    ? String(content.tracks[index][2])
+    : String((content.tracks[index][3] as string[])[level - 1]);
 function Icon({ name, size = 22 }: { name: string; size?: number }) {
   return <img className="icon" src={`./icons/${name}.svg`} alt="" width={size} height={size} />;
 }
 const prompts: Record<string, string> = {
   publish: 'Place the drawn book touching at least two books.',
   publishOverflow: 'Place an Inkling in a neighboring book’s binding spaces.',
-  resolveChoice: 'Choose any available Resolve placement option.',
+  resolveChoice: 'Choose any available Voice placement option.',
   placeAdjacent: 'Place up to 3 Inklings here or on adjacent pages.',
   setup: 'Choose a starting page for your Quill.',
   move: 'Move your figure to a highlighted page.',
@@ -504,7 +509,7 @@ export default function App() {
                       }}
                     >
                       <span className="trackHeading">
-                        <Icon name={row} />
+                        <Icon name={rowIcon(row)} />
                         {rowName(row)} · level {p.rows[row]}
                       </span>
                       <span className="trackLevels">
@@ -516,7 +521,7 @@ export default function App() {
                           >
                             <span className="trackHex">
                               {level > p.rows[row] ? (
-                                <Icon name={row} size={20} />
+                                <Icon name={rowIcon(row)} size={20} />
                               ) : level === p.rows[row] ? (
                                 '✓'
                               ) : (
@@ -538,12 +543,13 @@ export default function App() {
                   ))}
                 </div>
                 <p className="muted">
-                  Move {p.rows.curiosity === 3 ? 5 : p.rows.curiosity + 1} · Quill power{' '}
-                  {p.rows.valor === 3 ? '2 + your Inklings here' : p.rows.valor} · Draw{' '}
-                  {p.rows.insight + 1} Twist{p.rows.insight ? 's' : ''} at end of turn · Place{' '}
-                  {p.rows.resolve === 3
-                    ? 'up to 3 here or adjacent'
-                    : 'choose an available Resolve option'}
+                  {trackAbility(0, p.rows.curiosity)}
+                  {' · '}
+                  {trackAbility(1, p.rows.valor)}
+                  {' · '}
+                  {trackAbility(2, p.rows.insight)}
+                  {' · '}
+                  {trackAbility(3, p.rows.resolve)}
                 </p>
                 {p.hasSubplot && (!view || view.players[i].subplot === null) && (
                   <p className="muted">1 hidden Subplot</p>

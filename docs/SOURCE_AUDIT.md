@@ -76,6 +76,8 @@ All ten Subplot objectives replaced under the designer’s hidden-objective corr
 
 The designer request in this task supersedes earlier player-piece terminology and the final Curiosity/Valor/Insight benefits and all four Resolve tiers. The catalog, engine, private views, labels, bot choices, generated rules, and master PDF share edition 0.6. Print layout overrides that contradicted the catalog were removed: middle-space Twist symbols, submarine erasure, and cramped upgrade text. Printed objectives use the current hidden board-state predicates. The master includes the complete rules, icon legend, nine books, 40 cards, four player boards, scoreboard, 48 memories, conflict-token fronts/backs, and a player-piece sheet. Insight preserves the one-active-Subplot interpretation pending clarification, documented in DECISIONS.md.
 
+The 2026-10-07 player-board revision supersedes the displayed Curiosity/Insight/Valor/Resolve names and benefit copy with Pacing/Imagination/Tension/Voice and the supplied four-icon set. Stable engine row keys remain unchanged. The request was scoped to the player board; the new combat-triggered Imagination timing and background-Inkling term are recorded in DECISIONS.md for a separate mechanics ruling.
+
 
 The 2026-10-06 print-only layout revision packs two player boards per sheet. All four boards were compared against the previous master by extracted word counts: no words added or removed. The source catalog and digital game are unchanged.
 

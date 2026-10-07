@@ -108,6 +108,10 @@ Verified all 17 legacy SVG files were identical to the retained public icons. Pr
 
 Regenerated the master from the current checkout without the removed assets folder. Print checks pass for 18 vector-only pages, exactly two boards per board sheet, all four player colors, 12 full-size memory slots per board, text inside board boundaries, and exact catalog text in every base/upgrade cell. Word-count comparison against each original full-sheet board showed no added or removed words. Rendered both player-board sheets and reviewed all content, including the longest final Insight benefit and reserve reminders. Token duplex instructions and page indices are updated to 17-18.
 
+## Character Development board refresh (2026-10-07)
+
+Verified the Pacing, Imagination, Tension and Voice labels, their four supplied icons, all sixteen level descriptions, and the active-benefit summary in the live desktop player board. The longest Imagination and Voice benefits wrap inside their level cells at the normal two-player desktop layout. `vitest run` passes all 108 tests, TypeScript checking passes, and the Vite production build succeeds. The tracked master PDF was not regenerated because this request updates the GitHub player-board source rather than requesting a print-and-play sync.
+
 
 ## Rules overhaul + fifteen placement Subplots (2026-10-07)
 

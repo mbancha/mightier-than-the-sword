@@ -11,19 +11,19 @@ import vector_icons_v10 as v
 
 SYMBOLS={'[ink]':'inkling','[quill]':'Quill','[character]':'character',
  '[twist]':'twist','[pp]':'points','[unlock]':'early-inkling',
- '[curiosity]':'curiosity','[valor]':'valor','[insight]':'insight','[resolve]':'resolve',
+ '[curiosity]':'pacing','[valor]':'tension','[insight]':'imagination','[resolve]':'voice',
  '[combat]':'conflict','[passive]':'ongoing','[overflow-ink]':'overflow-ink'}
 LEGEND=[
  ('[ink]','Inkling','Your limited supply of ink. Each inkling on a book contributes 1 power.'),
- ('[quill]','Quill','Your quill and inkwell figure. Its power comes from Valor.'),
+ ('[quill]','Quill','Your quill and inkwell figure. Its power comes from Tension.'),
  ('[character]','Character','Draw the top character card when you gain one.'),
  ('[twist]','Twist','The shared deck of special effects.'),
  ('[pp]','Plot points','Your score. The most plot points wins.'),
  ('[unlock]','Unlock ink','Take ink from your next Act reserve into your current supply.'),
- ('[curiosity]','Curiosity','Movement row. Memory reward: place 1 inkling into overflow.'),
- ('[valor]','Valor','Quill power row. Memory reward: gain 1 plot point.'),
- ('[insight]','Insight','Hand-limit row. Memory reward: draw 1 Twist.'),
- ('[resolve]','Resolve','Placement row. Memory reward: unlock 1 inkling.'),
+ ('[curiosity]','Pacing','Movement row. Memory reward: place 1 inkling into binding.'),
+ ('[valor]','Tension','Quill power row. Memory reward: gain 1 plot point.'),
+ ('[insight]','Imagination','Twist-draw row. Memory reward: draw 1 Twist.'),
+ ('[resolve]','Voice','Placement row. Memory reward: unlock 1 inkling.'),
  ('[combat]','During conflict','A passive combat ability; no activation ink required.'),
  ('[passive]','Other passive','Use the printed timing; no activation ink required.')]
 
@@ -40,6 +40,24 @@ def configure():
     d.add(Polygon([3,21,12,23,21,21,20,10,17,5,12,1,7,5,4,10],fillColor=gold,strokeColor=ink,strokeWidth=1.3))
     d.add(Polygon([12,19,14,14,19,14,15,11,16,6,12,9,8,6,9,11,5,14,10,14],fillColor=paper,strokeColor=None))
     drawings['valor']=d
+    pacing=HexColor('#007F91');imagination=HexColor('#B87900');tension=HexColor('#D9472B');voice=HexColor('#7952B3')
+    d=Drawing(24,24)
+    d.add(Polygon([4.5,5.25,12.75,12,4.5,18.75,4.5,14.25,7.5,12,4.5,9.75],fillColor=pacing,strokeColor=None))
+    d.add(Polygon([12.75,5.25,21,12,12.75,18.75,12.75,14.25,15.75,12,12.75,9.75],fillColor=pacing,strokeColor=None))
+    drawings['pacing']=d
+    d=Drawing(24,24)
+    d.add(Circle(12,9.4,6.4,fillColor=imagination,strokeColor=None))
+    d.add(Rect(9.4,14,5.2,4.2,fillColor=imagination,strokeColor=None))
+    d.add(Rect(9.4,18.4,5.2,1.9,fillColor=imagination,strokeColor=None))
+    d.add(Rect(10.5,21.1,3,1.1,fillColor=imagination,strokeColor=None))
+    drawings['imagination']=d
+    d=Drawing(24,24)
+    d.add(Polygon([13.5,1.9,4.9,13.5,11.25,13.5,10.1,22.1,19.1,9.75,12.75,9.75],fillColor=tension,strokeColor=None))
+    drawings['tension']=d
+    d=Drawing(24,24)
+    d.add(Rect(2.25,4.1,19.5,14.3,rx=3.4,ry=3.4,fillColor=voice,strokeColor=None))
+    d.add(Polygon([5.6,16.8,5.6,22.1,10.9,18.4],fillColor=voice,strokeColor=None))
+    drawings['voice']=d
     d=Drawing(24,24)
     g=Group();g.add(v.DRAWINGS['inkling']);g.scale(.62,.62);g.translate(7,13);d.add(g)
     d.add(Line(3,9,3,2,strokeColor=ink,strokeWidth=1.7))

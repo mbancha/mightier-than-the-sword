@@ -510,37 +510,37 @@
   "tracks": [
     [
       "curiosity",
-      "Curiosity",
+      "Pacing",
       "Move 1 page",
-      ["Move 2 pages", "Move 3 pages", "Move 5 pages."],
+      ["Move 2 pages", "Move 3 pages", "Move 5 pages"],
       "Place one Inkling into binding space."
     ],
     [
       "valor",
-      "Valor",
-      "Quill power 0",
-      ["Power 1", "Power 2", "2 power, +1 power for each of your Inklings here."],
+      "Tension",
+      "Power 0",
+      ["Power 1", "Power 2", "Power 2 + 1 per Inkling here"],
       "Gain 1 plot point."
     ],
     [
       "insight",
-      "Insight",
-      "Draw 1 Twist at end of turn",
+      "Imagination",
+      "Draw 1 Twist after losing combat",
       [
-        "Draw 2 Twists at end of turn",
-        "Draw 3 Twists at end of turn",
-        "Draw 4 Twists at end of turn"
+        "Draw 1 Twist after every combat",
+        "After every combat, draw 1, then draw until you have 2 in hand",
+        "After every combat, draw 1, then draw until you have 4 in hand"
       ],
       "Draw 1 Twist."
     ],
     [
       "resolve",
-      "Resolve",
-      "Place 1 Inkling.",
+      "Voice",
+      "Place 1 Inkling",
       [
-        "Place 2 Inklings into binding space.",
-        "Place 1 Inkling normally and 1 into binding space.",
-        "Place up to 3 Inklings, split between here or adjacent pages."
+        "Place 1 Inkling and 1 background Inkling",
+        "Place up to 2 Inklings",
+        "Place up to 3 Inklings between here and adjacent pages"
       ],
       "Foreshadow 1 Inkling."
     ]

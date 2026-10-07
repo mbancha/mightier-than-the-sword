@@ -223,7 +223,7 @@ def board(index,base_y):
     player=PLAYERS[index];col=HexColor(player['color']);pale=HexColor(player['pale'])
     player_box(index,7,7,598,382,marks=False)
     player_mark(index,29,370,21)
-    para('Cover each row with 3 matching memories. Uncover left to right.<br/>Resolve: choose any one available placement option.',52,376,538,8.5,10.2,maxh=24)
+    para('Cover each row with 3 matching memories. Uncover left to right.<br/>Voice: choose any one available placement option.',52,376,538,8.5,10.2,maxh=24)
     for i,(key,name,base,levels,reward) in enumerate(TRACKS):
         yy=278-i*70
         player_box(index,18,yy,576,70,pale)

@@ -37,7 +37,9 @@ export const tokens = Object.entries(raw.tokens).flatMap(([act, items]) =>
     back: String(back),
   })),
 );
-export const rowName = (row: Row) => row[0].toUpperCase() + row.slice(1);
+export const rowName = (row: Row) => String(raw.tracks[ROWS.indexOf(row)][1]);
+export const rowIcon = (row: Row) =>
+  ({ curiosity: 'pacing', valor: 'tension', insight: 'imagination', resolve: 'voice' })[row];
 
 export const movementLimit = (level: number) => (level === 3 ? 5 : CONFIG.baseMove + level);
 export const quillPower = (level: number, inklings: number) => (level === 3 ? 2 + inklings : level);
