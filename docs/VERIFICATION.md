@@ -1,4 +1,8 @@
-# Verification — 2026-09-30
+# Verification
+
+Current Chapters edition verification is recorded in CHAPTER_VERIFICATION.md (2026-10-16): 127 tests, production build and desktop/tablet browser journeys pass. The remainder of this file describes the historical edition.
+
+## Historical verification — 2026-09-30
 
 Earlier verification: space-check revision 0.3 on the growing-map prototype. This is
 ready for designer testing, not a balance or rules-completeness certification.

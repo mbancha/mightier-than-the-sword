@@ -7,7 +7,10 @@
       "slots": 3,
       "timing": "ON BINDING PLACEMENT",
       "effect": "When an Inkling would enter this binding space, place it in an adjacent book's binding space instead.",
-      "page_slots": [1, 2]
+      "page_slots": [
+        1,
+        2
+      ]
     },
     {
       "title": "Around the World in 80 Days",
@@ -16,7 +19,10 @@
       "slots": 4,
       "timing": "ON PLACEMENT",
       "effect": "When you place an Inkling here, you may move your Quill or one of your characters up to 1 page.",
-      "page_slots": [2, 2]
+      "page_slots": [
+        2,
+        2
+      ]
     },
     {
       "title": "Journey to the Center of the Earth",
@@ -25,7 +31,10 @@
       "slots": 5,
       "timing": "DURING CONFLICT",
       "effect": "Each Inkling in binding space here contributes +1 power (2 total).",
-      "page_slots": [2, 3]
+      "page_slots": [
+        2,
+        3
+      ]
     },
     {
       "title": "The Odyssey",
@@ -34,7 +43,10 @@
       "slots": 5,
       "timing": "PASSIVE",
       "effect": "Whenever your Quill or a character moves from this book to another book, gain 1 plot point.",
-      "page_slots": [3, 2]
+      "page_slots": [
+        3,
+        2
+      ]
     },
     {
       "title": "The Iliad",
@@ -43,7 +55,10 @@
       "slots": 4,
       "timing": "DURING CONFLICT",
       "effect": "Each character and Quill here has +1 power.",
-      "page_slots": [2, 2]
+      "page_slots": [
+        2,
+        2
+      ]
     },
     {
       "title": "The Aeneid",
@@ -52,7 +67,10 @@
       "slots": 3,
       "timing": "AFTER CONFLICT",
       "effect": "Suspend all Inklings here instead of erasing them during conflict cleanup.",
-      "page_slots": [1, 2]
+      "page_slots": [
+        1,
+        2
+      ]
     },
     {
       "title": "Dracula",
@@ -61,7 +79,10 @@
       "slots": 4,
       "timing": "BEFORE CONFLICT",
       "effect": "The owner of the Inkling in the castle space may erase any 1 Inkling from this book.",
-      "page_slots": [2, 2]
+      "page_slots": [
+        2,
+        2
+      ]
     },
     {
       "title": "Frankenstein",
@@ -70,7 +91,10 @@
       "slots": 5,
       "timing": "AFTER CONFLICT",
       "effect": "Erase existing binding space Inklings, then move all Inklings in page spaces into binding space. These moved Inklings remain here.",
-      "page_slots": [2, 3]
+      "page_slots": [
+        2,
+        3
+      ]
     },
     {
       "title": "Dr. Jekyll and Mr. Hyde",
@@ -79,7 +103,10 @@
       "slots": 3,
       "timing": "ON PLACEMENT",
       "effect": "When you place an Inkling here, flip a coin. Heads: gain 1 plot point. Tails: lose 1 plot point.",
-      "page_slots": [1, 2]
+      "page_slots": [
+        1,
+        2
+      ]
     }
   ],
   "twists": [
@@ -91,7 +118,14 @@
       "Iliad",
       3
     ],
-    ["Doom Defied", "CONFLICT", "Gain +5 power.", "Fares Wyrd as she must.", "Beowulf", 3],
+    [
+      "Doom Defied",
+      "CONFLICT",
+      "Gain +5 power.",
+      "Fares Wyrd as she must.",
+      "Beowulf",
+      3
+    ],
     [
       "Travelling Light",
       "CONFLICT",
@@ -345,8 +379,14 @@
       "genre": "Epics",
       "power": 3,
       "actions": [
-        [1, "Move Achilles up to 1 page."],
-        [1, "Erase 1 opposing Inkling on Achilles' page."]
+        [
+          1,
+          "Move Achilles up to 1 page."
+        ],
+        [
+          1,
+          "Erase 1 opposing Inkling on Achilles' page."
+        ]
       ],
       "passive": null
     },
@@ -354,7 +394,12 @@
       "name": "Trojan Horse",
       "genre": "Epics",
       "power": 0,
-      "actions": [[1, "Move the Trojan Horse up to 2 pages."]],
+      "actions": [
+        [
+          1,
+          "Move the Trojan Horse up to 2 pages."
+        ]
+      ],
       "passive": [
         "combat",
         "When gained and at each Act start, hide 1 of its 5 power cards here. Reveal it at this book's next conflict; it lasts for that conflict, then stays spent until the next Act."
@@ -364,7 +409,12 @@
       "name": "Agamemnon",
       "genre": "Epics",
       "power": 1,
-      "actions": [[2, "Move Agamemnon up to 2 pages."]],
+      "actions": [
+        [
+          2,
+          "Move Agamemnon up to 2 pages."
+        ]
+      ],
       "passive": [
         "combat",
         "Exception: trigger conflict with 1 empty page space here. Agamemnon fills no slot and grants no space check. Once per conflict, play 2 Twists at one of your Inkling checks instead of 1."
@@ -374,14 +424,27 @@
       "name": "Odysseus",
       "genre": "Epics",
       "power": 2,
-      "actions": [[2, "Move Odysseus up to 3 pages."]],
-      "passive": ["combat", "Whenever you play a Twist in a conflict here, draw 1 Twist."]
+      "actions": [
+        [
+          2,
+          "Move Odysseus up to 3 pages."
+        ]
+      ],
+      "passive": [
+        "combat",
+        "Whenever you play a Twist in a conflict here, draw 1 Twist."
+      ]
     },
     {
       "name": "Captain Nemo",
       "genre": "Voyages",
       "power": 1,
-      "actions": [[3, "Move Nemo to any page."]],
+      "actions": [
+        [
+          3,
+          "Move Nemo to any page."
+        ]
+      ],
       "passive": [
         "combat",
         "Before Twists are played, you may move any activation Inklings from this card into binding space at Nemo's book. This empties those activation spaces."
@@ -391,14 +454,24 @@
       "name": "Phileas Fogg",
       "genre": "Voyages",
       "power": 1,
-      "actions": [[3, "Move Fogg to any page. Then you may move your Quill to any page."]],
+      "actions": [
+        [
+          3,
+          "Move Fogg to any page. Then you may move your Quill to any page."
+        ]
+      ],
       "passive": null
     },
     {
       "name": "Ichthyosaur",
       "genre": "Voyages",
       "power": 2,
-      "actions": [[1, "Put Ichthyosaur between any 2 edge-adjacent pages on different books."]],
+      "actions": [
+        [
+          1,
+          "Put Ichthyosaur between any 2 edge-adjacent pages on different books."
+        ]
+      ],
       "passive": [
         "passive",
         "Ichthyosaur is present on both adjoining pages and contributes power in either book's conflict."
@@ -414,7 +487,10 @@
       "Strategists",
       "Once this conflict, play 2 Twists at one of your page space checks instead of 1. Does not stack with Agamemnon."
     ],
-    ["Tribute to the Gods", "If you win this conflict, gain 4 extra plot points."],
+    [
+      "Tribute to the Gods",
+      "If you win this conflict, gain 4 extra plot points."
+    ],
     [
       "All Part of the Plan",
       "If you win this conflict, complete your current Subplot, regardless of its conditions (at most one Subplot completion per player per turn)."
@@ -512,14 +588,22 @@
       "curiosity",
       "Curiosity",
       "Move 1 page",
-      ["Move 2 pages", "Move 3 pages", "Move 5 pages."],
+      [
+        "Move 2 pages",
+        "Move 3 pages",
+        "Move 5 pages."
+      ],
       "Place one Inkling into binding space."
     ],
     [
       "valor",
       "Valor",
       "Quill power 0",
-      ["Power 1", "Power 2", "2 power, +1 power for each of your Inklings here."],
+      [
+        "Power 1",
+        "Power 2",
+        "2 power, +1 power for each of your Inklings here."
+      ],
       "Gain 1 plot point."
     ],
     [
@@ -596,11 +680,26 @@
       "Journey to the Center of the Earth",
       "https://www.gutenberg.org/cache/epub/18857/pg18857-images.html"
     ],
-    "Odyssey": ["The Odyssey", "https://www.gutenberg.org/cache/epub/1727/pg1727-images.html"],
-    "Iliad": ["The Iliad", "https://www.gutenberg.org/cache/epub/2199/pg2199-images.html"],
-    "Beowulf": ["Beowulf", "https://www.gutenberg.org/cache/epub/981/pg981-images.html"],
-    "Dracula": ["Dracula", "https://www.gutenberg.org/cache/epub/345/pg345-images.html"],
-    "Frankenstein": ["Frankenstein", "https://www.gutenberg.org/cache/epub/84/pg84-images.html"],
+    "Odyssey": [
+      "The Odyssey",
+      "https://www.gutenberg.org/cache/epub/1727/pg1727-images.html"
+    ],
+    "Iliad": [
+      "The Iliad",
+      "https://www.gutenberg.org/cache/epub/2199/pg2199-images.html"
+    ],
+    "Beowulf": [
+      "Beowulf",
+      "https://www.gutenberg.org/cache/epub/981/pg981-images.html"
+    ],
+    "Dracula": [
+      "Dracula",
+      "https://www.gutenberg.org/cache/epub/345/pg345-images.html"
+    ],
+    "Frankenstein": [
+      "Frankenstein",
+      "https://www.gutenberg.org/cache/epub/84/pg84-images.html"
+    ],
     "Jekyll": [
       "Dr. Jekyll and Mr. Hyde",
       "https://www.gutenberg.org/cache/epub/43/pg43-images.html"
@@ -642,7 +741,16 @@
     "baseHand": 3,
     "baseMove": 1,
     "maxActions": 20000,
-    "twistPower": [3, 5, 2, 2, 2, 2, 3, 3],
+    "twistPower": [
+      3,
+      5,
+      2,
+      2,
+      2,
+      2,
+      3,
+      3
+    ],
     "heroCharacterBonus": 3,
     "travellingSoloPower": 6,
     "experimentPerErased": 3
@@ -875,5 +983,386 @@
         "n": 2
       }
     ]
-  ]
+  ],
+  "redesign": {
+    "edition": "chapters-1",
+    "characters": [
+      {
+        "name": "Captain Nemo",
+        "genre": "Voyages",
+        "power": 2,
+        "ability": "Hidden Passage: After Nemo finishes normal movement, move up to 2 of your overflow Inklings from other books into this book's overflow. Free; once per turn."
+      },
+      {
+        "name": "Phileas Fogg",
+        "genre": "Voyages",
+        "power": 1,
+        "ability": "Right on Time: When you buy extra movement for Fogg, that purchase moves him up to 2 spaces instead of 1."
+      },
+      {
+        "name": "Ichthyosaur",
+        "genre": "Voyages",
+        "power": 3,
+        "ability": "From the Depths: In a conflict here, if you have at least 2 overflow Inklings here, Ichthyosaur has +2 power. The figure occupies one page like other characters."
+      },
+      {
+        "name": "Achilles",
+        "genre": "Epics",
+        "power": 3,
+        "ability": "Worthy Opponent: Achilles has +2 power in a conflict here if an opponent has a character here."
+      },
+      {
+        "name": "Odysseus",
+        "genre": "Epics",
+        "power": 1,
+        "ability": "A Plan Within a Plan: Once per conflict here, after you play a combat card, draw 1 card."
+      },
+      {
+        "name": "Aeneas",
+        "genre": "Epics",
+        "power": 2,
+        "ability": "Carry Them Home: After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn; transfers grant no rewards."
+      },
+      {
+        "name": "Dracula",
+        "genre": "Gothic Horror",
+        "power": 2,
+        "ability": "Guests for Dinner: Dracula has +1 power for each opposing player participating in this book's conflict."
+      },
+      {
+        "name": "Frankenstein's Creature",
+        "genre": "Gothic Horror",
+        "power": 1,
+        "ability": "Built from Scraps: Once per turn, after a normal placement from the Creature, you may pay 1 ink to place 2 Inklings from supply into this book's overflow. This does not use your paid extra-placement allowance."
+      },
+      {
+        "name": "Dr. Jekyll / Mr. Hyde",
+        "genre": "Gothic Horror",
+        "power": 1,
+        "ability": "The Other Self: At the start of a conflict here, you may pay 1 ink to give this character +3 power for this conflict."
+      }
+    ],
+    "twists": [
+      {
+        "name": "Travelling Light",
+        "genre": "Voyages",
+        "cost": 1,
+        "effect": "Gain +4 power if you have exactly 1 Inkling here; otherwise +2."
+      },
+      {
+        "name": "All Hands on Deck",
+        "genre": "Voyages",
+        "cost": 2,
+        "effect": "Gain +2 power, plus +1 for each of your overflow Inklings here, to a maximum of +5 total."
+      },
+      {
+        "name": "The Long Way Round",
+        "genre": "Voyages",
+        "cost": 3,
+        "effect": "Gain +6 power if you have Inklings on at least 3 different books; otherwise +4."
+      },
+      {
+        "name": "A Hero Provoked",
+        "genre": "Epics",
+        "cost": 1,
+        "effect": "Gain +3 power if your protagonist is here; otherwise +2."
+      },
+      {
+        "name": "Hold Fast",
+        "genre": "Epics",
+        "cost": 2,
+        "effect": "Gain +5 power if you occupy at least 2 consecutive page spaces here; otherwise +3."
+      },
+      {
+        "name": "Against All Odds",
+        "genre": "Epics",
+        "cost": 3,
+        "effect": "Gain +7 power if any one opponent has more Inklings here than you; otherwise +4."
+      },
+      {
+        "name": "A Shadow at the Door",
+        "genre": "Gothic Horror",
+        "cost": 1,
+        "effect": "Gain +3 power if an opponent has a character here; otherwise +2."
+      },
+      {
+        "name": "It Was Alive",
+        "genre": "Gothic Horror",
+        "cost": 2,
+        "effect": "Gain +5 power if you have both page-space and overflow Inklings here; otherwise +3."
+      },
+      {
+        "name": "The Final Transformation",
+        "genre": "Gothic Horror",
+        "cost": 3,
+        "effect": "Gain +6 power; gain +8 instead if paying this card's cost left you at zero ink."
+      }
+    ],
+    "subplots": [
+      {
+        "name": "Across the Map",
+        "genre": "Voyages",
+        "condition": "Place in a Voyages book while you have Inklings on at least 3 different books, including this one.",
+        "ongoing": "**Long Strides:** Your protagonist gets +1 normal movement allowance.",
+        "instant": "Draw 3 cards."
+      },
+      {
+        "name": "A Foot on Each Shore",
+        "genre": "Voyages",
+        "condition": "Place in a Voyages page space so you occupy at least one space on each of this book's two pages.",
+        "ongoing": "**Well Prepared:** Minimum hand size +1.",
+        "instant": "Gain 2 ink."
+      },
+      {
+        "name": "Below the Surface",
+        "genre": "Voyages",
+        "condition": "Place in a Voyages book's overflow so you have at least 3 overflow Inklings here and at least 1 page-space Inkling here.",
+        "ongoing": "**Deep Reserves:** Ink capacity +2.",
+        "instant": "Draw 3 cards."
+      },
+      {
+        "name": "A Connected Journey",
+        "genre": "Voyages",
+        "condition": "Place in a Voyages book while you have Inklings in it and in a different, edge-adjacent Voyages book.",
+        "ongoing": "**Another Step:** Increase paid extra-movement purchases per turn by 1.",
+        "instant": "Gain 2 ink."
+      },
+      {
+        "name": "Out of Your Depth",
+        "genre": "Voyages",
+        "condition": "Participate in a Voyages conflict with at least 2 overflow Inklings here at conflict start. Winning is not required.",
+        "ongoing": "**Seasoned Crew:** Your protagonist has +1 power when you have overflow Inklings at its conflict book.",
+        "instant": "Draw 2 cards."
+      },
+      {
+        "name": "Hold the Line",
+        "genre": "Epics",
+        "condition": "Place in an Epics page space so you occupy at least 2 consecutive spaces in this book's left-to-right track. The sequence may cross the fold.",
+        "ongoing": "**Reinforcements:** Increase paid extra-placement allowance per turn by 1.",
+        "instant": "Draw 2 cards."
+      },
+      {
+        "name": "The First and Last Word",
+        "genre": "Epics",
+        "condition": "Place in an Epics book's first or last space while you also occupy its other endpoint.",
+        "ongoing": "**Heroic Stature:** Your protagonist has +1 power.",
+        "instant": "Gain 2 ink."
+      },
+      {
+        "name": "Muster the Host",
+        "genre": "Epics",
+        "condition": "Place in an Epics book so you have at least 3 Inklings here, including at least 1 in a page space and 1 in overflow.",
+        "ongoing": "**A Second Wave:** Once per turn when buying an extra normal placement, you may put that purchased Inkling in the same book's overflow even if a page space is available.",
+        "instant": "Draw 3 cards."
+      },
+      {
+        "name": "A Worthy Rival",
+        "genre": "Epics",
+        "condition": "Win an Epics conflict where your protagonist and an enemy character were both present at conflict start.",
+        "ongoing": "**Tactical Reserve:** Minimum hand size +1.",
+        "instant": "Gain 2 ink."
+      },
+      {
+        "name": "A Deed Remembered",
+        "genre": "Epics",
+        "condition": "Win a conflict in an Epics book that already had a conflict token at conflict start.",
+        "ongoing": "**Veteran Commander:** Once per conflict at your protagonist's book, after playing a combat card, you may discard 1 card to draw 1.",
+        "instant": "Draw 4 cards."
+      },
+      {
+        "name": "An Unwelcome Guest",
+        "genre": "Gothic Horror",
+        "condition": "Place in a Gothic Horror page space so one of your spaces is immediately next to an enemy-occupied space in the same book's track.",
+        "ongoing": "**Unsettling Presence:** Your protagonist has +1 power when an opposing character is at its conflict book.",
+        "instant": "Draw 2 cards."
+      },
+      {
+        "name": "In the Margins",
+        "genre": "Gothic Horror",
+        "condition": "Place in a Gothic Horror book so you have at least 1 page-space Inkling and at least 2 overflow Inklings here.",
+        "ongoing": "**Working in Secret:** Increase paid extra-placement allowance per turn by 1.",
+        "instant": "Gain 2 ink."
+      },
+      {
+        "name": "A House Divided",
+        "genre": "Gothic Horror",
+        "condition": "Place in a Gothic Horror page space so you occupy 2 nonconsecutive spaces here with an enemy-occupied space somewhere between them.",
+        "ongoing": "**Forbidden Reading:** Minimum hand size +1.",
+        "instant": "Draw 3 cards."
+      },
+      {
+        "name": "Something in the Cellar",
+        "genre": "Gothic Horror",
+        "condition": "Participate in a Gothic Horror conflict where you have at least 2 overflow Inklings and an opponent has at least 2 page-space Inklings at conflict start.",
+        "ongoing": "**A Larger Vessel:** Ink capacity +2.",
+        "instant": "Gain 2 ink."
+      },
+      {
+        "name": "The Last Candle",
+        "genre": "Gothic Horror",
+        "condition": "Win a Gothic Horror conflict with 2 ink or fewer when the result is determined.",
+        "ongoing": "**Dangerous Experiment:** Increase paid extra-movement purchases per turn by 1.",
+        "instant": "Draw 3 cards."
+      }
+    ],
+    "bonuses": [
+      "#2: pay 1 ink, draw 2 cards",
+      "#2: pay 0, gain 1 ink; #3: pay 2 ink, draw 2 cards",
+      "#2: pay 2 ink, add 3 Inklings to local overflow; #3: pay 2 ink, draw 2 cards; #4: pay 1 ink, draw 1 card",
+      "#2: pay 0, gain 1 ink; #3: pay 2 ink, draw 2 cards; #4: pay 1 ink, draw 1 card",
+      "#2: pay 2 ink, add 3 Inklings to local overflow; #3: pay 2 ink, draw 2 cards",
+      "#2: pay 2 ink, draw 3 cards",
+      "#2: pay 0, gain 1 ink; #3: pay 3 ink, draw 2 cards",
+      "#2: pay 2 ink, add 3 Inklings to local overflow; #3: pay 3 ink, draw 3 cards; #4: pay 4 ink, draw 3 cards",
+      "#2: pay 1 ink, draw 2 cards"
+    ],
+    "bookEffects": [
+      {
+        "category": "Special space / submarine",
+        "effect": "Mark #2 Diving Hatch. After placing here, you may move 1 of your Inklings from any other book's overflow to this book's overflow. Free; transfer, not placement."
+      },
+      {
+        "category": "Movement end / footsteps",
+        "effect": "Express Connection: After a character finishes normal movement here from a different book, its owner may move 1 of their other characters 1 space. Once per player turn. This bonus movement triggers no arrival effect."
+      },
+      {
+        "category": "Conflict / crossed swords",
+        "effect": "Hidden Depths: Overflow Inklings here have +1 power each during conflict. This adds to other power bonuses."
+      },
+      {
+        "category": "Movement end / footsteps",
+        "effect": "Stories from Afar: After a character finishes normal movement here from a different book, its owner may discard 1 card to draw 1 card. Once per player turn."
+      },
+      {
+        "category": "Conflict / crossed swords",
+        "effect": "Heroes of Troy: Every character here has +1 power during conflict."
+      },
+      {
+        "category": "Movement end / footsteps",
+        "effect": "A New Homeland: After a character finishes normal movement here from a different book, its owner may move 1 of their Inklings from another book's overflow into this book's overflow. Once per player turn."
+      },
+      {
+        "category": "Special space / castle",
+        "effect": "Mark #1 Castle. At conflict start, its occupant may move 1 opposing page-space Inkling here into this book's overflow. This does not cancel the already-triggered conflict."
+      },
+      {
+        "category": "Conflict / crossed swords",
+        "effect": "It Lives Again: After this book's first conflict, return existing overflow Inklings to supply, then move its page-space Inklings into overflow instead of returning them. After its second conflict, return all Inklings normally as the book is claimed."
+      },
+      {
+        "category": "Special space / split mask",
+        "effect": "Mark #2 The Laboratory. After placing here, you may discard 1 card to add 1 Inkling from supply to this book's overflow. No ink cost."
+      }
+    ],
+    "spaceBonuses": [
+      [
+        [
+          1,
+          "draw",
+          2
+        ]
+      ],
+      [
+        [
+          0,
+          "ink",
+          1
+        ],
+        [
+          2,
+          "draw",
+          2
+        ]
+      ],
+      [
+        [
+          2,
+          "overflow",
+          3
+        ],
+        [
+          2,
+          "draw",
+          2
+        ],
+        [
+          1,
+          "draw",
+          1
+        ]
+      ],
+      [
+        [
+          0,
+          "ink",
+          1
+        ],
+        [
+          2,
+          "draw",
+          2
+        ],
+        [
+          1,
+          "draw",
+          1
+        ]
+      ],
+      [
+        [
+          2,
+          "overflow",
+          3
+        ],
+        [
+          2,
+          "draw",
+          2
+        ]
+      ],
+      [
+        [
+          2,
+          "draw",
+          3
+        ]
+      ],
+      [
+        [
+          0,
+          "ink",
+          1
+        ],
+        [
+          3,
+          "draw",
+          2
+        ]
+      ],
+      [
+        [
+          2,
+          "overflow",
+          3
+        ],
+        [
+          3,
+          "draw",
+          3
+        ],
+        [
+          4,
+          "draw",
+          3
+        ]
+      ],
+      [
+        [
+          1,
+          "draw",
+          2
+        ]
+      ]
+    ]
+  }
 }

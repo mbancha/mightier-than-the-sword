@@ -1,5 +1,11 @@
 # Source audit
 
+## Current digital edition — Chapters, 2026-10-16
+
+Authority: the designer's redesign instructions and approved proposed content in CHAPTER_SPEC.md. The latest clarification replaces the disconnected-map question with winner-controlled gap closure. Current content is content.json.redesign: nine characters, nine Twist designs with five copies each, fifteen Subplots with two copies each, nine book effects and priced middle-space bonuses. The live entrypoint is ChapterApp.tsx with game/chapters.ts. Legacy fields/IDs remain for historical regression and the unchanged print edition. Current evidence is CHAPTER_VERIFICATION.md.
+
+## Historical edition audit
+
 Source edition: Mightier_than_the_Sword_Playtest_v15.pdf and its inspected local
 generators/content, after the designer's foreshadow/Inkling and enlarged-book edits.
 The PDF snapshot is kept under print/outputs. No old Google Doc rule has been

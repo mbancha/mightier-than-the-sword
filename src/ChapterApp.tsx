@@ -1,0 +1,422 @@
+import { useEffect, useState } from 'react';
+import source from './data/content.json';
+import { chooseChapterAction } from './game/chapterBot';
+import {
+  newGame,
+  applyAction,
+  actingPlayer,
+  playerView,
+  content,
+  bookmarkNames,
+  bookmarkText,
+  capacity,
+  minimum,
+  type State,
+} from './game/chapters';
+import './chapters.css';
+export default function ChapterApp() {
+  const [game, setGame] = useState<State | null>(null),
+    [history, setHistory] = useState<State[]>([]),
+    [seats, setSeats] = useState(2),
+    [seed, setSeed] = useState('42'),
+    [bots, setBots] = useState<boolean[]>([false, true, false, false]),
+    [revealed, setRevealed] = useState<number | null>(null),
+    [error, setError] = useState(''),
+    [auto, setAuto] = useState(false);
+  const actor = game ? actingPlayer(game) : 0;
+  const view = game ? playerView(game, actor) : null;
+  const act = (key: string) => {
+    if (!game) return;
+    try {
+      const next = applyAction(game, key);
+      setHistory((h) => [...h, game]);
+      setGame(next);
+      if (actingPlayer(next) !== actor) setRevealed(null);
+      setError('');
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+  useEffect(() => {
+    if (!game || !auto || !game.players[actor].bot || game.winner !== null) return;
+    const actions = playerView(game, actor).actions;
+    if (!actions.length) return;
+    const t = setTimeout(() => {
+      const key = chooseChapterAction(playerView(game, actor));
+      if (key) act(key);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [game, auto, actor]);
+  const save = () => {
+    if (game) localStorage.setItem('mtts-chapters-1', JSON.stringify({ game, history }));
+  };
+  const load = (text: string) => {
+    try {
+      const data = JSON.parse(text);
+      if (data.game?.edition !== 'chapters-1')
+        throw Error('This save belongs to another rules edition.');
+      playerView(data.game, actingPlayer(data.game));
+      setGame(data.game);
+      setHistory(data.history ?? []);
+      setRevealed(null);
+      setAuto(false);
+    } catch (e) {
+      setError(`Cannot load: ${e}`);
+    }
+  };
+  const download = () => {
+    if (!game) return;
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify({ game, history })], { type: 'application/json' }),
+    );
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mtts-private-chapters-save.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  return (
+    <main className="chapterApp">
+      <header>
+        <h1>Mightier than the Sword</h1>
+        <p>Characters, ink, and the books worth fighting for.</p>
+        <span>Digital playtest · Chapters edition</span>
+      </header>
+      {error && <p role="alert">{error}</p>}
+      {!game ? (
+        <section>
+          <h2>Begin a story</h2>
+          <label>
+            Players{' '}
+            <select value={seats} onChange={(e) => setSeats(Number(e.target.value))}>
+              {[2, 3, 4].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Shuffle seed <input value={seed} onChange={(e) => setSeed(e.target.value)} />
+          </label>
+          {Array.from({ length: seats }, (_, i) => (
+            <label key={i}>
+              Player {i + 1} controller{' '}
+              <select
+                aria-label={`Player ${i + 1} controller`}
+                value={bots[i] ? 'bot' : 'human'}
+                onChange={(e) =>
+                  setBots((a) => a.map((v, k) => (k === i ? e.target.value === 'bot' : v)))
+                }
+              >
+                <option value="human">Human</option>
+                <option value="bot">Bot</option>
+              </select>
+            </label>
+          ))}
+          <button
+            onClick={() => {
+              setGame(
+                newGame(
+                  Array.from({ length: seats }, (_, i) => `Player ${i + 1}`),
+                  Number(seed) || 1,
+                  bots,
+                ),
+              );
+              setHistory([]);
+            }}
+          >
+            Begin story
+          </button>
+          <button onClick={() => load(localStorage.getItem('mtts-chapters-1') ?? '{}')}>
+            Load local story
+          </button>
+        </section>
+      ) : (
+        view && (
+          <>
+            <nav aria-label="Story controls">
+              <button
+                disabled={!history.length}
+                onClick={() => {
+                  setGame(history.at(-1)!);
+                  setHistory((h) => h.slice(0, -1));
+                  setAuto(false);
+                  setRevealed(null);
+                }}
+              >
+                Undo
+              </button>
+              <button onClick={save}>Save locally</button>
+              <button onClick={download}>Download private save</button>
+              <label>
+                Load private save{' '}
+                <input
+                  type="file"
+                  accept="application/json"
+                  onChange={(e) => {
+                    e.target.files?.[0]?.text().then(load);
+                  }}
+                />
+              </label>
+              <button onClick={() => setAuto((x) => !x)}>{auto ? 'Pause bots' : 'Run bots'}</button>
+              <button
+                onClick={() => {
+                  setGame(null);
+                  setAuto(false);
+                }}
+              >
+                New story
+              </button>
+            </nav>
+            {view.winner !== null ? (
+              <h2 role="status">
+                {view.players[view.winner].name} wins with {view.players[view.winner].books.length}{' '}
+                books!
+              </h2>
+            ) : (
+              <h2>
+                {view.players[actor].name} ·{' '}
+                {(
+                  {
+                    setup: 'Choose a starting page',
+                    start: 'Begin your turn',
+                    movement: 'Move your characters',
+                    route: 'Finish moving',
+                    place: 'Place an Inkling',
+                    afterPlace: 'Additional placement',
+                    bonus: 'Page bonus',
+                    subplot: 'Complete a Subplot',
+                    twist: 'Play a Twist or pass',
+                    publish: 'Publish a book',
+                    evacuate: 'Leave the claimed book',
+                    compact: 'Close the gap',
+                    character: 'Meet your companion',
+                    transfer: 'Move your Inklings',
+                    exchange: 'Exchange a card',
+                    castle: 'Castle Dracula',
+                    hyde: 'Become Hyde',
+                    laboratory: 'The laboratory',
+                    aeneas: 'Carry them home',
+                    express: 'Express connection',
+                  } as Record<string, string>
+                )[view.phase ?? ''] ?? 'Resolve an effect'}{' '}
+                · Turn {view.turn}
+              </h2>
+            )}
+            <div className="chapterPlayers">
+              {view.players.map((p, i) => (
+                <section className={`seat seat${i}`} key={i}>
+                  <h3>
+                    {p.name} {i === actor ? '• choosing' : ''}
+                  </h3>
+                  <label>
+                    Ink: {p.ink} / {capacity(p)} <meter min={0} max={capacity(p)} value={p.ink} />
+                  </label>
+                  <p>
+                    Chapter {p.chapter} · {p.supply} Inklings available · Minimum hand {minimum(p)}{' '}
+                    · {p.handCount} cards
+                  </p>
+                  {p.figures.map((f) => (
+                    <details key={f.id}>
+                      <summary>
+                        {f.primary ? '★ Protagonist: ' : 'Companion: '}
+                        {content.characters[f.id].name} · {content.characters[f.id].power} base
+                        power
+                      </summary>
+                      {content.characters[f.id].ability}
+                    </details>
+                  ))}
+                  <p>
+                    Books: {p.books.length} / {view.players.length === 2 ? 3 : 2}
+                  </p>
+                  {p.books.map((id) => (
+                    <span className="collected" key={id}>
+                      {source.books[id].title}
+                    </span>
+                  ))}
+                  {p.marks.map((m, k) => (
+                    <details className="bookmark earned" key={k}>
+                      <summary>{bookmarkNames[m]}</summary>
+                      {bookmarkText[m]}
+                    </details>
+                  ))}
+                  {p.ongoing.map((n) => (
+                    <details key={n}>
+                      <summary>{content.subplots[n].name}</summary>
+                      {content.subplots[n].ongoing}
+                    </details>
+                  ))}
+                </section>
+              ))}
+            </div>
+            <section>
+              <h2>The library</h2>
+              <p>
+                {view.stackCount} books remain in the stack. First conflict awards the bookmark;
+                second conflict claims the book.
+              </p>
+              <div className="library">
+                {view.books.map((b) => (
+                  <article
+                    className="chapterBook"
+                    key={b.id}
+                    style={{
+                      gridColumn: `${2 * b.q + b.r - Math.min(...view.books.map((x) => 2 * x.q + x.r)) + 1} / span 2`,
+                      gridRow: b.r - Math.min(...view.books.map((x) => x.r)) + 1,
+                    }}
+                  >
+                    <div className="bookHeading">
+                      <div>
+                        <small>
+                          {source.books[b.id].genre} · ({b.q}, {b.r})
+                        </small>
+                        <h3>{source.books[b.id].title}</h3>
+                      </div>
+                      {b.mark !== null && (
+                        <details className="bookmark">
+                          <summary>{bookmarkNames[b.mark]}</summary>
+                          {bookmarkText[b.mark]}
+                        </details>
+                      )}
+                    </div>
+                    <p>
+                      {b.contested
+                        ? '⚔ Conflict token — next winner claims this book'
+                        : 'First conflict pending'}
+                    </p>
+                    <p>
+                      <span aria-hidden="true">
+                        {[2, 4, 7].includes(b.id)
+                          ? '⚔'
+                          : [1, 3, 5].includes(b.id)
+                            ? '👣'
+                            : b.id === 0
+                              ? '⚓'
+                              : b.id === 6
+                                ? '♜'
+                                : '◐'}
+                      </span>{' '}
+                      {content.bookEffects[b.id].category}: {content.bookEffects[b.id].effect}
+                    </p>
+                    <div className="bookPages">
+                      {[0, 1].map((side) => (
+                        <div className="page" key={side}>
+                          <strong>{side ? 'Right' : 'Left'} page</strong>
+                          {view.players.flatMap((p, i) =>
+                            p.figures
+                              .filter((f) => f.page === b.id * 2 + side)
+                              .map((f) => (
+                                <span className={`figure seat${i}`} key={f.id}>
+                                  {p.name}: {content.characters[f.id].name}
+                                  {f.primary ? ' ★' : ''}
+                                </span>
+                              )),
+                          )}
+                          {b.slots.map((owner, k) => {
+                            if ((k < source.books[b.id].page_slots[0] ? 0 : 1) !== side)
+                              return null;
+                            const special =
+                              (b.id === 0 && k === 1) ||
+                              (b.id === 6 && k === 0) ||
+                              (b.id === 8 && k === 1);
+                            return (
+                              <span
+                                className={`pageSlot ${owner === null ? 'empty' : `seat${owner}`}`}
+                                key={k}
+                              >
+                                #{k + 1}{' '}
+                                {special ? (b.id === 0 ? '⚓' : b.id === 6 ? '♜' : '◐') : ''}{' '}
+                                {owner === null ? 'Empty' : view.players[owner].name}
+                                {k > 0 && k < b.slots.length - 1 && (
+                                  <small className="slotBonus">
+                                    {content.spaceBonuses[b.id][k - 1][0]} ink →{' '}
+                                    {content.spaceBonuses[b.id][k - 1][2]}{' '}
+                                    {content.spaceBonuses[b.id][k - 1][1] === 'draw'
+                                      ? 'cards'
+                                      : content.spaceBonuses[b.id][k - 1][1] === 'ink'
+                                        ? 'ink'
+                                        : 'overflow Inklings'}
+                                  </small>
+                                )}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="bonuses">Bonuses: {content.bonuses[b.id]}</p>
+                    <p>
+                      Overflow:{' '}
+                      {b.overflow.map((n, p) => `${view.players[p].name}: ${n}`).join(' · ')}
+                    </p>
+                    {view.battle?.book === b.id && (
+                      <p>
+                        Conflict power:{' '}
+                        {view.battle.power
+                          .map((n, p) => `${view.players[p].name}: ${n}`)
+                          .join(' · ')}
+                      </p>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
+            {view.winner === null && (
+              <section className="choices">
+                <h2>Choose an action</h2>
+                {revealed !== actor ? (
+                  <button onClick={() => setRevealed(actor)}>
+                    Reveal my hand and choices — {view.players[actor].name}
+                  </button>
+                ) : (
+                  <>
+                    <div className="hand">
+                      {view.players[actor].hand.map((c) => (
+                        <details key={c.id}>
+                          <summary>
+                            {c.kind === 'twist' ? 'Twist' : 'Subplot'}:{' '}
+                            {c.kind === 'twist'
+                              ? content.twists[c.design].name
+                              : content.subplots[c.design].name}
+                          </summary>
+                          {c.kind === 'twist' ? (
+                            <p>
+                              {content.twists[c.design].cost} ink ·{' '}
+                              {content.twists[c.design].effect}
+                            </p>
+                          ) : (
+                            <>
+                              <p>{content.subplots[c.design].condition}</p>
+                              <p>Ongoing: {content.subplots[c.design].ongoing}</p>
+                              <p>Immediate: {content.subplots[c.design].instant}</p>
+                              <p>Or play for 1 ink and +1 power.</p>
+                            </>
+                          )}
+                        </details>
+                      ))}
+                    </div>
+                    <div className="chapterActions">
+                      {view.actions.map((a) => (
+                        <button key={a.key} onClick={() => act(a.key)}>
+                          {a.label}
+                        </button>
+                      ))}
+                    </div>
+                    {!view.actions.length && (
+                      <p role="alert">No legal choices. Save this story for diagnosis.</p>
+                    )}
+                  </>
+                )}
+              </section>
+            )}
+            <details>
+              <summary>Story log</summary>
+              {view.log.map((line, i) => (
+                <p key={i}>{line}</p>
+              ))}
+            </details>
+          </>
+        )
+      )}
+    </main>
+  );
+}

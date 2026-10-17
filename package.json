@@ -1,16 +1,16 @@
 {
   "name": "mightier-than-the-sword",
   "private": true,
-  "version": "0.7.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
-    "smoke": "node scripts/smoke.mjs",
+    "smoke": "node scripts/chapter-smoke.mjs",
     "verify": "npm run test && npm run build && npm run smoke",
-    "docs": "node scripts/docs.mjs",
+    "docs": "node scripts/chapter-docs.mjs",
     "format": "prettier --write src tests scripts vite.config.ts",
     "simulate": "node scripts/simulate.mjs"
   },

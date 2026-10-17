@@ -1,3 +1,13 @@
+# Chapters redesign — 2026-10-16
+
+Latest explicit designer rules override the historical rulings below. The current complete specification is CHAPTER_SPEC.md. Chapters replaces memories, point scoring, reserves, separate decks, old characters and shared Acts. Start with seven ink. End chapter consumes the turn. Characters are dealt. Bookmark power boosts affect only the protagonist. On an empty-stack split, the winner closes the gap so every book touches at least two others, keeping the nearest practical orientation. The expected three-book endpoint was a miscalculation, not a rule.
+
+The approved plan supplies all proposed playtest content and defaults. No claim of balance is made. Print remains the old edition.
+
+---
+
+Historical edition decisions:
+
 # Current rulings and open playtest questions
 
 Authority: latest explicit designer decisions → v15 catalog/rules → provisional
