@@ -43,18 +43,52 @@ try {
     if (await skip.count()) await skip.click();
     else await page.locator('.chapterActions button').first().click();
   }
-  await page
-    .getByRole('button', { name: /^Place (in space|in overflow)/ })
-    .first()
-    .click();
+  await page.locator('.inkSpace.legalTarget').first().click();
   await page.getByRole('button', { name: 'Save locally', exact: true }).click();
-  assert.equal(await page.locator('.chapterBook').count(), 3);
+  assert.equal(await page.locator('.visualBook').count(), 3);
+  for (const b of await page.locator('.visualBook').all()) {
+    const boxes = await b.locator('.inkSpace').evaluateAll((es) =>
+      es.map((e) => {
+        const b = e.getBoundingClientRect();
+        return { x: b.x, y: b.y };
+      }),
+    );
+    assert.ok(
+      boxes.every((b, i) => i === 0 || b.x > boxes[i - 1].x),
+      'Spaces must increase left to right',
+    );
+    assert.ok(
+      Math.max(...boxes.map((b) => b.y)) - Math.min(...boxes.map((b) => b.y)) < 2,
+      'Spaces must share one horizontal line',
+    );
+  }
   await page.screenshot({ path: 'artifacts/chapters-desktop.png', fullPage: true });
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await page.getByRole('button', { name: /Reveal my hand/ }).click();
   assert.ok(await page.getByRole('button', { name: /^Place (in space|in overflow)/ }).count());
   await page.setViewportSize({ width: 820, height: 1180 });
   await page.screenshot({ path: 'artifacts/chapters-tablet.png', fullPage: true });
+  // Readable overflow fixture, using the same private save format as real play.
+  await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem('mtts-chapters-1'));
+    const s = saved.game;
+    s.books[0].overflow = [3, 2];
+    for (let p = 0; p < 2; p++)
+      s.players[p].supply =
+        12 - s.books.reduce((n, b) => n + b.overflow[p] + b.slots.filter((x) => x === p).length, 0);
+    localStorage.setItem('mtts-chapters-1', JSON.stringify({ game: s, history: [] }));
+  });
+  await page.getByRole('button', { name: 'New story', exact: true }).click();
+  await page.getByRole('button', { name: 'Load local story', exact: true }).click();
+  assert.equal(await page.locator('.overflowPieces .meeple').count(), 5);
+  await page
+    .getByRole('button', { name: /Inspect .* effect/ })
+    .first()
+    .click();
+  await page.screenshot({ path: 'artifacts/tabletop-overflow-tablet.png', fullPage: true });
+  await page.setViewportSize({ width: 1500, height: 1100 });
+  await page.getByRole('button', { name: 'Fit table', exact: true }).click();
+  await page.screenshot({ path: 'artifacts/tabletop-desktop.png', fullPage: true });
   assert.deepEqual(errors, []);
   await writeFile(
     'artifacts/chapter-smoke.json',

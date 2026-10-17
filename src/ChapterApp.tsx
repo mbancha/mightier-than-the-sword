@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import source from './data/content.json';
 import { chooseChapterAction } from './game/chapterBot';
 import {
@@ -14,6 +14,8 @@ import {
   type State,
 } from './game/chapters';
 import './chapters.css';
+import TabletopBook, { Meeple, Glyph } from './TabletopBook';
+import './tabletop.css';
 export default function ChapterApp() {
   const [game, setGame] = useState<State | null>(null),
     [history, setHistory] = useState<State[]>([]),
@@ -23,6 +25,10 @@ export default function ChapterApp() {
     [revealed, setRevealed] = useState<number | null>(null),
     [error, setError] = useState(''),
     [auto, setAuto] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null),
+    [zoom, setZoom] = useState(0.85);
+  const table = useRef<HTMLDivElement>(null),
+    pan = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
   const actor = game ? actingPlayer(game) : 0;
   const view = game ? playerView(game, actor) : null;
   const act = (key: string) => {
@@ -209,7 +215,8 @@ export default function ChapterApp() {
                     {p.name} {i === actor ? '• choosing' : ''}
                   </h3>
                   <label>
-                    Ink: {p.ink} / {capacity(p)} <meter min={0} max={capacity(p)} value={p.ink} />
+                    <Glyph kind="ink" /> {p.ink} / {capacity(p)}{' '}
+                    <meter min={0} max={capacity(p)} value={p.ink} />
                   </label>
                   <p>
                     Chapter {p.chapter} · {p.supply} Inklings available · Minimum hand {minimum(p)}{' '}
@@ -226,7 +233,7 @@ export default function ChapterApp() {
                     </details>
                   ))}
                   <p>
-                    Books: {p.books.length} / {view.players.length === 2 ? 3 : 2}
+                    <Glyph kind="book" /> {p.books.length} / {view.players.length === 2 ? 3 : 2}
                   </p>
                   {p.books.map((id) => (
                     <span className="collected" key={id}>
@@ -254,110 +261,103 @@ export default function ChapterApp() {
                 {view.stackCount} books remain in the stack. First conflict awards the bookmark;
                 second conflict claims the book.
               </p>
-              <div className="library">
-                {view.books.map((b) => (
-                  <article
-                    className="chapterBook"
-                    key={b.id}
-                    style={{
-                      gridColumn: `${2 * b.q + b.r - Math.min(...view.books.map((x) => 2 * x.q + x.r)) + 1} / span 2`,
-                      gridRow: b.r - Math.min(...view.books.map((x) => x.r)) + 1,
-                    }}
-                  >
-                    <div className="bookHeading">
-                      <div>
-                        <small>
-                          {source.books[b.id].genre} · ({b.q}, {b.r})
-                        </small>
-                        <h3>{source.books[b.id].title}</h3>
-                      </div>
-                      {b.mark !== null && (
-                        <details className="bookmark">
-                          <summary>{bookmarkNames[b.mark]}</summary>
-                          {bookmarkText[b.mark]}
-                        </details>
-                      )}
+              <div className="tableTools">
+                <button
+                  onClick={() => setZoom((z) => Math.max(0.4, z - 0.1))}
+                  aria-label="Zoom out"
+                >
+                  −
+                </button>
+                <button onClick={() => setZoom((z) => Math.min(1.5, z + 0.1))} aria-label="Zoom in">
+                  ＋
+                </button>
+                <button
+                  onClick={() => {
+                    const el = table.current;
+                    if (el) {
+                      const canvas = el.firstElementChild as HTMLElement;
+                      setZoom(
+                        Math.max(
+                          0.3,
+                          Math.min(
+                            1,
+                            (el.clientWidth - 40) / (canvas.offsetWidth || 1000),
+                            (el.clientHeight - 40) / (canvas.offsetHeight || 700),
+                          ),
+                        ),
+                      );
+                      el.scrollTo(0, 0);
+                    }
+                  }}
+                >
+                  Fit table
+                </button>
+                <span>
+                  Drag the table to pan · Tap a character, then a highlighted page or space
+                </span>
+              </div>
+              <div
+                className="visualTable"
+                ref={table}
+                onPointerDown={(e) => {
+                  if (
+                    (e.target as HTMLElement).closest('button,summary,details') ||
+                    e.pointerType === 'touch'
+                  )
+                    return;
+                  const el = table.current!;
+                  pan.current = {
+                    x: e.clientX,
+                    y: e.clientY,
+                    left: el.scrollLeft,
+                    top: el.scrollTop,
+                  };
+                  el.setPointerCapture(e.pointerId);
+                }}
+                onPointerMove={(e) => {
+                  if (pan.current && table.current) {
+                    table.current.scrollLeft = pan.current.left - (e.clientX - pan.current.x);
+                    table.current.scrollTop = pan.current.top - (e.clientY - pan.current.y);
+                  }
+                }}
+                onPointerUp={() => (pan.current = null)}
+                onPointerCancel={() => (pan.current = null)}
+              >
+                <div
+                  className="tableCanvas"
+                  style={{
+                    zoom,
+                    gridTemplateColumns: `repeat(${Math.max(...view.books.map((b) => 2 * b.q + b.r)) - Math.min(...view.books.map((b) => 2 * b.q + b.r)) + 2},240px)`,
+                  }}
+                >
+                  {view.books.map((b) => (
+                    <div
+                      className="bookPosition"
+                      key={b.id}
+                      style={{
+                        gridColumn: `${2 * b.q + b.r - Math.min(...view.books.map((x) => 2 * x.q + x.r)) + 1} / span 2`,
+                        gridRow: b.r - Math.min(...view.books.map((x) => x.r)) + 1,
+                      }}
+                    >
+                      <TabletopBook
+                        b={b}
+                        view={view}
+                        selected={
+                          selected !== null &&
+                          view.players[actor].figures.some((f) => f.id === selected)
+                            ? selected
+                            : null
+                        }
+                        onSelect={setSelected}
+                        sourcePage={
+                          view.players[actor].figures.find((f) => f.id === game.source)?.page
+                        }
+                        act={act}
+                        enabled={revealed === actor}
+                      />
                     </div>
-                    <p>
-                      {b.contested
-                        ? '⚔ Conflict token — next winner claims this book'
-                        : 'First conflict pending'}
-                    </p>
-                    <p>
-                      <span aria-hidden="true">
-                        {[2, 4, 7].includes(b.id)
-                          ? '⚔'
-                          : [1, 3, 5].includes(b.id)
-                            ? '👣'
-                            : b.id === 0
-                              ? '⚓'
-                              : b.id === 6
-                                ? '♜'
-                                : '◐'}
-                      </span>{' '}
-                      {content.bookEffects[b.id].category}: {content.bookEffects[b.id].effect}
-                    </p>
-                    <div className="bookPages">
-                      {[0, 1].map((side) => (
-                        <div className="page" key={side}>
-                          <strong>{side ? 'Right' : 'Left'} page</strong>
-                          {view.players.flatMap((p, i) =>
-                            p.figures
-                              .filter((f) => f.page === b.id * 2 + side)
-                              .map((f) => (
-                                <span className={`figure seat${i}`} key={f.id}>
-                                  {p.name}: {content.characters[f.id].name}
-                                  {f.primary ? ' ★' : ''}
-                                </span>
-                              )),
-                          )}
-                          {b.slots.map((owner, k) => {
-                            if ((k < source.books[b.id].page_slots[0] ? 0 : 1) !== side)
-                              return null;
-                            const special =
-                              (b.id === 0 && k === 1) ||
-                              (b.id === 6 && k === 0) ||
-                              (b.id === 8 && k === 1);
-                            return (
-                              <span
-                                className={`pageSlot ${owner === null ? 'empty' : `seat${owner}`}`}
-                                key={k}
-                              >
-                                #{k + 1}{' '}
-                                {special ? (b.id === 0 ? '⚓' : b.id === 6 ? '♜' : '◐') : ''}{' '}
-                                {owner === null ? 'Empty' : view.players[owner].name}
-                                {k > 0 && k < b.slots.length - 1 && (
-                                  <small className="slotBonus">
-                                    {content.spaceBonuses[b.id][k - 1][0]} ink →{' '}
-                                    {content.spaceBonuses[b.id][k - 1][2]}{' '}
-                                    {content.spaceBonuses[b.id][k - 1][1] === 'draw'
-                                      ? 'cards'
-                                      : content.spaceBonuses[b.id][k - 1][1] === 'ink'
-                                        ? 'ink'
-                                        : 'overflow Inklings'}
-                                  </small>
-                                )}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
-                    <p className="bonuses">Bonuses: {content.bonuses[b.id]}</p>
-                    <p>
-                      Overflow:{' '}
-                      {b.overflow.map((n, p) => `${view.players[p].name}: ${n}`).join(' · ')}
-                    </p>
-                    {view.battle?.book === b.id && (
-                      <p>
-                        Conflict power:{' '}
-                        {view.battle.power
-                          .map((n, p) => `${view.players[p].name}: ${n}`)
-                          .join(' · ')}
-                      </p>
-                    )}
-                  </article>
-                ))}
+                  ))}
+                </div>
               </div>
             </section>
             {view.winner === null && (
