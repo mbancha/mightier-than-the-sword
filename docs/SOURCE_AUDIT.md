@@ -1,5 +1,7 @@
 # Source audit
 
+Smooth-turn interface (2026-10-17): chapterFlow.ts consumes existing legal actions without changing rules/catalog. ChapterApp runs bots automatically and only requests human handoffs for shared-screen human seats. See SMOOTH_FLOW.md for verification.
+
 Visual interface (2026-10-17): TabletopBook.tsx and tabletop.css now supply the live spatial board presentation. Handwritten SVG meeples and resource/reward symbols replace repeated piece labels. Existing book/character identities and rules remain sourced from the Chapters catalog. See VISUAL_TABLETOP.md for verification.
 
 ## Current digital edition — Chapters, 2026-10-16

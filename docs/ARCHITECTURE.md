@@ -1,5 +1,7 @@
 # Chapters architecture
 
+chapterFlow.ts is the current interface adapter between ChapterApp and the engine. It combines administrative legal actions, preserves explicit decisions and supplies board placement metadata. See SMOOTH_FLOW.md for turn automation, human privacy, bot scheduling and Undo behavior.
+
 Current runtime: ChapterApp.tsx -> game/chapters.ts -> data/content.json.redesign. game/chapterBot.ts selects from a player projection. Previous game modules are legacy compatibility references, not active runtime.
 
 State is serializable. Randomness lives in state.rng. newGame/applyAction/legalActions are the rules boundary. applyAction clones before checking actions so failures do not commit mutations. Pending choices are explicit data jobs. UI uses playerView, excluding opponents hands, deck order, random state, hidden bookmark pool and battle snapshots.

@@ -124,7 +124,12 @@ export default function TabletopBook({
   const placement = (k: number | null) =>
     sourcePage !== undefined && Math.floor(sourcePage / 2) === b.id
       ? actions.find((a) => a.key === `place:${k}`)
-      : undefined;
+      : actions.find(
+          (a) =>
+            a.key.split('@')[0] === `place:${k}` &&
+            (a as { page?: number }).page !== undefined &&
+            Math.floor((a as { page?: number }).page! / 2) === b.id,
+        );
   const split = source.books[b.id].page_slots[0];
   const slot = (k: number) => {
     const owner = b.slots[k],
@@ -243,7 +248,13 @@ export default function TabletopBook({
               {a && (
                 <button className="pageDestination" onClick={() => act(a.key)} aria-label={a.label}>
                   <Glyph kind="move" />
-                  <span>{view.phase === 'setup' ? 'Start here' : 'Move here'}</span>
+                  <span>
+                    {view.phase === 'setup'
+                      ? 'Start here'
+                      : a.key.startsWith('step:')
+                        ? '1 ink · Move'
+                        : 'Move here'}
+                  </span>
                 </button>
               )}
               <div className="pageTrack">

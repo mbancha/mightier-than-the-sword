@@ -14,6 +14,7 @@ import {
   type State,
 } from './game/chapters';
 import './chapters.css';
+import { settleFlow, flowView, applyFlow } from './game/chapterFlow';
 import TabletopBook, { Meeple, Glyph } from './TabletopBook';
 import './tabletop.css';
 export default function ChapterApp() {
@@ -24,20 +25,26 @@ export default function ChapterApp() {
     [bots, setBots] = useState<boolean[]>([false, true, false, false]),
     [revealed, setRevealed] = useState<number | null>(null),
     [error, setError] = useState(''),
-    [auto, setAuto] = useState(false);
+    [auto, setAuto] = useState(true);
   const [selected, setSelected] = useState<number | null>(null),
     [zoom, setZoom] = useState(0.85);
   const table = useRef<HTMLDivElement>(null),
     pan = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
   const actor = game ? actingPlayer(game) : 0;
-  const view = game ? playerView(game, actor) : null;
+  const view = game ? flowView(game, actor) : null;
+  const showHand =
+    !!game &&
+    !game.players[actor].bot &&
+    (game.players.filter((p) => !p.bot).length === 1 || revealed === actor);
   const act = (key: string) => {
     if (!game) return;
     try {
-      const next = applyAction(game, key);
-      setHistory((h) => [...h, game]);
+      const next = game.players[actor].bot
+        ? settleFlow(applyAction(game, key))
+        : applyFlow(game, key);
+      if (!game.players[actor].bot) setHistory((h) => [...h, game]);
       setGame(next);
-      if (actingPlayer(next) !== actor) setRevealed(null);
+      setSelected(null);
       setError('');
     } catch (e) {
       setError(String(e));
@@ -62,10 +69,10 @@ export default function ChapterApp() {
       if (data.game?.edition !== 'chapters-1')
         throw Error('This save belongs to another rules edition.');
       playerView(data.game, actingPlayer(data.game));
-      setGame(data.game);
+      setGame(settleFlow(data.game));
       setHistory(data.history ?? []);
       setRevealed(null);
-      setAuto(false);
+      setAuto(true);
     } catch (e) {
       setError(`Cannot load: ${e}`);
     }
@@ -121,13 +128,17 @@ export default function ChapterApp() {
           <button
             onClick={() => {
               setGame(
-                newGame(
-                  Array.from({ length: seats }, (_, i) => `Player ${i + 1}`),
-                  Number(seed) || 1,
-                  bots,
+                settleFlow(
+                  newGame(
+                    Array.from({ length: seats }, (_, i) => `Player ${i + 1}`),
+                    Number(seed) || 1,
+                    bots,
+                  ),
                 ),
               );
               setHistory([]);
+              setAuto(true);
+              setRevealed(null);
             }}
           >
             Begin story
@@ -186,7 +197,7 @@ export default function ChapterApp() {
                     setup: 'Choose a starting page',
                     start: 'Begin your turn',
                     movement: 'Move your characters',
-                    route: 'Finish moving',
+                    route: 'Place an Inkling, or pay ink to move farther',
                     place: 'Place an Inkling',
                     afterPlace: 'Additional placement',
                     bonus: 'Page bonus',
@@ -353,7 +364,7 @@ export default function ChapterApp() {
                           view.players[actor].figures.find((f) => f.id === game.source)?.page
                         }
                         act={act}
-                        enabled={revealed === actor}
+                        enabled={showHand}
                       />
                     </div>
                   ))}
@@ -363,9 +374,11 @@ export default function ChapterApp() {
             {view.winner === null && (
               <section className="choices">
                 <h2>Choose an action</h2>
-                {revealed !== actor ? (
+                {game.players[actor].bot ? (
+                  <p role="status">{view.players[actor].name} is thinking…</p>
+                ) : !showHand ? (
                   <button onClick={() => setRevealed(actor)}>
-                    Reveal my hand and choices — {view.players[actor].name}
+                    Pass to {view.players[actor].name}
                   </button>
                 ) : (
                   <>
@@ -395,12 +408,24 @@ export default function ChapterApp() {
                       ))}
                     </div>
                     <div className="chapterActions">
-                      {view.actions.map((a) => (
-                        <button key={a.key} onClick={() => act(a.key)}>
-                          {a.label}
-                        </button>
-                      ))}
+                      {view.actions
+                        .filter((a) => !/^(move|step|setup|place):/.test(a.key))
+                        .map((a) => (
+                          <button key={a.key} onClick={() => act(a.key)}>
+                            {a.label}
+                          </button>
+                        ))}
                     </div>
+                    <details className="advancedActions">
+                      <summary>All actions</summary>
+                      <div className="chapterActions">
+                        {view.actions.map((a) => (
+                          <button key={a.key} onClick={() => act(a.key)}>
+                            {a.label}
+                          </button>
+                        ))}
+                      </div>
+                    </details>
                     {!view.actions.length && (
                       <p role="alert">No legal choices. Save this story for diagnosis.</p>
                     )}
