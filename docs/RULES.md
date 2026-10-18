@@ -1,39 +1,263 @@
-# Mightier than the Sword — current rules
+# Mightier than the Sword — Chapters edition
 
-Generated from `src/data/content.json`. Source edition digital-and-print-0.7.1, rules mightier-0.7.1. See DECISIONS.md for digital rulings.
+Digital playtest content. PnP remains on its previous edition.
 
-## Setup
+See CHAPTER_SPEC.md for confirmed rules and proposed operational defaults.
 
-Shuffle 9 books; start with 3 in a triangle and stack the rest face down. Each player takes a Quill, 12 Inklings and 12 memories (3 per row). Start at 0 points, with 6 supply Inklings, 3 reserved for Act II and 3 for Act III. Shuffle the decks; deal 1 Twist and 1 hidden Subplot each. Place Quills on any pages. Randomly select 1 conflict token per player for each Act and display Act I's tokens front-side up. In a 2-player game, place a neutral Inkling in the first page space of the first book. It occupies the space and can trigger conflict, but never participates. Choose a first player.
+## Base rules
 
-## Your turn
+Whenever an Inkling is moved from one space to another, it doesn't trigger the rewards of the new space.
 
-If you start with no supply Inklings, choose a book containing one of your Inklings and resolve a conflict there instead of taking a normal turn. If you have no Inkling on any book, end your turn. Otherwise move your Quill at least 1 page, up to your movement limit, ending on a different page. Choose an available Resolve option to place Inklings. Normal placement uses an empty page space on the destination page; if none are empty, use that book's binding spaces. After placement and any immediate conflicts, you may replace one of your Inklings there with a memory. Character actions cannot be chosen directly: landing an Inkling on a memory is the only way to use one. At the end of your turn, draw Twists equal to 1 plus your Insight level. There is no hand limit.
+## Characters
 
-## Inklings and placement
+### Captain Nemo (Voyages)
 
-The spaces along each book are page spaces. Binding spaces are shared spaces outside the pages. Their Inklings add power but do not fill page spaces and receive no Twist check. Resolve upgrades may grant additional placement choices shown on the player board. Page spaces grant no automatic Twist reward. Erase returns an Inkling to supply; suspend sends it to the next Act reserve (or out of play in Act III). Foreshadow moves Inklings from the next reserve to supply; gain 1 point for each unavailable Inkling. Moving an existing Inkling grants no placement reward.
+Power 2. Hidden Passage: After Nemo finishes normal movement, move up to 2 of your overflow Inklings from other books into this book's overflow. Free; once per turn.
 
-## Memories and upgrades
+### Phileas Fogg (Voyages)
 
-You may have at most 1 of your memories on each book. To leave a memory, suspend your Inkling from a page space without a memory and place the leftmost covered memory from one row there, improving that row. Memories add no power and do not fill spaces. When you later place an Inkling on any memory, choose either that memory's benefit or one action on a character you own. This is the only way to take a character action. Curiosity places its bonus Inkling in this book's binding space. Returning a memory lowers its row; an Inkling on it stays.
+Power 1. Right on Time: When you buy extra movement for Fogg, that purchase moves him up to 2 spaces instead of 1.
+
+### Ichthyosaur (Voyages)
+
+Power 3. From the Depths: In a conflict here, if you have at least 2 overflow Inklings here, Ichthyosaur has +2 power. The figure occupies one page like other characters.
+
+### Achilles (Epics)
+
+Power 3. Worthy Opponent: Achilles has +2 power in a conflict here if an opponent has a character here.
+
+### Odysseus (Epics)
+
+Power 1. A Plan Within a Plan: Once per conflict here, after you play a combat card, draw 1 card.
+
+### Aeneas (Epics)
+
+Power 2. Carry Them Home: After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn.
+
+### Dracula (Gothic Horror)
+
+Power 2. Guests for Dinner: Dracula has +1 power for each opposing player participating in this book's conflict.
+
+### Frankenstein's Creature (Gothic Horror)
+
+Power 1. Built from Scraps: Once per turn, after a normal placement from the Creature, you may pay 1 ink to place 2 Inklings from supply into this book's overflow. This does not use your paid extra-placement allowance.
+
+### Dr. Jekyll / Mr. Hyde (Gothic Horror)
+
+Power 1. The Other Self: At the start of a conflict here, you may pay 1 ink to give this character +3 power for this conflict.
+
+## Twists
+
+### Travelling Light (Voyages)
+
+Cost 1 ink. Gain +4 power if you have exactly 1 Inkling here; otherwise +2.
+
+### All Hands on Deck (Voyages)
+
+Cost 2 ink. Gain +2 power, plus +1 for each of your overflow Inklings here, to a maximum of +5 total.
+
+### The Long Way Round (Voyages)
+
+Cost 3 ink. Gain +6 power if you have Inklings on at least 3 different books; otherwise +4.
+
+### A Hero Provoked (Epics)
+
+Cost 1 ink. Gain +3 power if your protagonist is here; otherwise +2.
+
+### Hold Fast (Epics)
+
+Cost 2 ink. Gain +5 power if you occupy at least 2 consecutive page spaces here; otherwise +3.
+
+### Against All Odds (Epics)
+
+Cost 3 ink. Gain +7 power if any one opponent has more Inklings here than you; otherwise +4.
+
+### A Shadow at the Door (Gothic Horror)
+
+Cost 1 ink. Gain +3 power if an opponent has a character here; otherwise +2.
+
+### It Was Alive (Gothic Horror)
+
+Cost 2 ink. Gain +5 power if you have both page-space and overflow Inklings here; otherwise +3.
+
+### The Final Transformation (Gothic Horror)
+
+Cost 3 ink. Gain +6 power; gain +8 instead if paying this card's cost left you at zero ink.
 
 ## Subplots
 
-Keep your active Subplot hidden. Check its objective only when you place an Inkling, using the board immediately after placement and before rewards or conflict effects. Moving an existing Inkling, leaving a memory, drawing a card and forced conflicts do not complete objectives. Memory spaces are page spaces with a memory of any type; ownership matters only where stated. Binding spaces belong to the book, not either page. Adjacent books share an edge. A placement triggers conflict when it fills the book, including Agamemnon's one-empty-space exception. When fulfilled, reveal the card, choose a character or its alternative reward, keep it for its printed end-game points and draw a new hidden Subplot. At most one Subplot per player may complete in each player turn; a replacement waits until a later turn. Played Twists are also kept for their printed end-game points. The Trojan Horse power All Part of the Plan still explicitly overrides objective conditions.
+### Across the Map (Voyages)
 
-## Immediate conflict
+Place in a Voyages book while you have Inklings on at least 3 different books, including this one.
 
-Finish placement rewards, then immediately fight when the last page space gains an Inkling. All players with Inklings or figures there participate. Resolve start effects, then check occupied page spaces once from left to right. At each space, its current Inkling owner may play 1 Twist or pass. Skip empty, memory-only and neutral spaces; binding space grants no checks. Keep each played Twist for end-game scoring. Other full books wait until this conflict finishes.
+Choose ongoing: **Long Strides:** Your protagonist gets +1 normal movement allowance.
 
-## Scoring and rewards
+Or immediate: Draw 3 cards.
 
-After checks, total Inklings, character power, Quill Valor and effects. Most power wins. Break every tie in favor of the tied player whose Inkling is furthest left among the book's page spaces. Choose a current-Act conflict token. If it is front-side up, first and second place score 5/2 in Act I, 7/3 in Act II or 10/4 in Act III; then flip it. If it is already back-side up, first and second score 3/2, 4/2 or 5/2 respectively. Conflict tokens have no bonus effects or multipliers. A front-side conflict also publishes a new book touching at least 2 others; then place 1 supply Inkling in a touching old book's binding space. A book may conflict repeatedly in the same Act. If tied players have no page-space Inklings, their remaining tie follows clockwise order from the active player.
+### A Foot on Each Shore (Voyages)
 
-## Acts and victory
+Place in a Voyages page space so you occupy at least one space on each of this book's two pages.
 
-When every current-Act conflict token has been used on its front side, finish that conflict and end the Act. Clear and reset the conflict tokens; return character-card Inklings to supply; release the next reserve; prepare the Horse and display the next Act's tokens. Book Inklings and memories stay. After Act III, add the printed end-game points on every kept Twist and completed Subplot to each player's scoreboard points. Highest total wins; ties share victory. If no player has supply Inklings or an Inkling on a book at turn start, end the Act to release the next reserve; after Act III, score the game.
+Choose ongoing: **Well Prepared:** Minimum hand size +1.
 
-## Book effects
+Or immediate: Gain 2 ink.
 
-Dracula marks the first page space with a castle. The Odyssey rewards a figure for leaving its book. Around the World moves an owned figure after placement. Jekyll may reduce points below zero. Twenty Thousand Leagues redirects an Inkling that would enter its binding space to an adjacent book's binding space instead.
+### Below the Surface (Voyages)
+
+Place in a Voyages book's overflow so you have at least 3 overflow Inklings here and at least 1 page-space Inkling here.
+
+Choose ongoing: **Deep Reserves:** Ink capacity +2.
+
+Or immediate: Draw 3 cards.
+
+### A Connected Journey (Voyages)
+
+Place in a Voyages book while you have Inklings in it and in a different, edge-adjacent Voyages book.
+
+Choose ongoing: **Another Step:** Increase paid extra-movement purchases per turn by 1.
+
+Or immediate: Gain 2 ink.
+
+### Out of Your Depth (Voyages)
+
+Participate in a Voyages conflict with at least 2 overflow Inklings here at conflict start. Winning is not required.
+
+Choose ongoing: **Seasoned Crew:** Your protagonist has +1 power when you have overflow Inklings at its conflict book.
+
+Or immediate: Draw 2 cards.
+
+### Hold the Line (Epics)
+
+Place in an Epics page space so you occupy at least 2 consecutive spaces in this book's left-to-right track. The sequence may cross the fold.
+
+Choose ongoing: **Reinforcements:** Increase paid extra-placement allowance per turn by 1.
+
+Or immediate: Draw 2 cards.
+
+### The First and Last Word (Epics)
+
+Place in an Epics book's first or last space while you also occupy its other endpoint.
+
+Choose ongoing: **Heroic Stature:** Your protagonist has +1 power.
+
+Or immediate: Gain 2 ink.
+
+### Muster the Host (Epics)
+
+Place in an Epics book so you have at least 3 Inklings here, including at least 1 in a page space and 1 in overflow.
+
+Choose ongoing: **A Second Wave:** Once per turn when buying an extra normal placement, you may put that purchased Inkling in the same book's overflow even if a page space is available.
+
+Or immediate: Draw 3 cards.
+
+### A Worthy Rival (Epics)
+
+Win an Epics conflict where your protagonist and an enemy character were both present at conflict start.
+
+Choose ongoing: **Tactical Reserve:** Minimum hand size +1.
+
+Or immediate: Gain 2 ink.
+
+### A Deed Remembered (Epics)
+
+Win a conflict in an Epics book that already had a conflict token at conflict start.
+
+Choose ongoing: **Veteran Commander:** Once per conflict at your protagonist's book, after playing a combat card, you may discard 1 card to draw 1.
+
+Or immediate: Draw 4 cards.
+
+### An Unwelcome Guest (Gothic Horror)
+
+Place in a Gothic Horror page space so one of your spaces is immediately next to an enemy-occupied space in the same book's track.
+
+Choose ongoing: **Unsettling Presence:** Your protagonist has +1 power when an opposing character is at its conflict book.
+
+Or immediate: Draw 2 cards.
+
+### In the Margins (Gothic Horror)
+
+Place in a Gothic Horror book so you have at least 1 page-space Inkling and at least 2 overflow Inklings here.
+
+Choose ongoing: **Working in Secret:** Increase paid extra-placement allowance per turn by 1.
+
+Or immediate: Gain 2 ink.
+
+### A House Divided (Gothic Horror)
+
+Place in a Gothic Horror page space so you occupy 2 nonconsecutive spaces here with an enemy-occupied space somewhere between them.
+
+Choose ongoing: **Forbidden Reading:** Minimum hand size +1.
+
+Or immediate: Draw 3 cards.
+
+### Something in the Cellar (Gothic Horror)
+
+Participate in a Gothic Horror conflict where you have at least 2 overflow Inklings and an opponent has at least 2 page-space Inklings at conflict start.
+
+Choose ongoing: **A Larger Vessel:** Ink capacity +2.
+
+Or immediate: Gain 2 ink.
+
+### The Last Candle (Gothic Horror)
+
+Win a Gothic Horror conflict with 2 ink or fewer when the result is determined.
+
+Choose ongoing: **Dangerous Experiment:** Increase paid extra-movement purchases per turn by 1.
+
+Or immediate: Draw 3 cards.
+
+## Books
+
+### 20,000 Leagues Under the Sea
+
+Special space / submarine: Mark #2 Diving Hatch. After placing here, you may move 1 of your Inklings from any other book's overflow to this book's overflow. Free.
+
+Middle spaces: #2: pay 1 ink, draw 2 cards
+
+### Around the World in 80 Days
+
+Movement end / footsteps: Express Connection: After a character finishes normal movement here from a different book, its owner may move 1 of their other characters 1 space. Once per player turn. This bonus movement triggers no arrival effect.
+
+Middle spaces: #2: pay 0, gain 1 ink; #3: pay 2 ink, draw 2 cards
+
+### Journey to the Center of the Earth
+
+Conflict / crossed swords: Hidden Depths: Overflow Inklings here have +1 power each during conflict. This adds to other power bonuses.
+
+Middle spaces: #2: pay 2 ink, add 3 Inklings to local overflow; #3: pay 2 ink, draw 2 cards; #4: pay 1 ink, draw 1 card
+
+### The Odyssey
+
+Movement end / footsteps: Stories from Afar: After a character finishes normal movement here from a different book, its owner may discard 1 card to draw 1 card. Once per player turn.
+
+Middle spaces: #2: pay 0, gain 1 ink; #3: pay 2 ink, draw 2 cards; #4: pay 1 ink, draw 1 card
+
+### The Iliad
+
+Conflict / crossed swords: Heroes of Troy: Every character here has +1 power during conflict.
+
+Middle spaces: #2: pay 2 ink, add 3 Inklings to local overflow; #3: pay 2 ink, draw 2 cards
+
+### The Aeneid
+
+Movement end / footsteps: A New Homeland: After a character finishes normal movement here from a different book, its owner may move 1 of their Inklings from another book's overflow into this book's overflow. Once per player turn.
+
+Middle spaces: #2: pay 2 ink, draw 3 cards
+
+### Dracula
+
+Special space / castle: Mark #1 Castle. At conflict start, its occupant may move 1 opposing page-space Inkling here into this book's overflow. This does not cancel the already-triggered conflict.
+
+Middle spaces: #2: pay 0, gain 1 ink; #3: pay 3 ink, draw 2 cards
+
+### Frankenstein
+
+Conflict / crossed swords: It Lives Again: After this book's first conflict, return existing overflow Inklings to supply, then move its page-space Inklings into overflow instead of returning them. After its second conflict, return all Inklings normally as the book is claimed.
+
+Middle spaces: #2: pay 2 ink, add 3 Inklings to local overflow; #3: pay 3 ink, draw 3 cards; #4: pay 4 ink, draw 3 cards
+
+### Dr. Jekyll and Mr. Hyde
+
+Special space / split mask: Mark #2 The Laboratory. After placing here, you may discard 1 card to add 1 Inkling from supply to this book's overflow. No ink cost.
+
+Middle spaces: #2: pay 1 ink, draw 2 cards

@@ -1,4 +1,12 @@
-# Verification — 2026-09-30
+# Verification
+
+Smooth flow update (2026-10-17): see SMOOTH_FLOW.md. Full suite and eight focused flow tests pass; production build and human-versus-auto-bot browser journey pass, including Undo and two-human privacy. npm run smoke now runs the current smooth-flow journey.
+
+Visual tabletop update (2026-10-17): see VISUAL_TABLETOP.md for horizontal track, SVG pieces, overflow tray, direct board interactions and inspected desktop/tablet evidence. All 127 tests, build and browser journeys pass.
+
+Current Chapters edition verification is recorded in CHAPTER_VERIFICATION.md (2026-10-16): 127 tests, production build and desktop/tablet browser journeys pass. The remainder of this file describes the historical edition.
+
+## Historical verification — 2026-09-30
 
 Earlier verification: space-check revision 0.3 on the growing-map prototype. This is
 ready for designer testing, not a balance or rules-completeness certification.

@@ -1,0 +1,535 @@
+.chapterApp {
+  font-family: system-ui, sans-serif;
+  padding: 18px;
+  background: radial-gradient(ellipse at top, #263e39, #111e22 80%);
+}
+.chapterApp header {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 0 0 10px;
+}
+.chapterApp header h1 {
+  font:
+    700 30px Georgia,
+    serif;
+}
+.chapterApp header p {
+  display: none;
+}
+.chapterApp header span {
+  font-size: 12px;
+  color: #b5c4ba;
+}
+.chapterApp section {
+  margin: 10px 0;
+  padding: 12px;
+}
+.chapterApp h2 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+.chapterApp nav button,
+.chapterApp nav input {
+  font-size: 12px;
+  min-height: 36px;
+  padding: 6px;
+}
+.chapterPlayers {
+  gap: 10px;
+}
+.chapterApp .seat {
+  padding: 9px 12px;
+  margin: 0;
+  border-top-width: 3px;
+}
+.seat h3 {
+  margin: 0;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.seat p,
+.seat label,
+.seat details {
+  font-size: 12px;
+  margin: 3px 0;
+}
+.chapterApp meter {
+  height: 12px;
+}
+.chapterApp .earned {
+  display: inline-block;
+  padding: 3px 6px;
+  margin: 3px;
+  font-size: 11px;
+  background: #803f41;
+}
+.glyph {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: middle;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+.glyph rect {
+  fill: #e7d9bc;
+  stroke: currentColor;
+}
+.meeple {
+  width: 32px;
+  height: 38px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  color: var(--seat);
+  filter: drop-shadow(0 2px 1px #0005);
+}
+.meeple path {
+  fill: var(--seat);
+  stroke: #283139;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.meeple text {
+  fill: #203039;
+  font: bold 9px sans-serif;
+  stroke: none;
+}
+.meeple.small {
+  width: 21px;
+  height: 25px;
+}
+.visualTable {
+  height: min(66vh, 760px);
+  min-height: 440px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  cursor: grab;
+  border-radius: 10px;
+  background:
+    radial-gradient(#6c897326 1px, transparent 1px) 0 0/20px 20px,
+    #152c2a;
+  border: 1px solid #50655d;
+  padding: 18px;
+  scrollbar-color: #b5a077 #243e37;
+}
+.visualTable:active {
+  cursor: grabbing;
+}
+.tableTools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.tableTools span {
+  font-size: 12px;
+  color: #c3d0c5;
+  margin-left: 8px;
+}
+.tableTools button {
+  font-size: 13px;
+  padding: 6px 10px !important;
+  min-height: 36px !important;
+}
+.tableCanvas {
+  display: grid;
+  gap: 18px;
+  width: max-content;
+  transform-origin: top left;
+  padding: 4px 12px 20px 4px;
+  align-items: start;
+}
+.bookPosition {
+  min-width: 0;
+}
+.visualBook {
+  position: relative;
+  background: #eee1bf;
+  color: #28322e;
+  border: 5px solid #967044;
+  border-radius: 12px 16px 16px 12px;
+  box-shadow:
+    3px 6px 0 #0004,
+    inset 0 0 0 1px #f8edcf;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  cursor: default;
+}
+.visualBook.genre0 {
+  border-color: #487a81;
+}
+.visualBook.genre1 {
+  border-color: #aa8042;
+}
+.visualBook.genre2 {
+  border-color: #79506f;
+}
+.visualBookHeading {
+  display: flex;
+  align-items: start;
+  gap: 8px;
+  min-height: 52px;
+  padding-right: 112px;
+}
+.visualBook h3 {
+  font:
+    700 18px/1.2 Georgia,
+    serif;
+  margin: 4px 0;
+}
+.genreLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: #685c47;
+}
+.chapterApp .effectBadge {
+  background: transparent;
+  border: 1px solid #b09b73;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 3px;
+  margin: 0;
+  color: #4c4939;
+}
+.themeBadge {
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.visualBookmark {
+  position: absolute;
+  right: 12px;
+  top: -5px;
+  width: 84px;
+  background: #8f3f43;
+  color: #fff4df;
+  padding: 12px 8px 20px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 91%, 0 100%);
+  z-index: 2;
+}
+.visualBookmark summary {
+  font-size: 10px;
+  text-align: center;
+  list-style: none;
+  line-height: 1.2;
+}
+.visualBookmark summary span {
+  display: block;
+  margin-top: 5px;
+}
+.visualBookmark .glyph {
+  width: 25px;
+  height: 25px;
+}
+.visualBookmark p {
+  font-size: 11px;
+}
+.bookStatus {
+  height: 26px;
+  display: flex;
+  align-items: center;
+}
+.uncontested {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  border: 1px solid #af9c78;
+}
+.conflictDisc {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #70414a;
+  color: #fff1cf;
+  border: 2px solid #bc9695;
+  box-shadow: 0 2px 1px #0004;
+}
+.openBook {
+  display: flex;
+  gap: 0;
+  border: 1px solid #c0aa83;
+  background: linear-gradient(90deg, #f9eed2, #e8d6b2 49%, #b9a27b 50%, #f9eed2 52%, #ebdabc);
+  border-radius: 5px;
+  min-height: 142px;
+}
+.visualPage {
+  width: 50%;
+  position: relative;
+  padding: 6px;
+  box-sizing: border-box;
+}
+.visualPage + .visualPage {
+  border-left: 2px solid #b9a17b;
+}
+.figureLane {
+  height: 48px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  position: relative;
+}
+.chapterApp .standee {
+  width: 39px;
+  height: 42px;
+  min-height: 0;
+  background: var(--seat);
+  border: 2px solid #263633;
+  border-radius: 50% 50% 4px 4px;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  box-shadow: 0 3px 0 #4a4332;
+}
+.portrait {
+  font: bold 11px Georgia;
+  color: #15242c;
+}
+.primaryStar {
+  position: absolute;
+  right: -4px;
+  top: -6px;
+  font-size: 13px;
+  color: #7c5118;
+  background: #ffe3a0;
+  border-radius: 50%;
+  padding: 0 2px;
+}
+.selectedFigure {
+  outline: 3px solid #30776b;
+  outline-offset: 2px;
+}
+.pageTrack {
+  display: flex;
+  align-items: start;
+  justify-content: space-around;
+  gap: 7px;
+  flex-wrap: nowrap;
+  padding: 5px 0;
+}
+.trackCell {
+  width: 55px;
+  flex: 0 0 55px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.chapterApp .inkSpace {
+  width: 49px;
+  height: 50px;
+  min-height: 0;
+  border-radius: 50%;
+  padding: 2px;
+  margin: 0;
+  border: 2px solid #b6a27d;
+  background: #dfcfab;
+  position: relative;
+  box-shadow: inset 0 2px 4px #82654533;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+}
+.inkSpace .themeBadge {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  font-size: 16px;
+  background: #eee1bf;
+  border-radius: 50%;
+  padding: 1px;
+}
+.emptySocket {
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  border: 1px dashed #a18c66;
+}
+.inkSpace:disabled {
+  cursor: default;
+}
+.reward {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  white-space: nowrap;
+  font: 600 10px system-ui;
+  margin-top: 8px;
+  height: 20px;
+  color: #3d4d42;
+}
+.reward > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+.reward .glyph {
+  width: 13px;
+  height: 15px;
+}
+.cost {
+  background: #e1c9a5;
+  padding: 1px 2px;
+  border-radius: 3px;
+}
+.rewardArrow {
+  color: #9b855e;
+}
+.noReward {
+  height: 28px;
+}
+.legalTarget {
+  outline: 3px solid #358875 !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #70c7ac33 !important;
+}
+.chapterApp .legalTarget:hover {
+  background: #c4e8d4;
+}
+.availablePage {
+  background: #abd9bd33;
+}
+.chapterApp .pageDestination {
+  position: absolute;
+  right: 6px;
+  top: 10px;
+  font: 600 10px system-ui;
+  min-height: 30px;
+  padding: 4px 6px;
+  margin: 0;
+  border: 2px solid #2b8b70;
+  background: #e3f3df;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+.pageDestination .glyph {
+  width: 15px;
+  height: 15px;
+}
+.overflowTray {
+  margin-top: 10px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px;
+  background: #dac59d;
+  border: 1px dashed #a18a60;
+  border-radius: 6px;
+  position: relative;
+}
+.trayLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font: 9px system-ui;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #786442;
+}
+.overflowPieces {
+  display: flex;
+  gap: 1px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.overflowPieces .meeple {
+  width: 25px;
+  height: 29px;
+}
+.chapterApp .overflowPlace {
+  display: flex;
+  align-items: center;
+  padding: 2px 6px;
+  margin: 0;
+  min-height: 34px;
+  border: 1px solid #377f6c;
+  background: #dff1dc;
+}
+.bookInspector {
+  font-size: 12px;
+  background: #fff5dc;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+.battleTotals {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+}
+.battleTotals > span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 3px solid var(--seat);
+}
+.chapterApp .choices {
+  position: relative;
+  bottom: 0;
+  z-index: 5;
+  background: #1b302ef5;
+  box-shadow: 0 -5px 18px #0004;
+  max-height: 35vh;
+  overflow: auto;
+}
+.chapterApp .choices h2 {
+  font-size: 14px;
+  margin: 2px 0 6px;
+}
+.choices button {
+  font-size: 13px;
+  padding: 7px 10px;
+  min-height: 40px;
+}
+.hand details {
+  font-size: 12px;
+  padding: 5px 8px;
+}
+.hand details p {
+  margin: 4px 0;
+}
+.chapterApp button:focus-visible,
+.chapterApp summary:focus-visible {
+  outline: 3px solid #f4bd58;
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .chapterApp {
+    padding: 10px;
+  }
+  .chapterPlayers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tableTools span {
+    display: none;
+  }
+  .visualTable {
+    height: 58vh;
+    min-height: 400px;
+  }
+  .chapterActions button {
+    width: auto;
+  }
+  .chapterApp .seat details {
+    font-size: 11px;
+  }
+  .chapterApp header h1 {
+    font-size: 24px;
+  }
+}

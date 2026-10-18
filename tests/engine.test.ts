@@ -69,7 +69,7 @@ describe('Current source and topology', () => {
       tokens.length,
       content.horse.length,
     ]).toEqual([9, 15, 15, 10, 15, 5]);
-    expect(JSON.stringify(content)).not.toMatch(/\b(?:ink|unlock\w*|sidekick|bookmark)\b/i);
+    expect(JSON.stringify({...content, redesign: undefined})).not.toMatch(/\b(?:ink|unlock\w*|sidekick|bookmark)\b/i);
     for (const b of books) {
       expect(b.slots).toBe(b.page_slots[0] + b.page_slots[1]);
       expect(Math.abs(b.page_slots[0] - b.page_slots[1])).toBeLessThanOrEqual(1);

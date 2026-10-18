@@ -1,0 +1,201 @@
+.slotBonus {
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+  color: #4c3c22;
+}
+.chapterApp {
+  max-width: 1800px;
+  margin: auto;
+  padding: 24px;
+  color: #ebdfc9;
+  background: #161d25;
+  min-height: 100vh;
+  font:
+    16px/1.5 Georgia,
+    serif;
+}
+.chapterApp header {
+  border-bottom: 2px solid #a88247;
+  padding-bottom: 16px;
+}
+.chapterApp h1 {
+  font-size: clamp(28px, 4vw, 48px);
+  margin: 0;
+}
+.chapterApp h2 {
+  font-size: 24px;
+}
+.chapterApp section {
+  background: #202c36;
+  border: 1px solid #52616c;
+  border-radius: 12px;
+  padding: 18px;
+  margin: 16px 0;
+}
+.chapterApp button,
+.chapterApp input,
+.chapterApp select {
+  font: inherit;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #ae956c;
+  margin: 5px;
+  background: #efe1c4;
+  color: #17222a;
+  min-height: 44px;
+}
+.chapterApp button {
+  cursor: pointer;
+}
+.chapterApp button:hover {
+  background: #ffe4a6;
+}
+.chapterApp button:disabled {
+  opacity: 0.5;
+}
+.chapterApp label {
+  display: inline-block;
+  margin: 5px;
+}
+.chapterApp meter {
+  display: block;
+  width: 100%;
+  height: 24px;
+}
+.chapterPlayers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.chapterApp .seat {
+  border-top: 5px solid var(--seat);
+}
+.seat0 {
+  --seat: #67c8cb;
+}
+.seat1 {
+  --seat: #f28d9d;
+}
+.seat2 {
+  --seat: #d4adf0;
+}
+.seat3 {
+  --seat: #f6c66c;
+}
+.chapterApp details {
+  margin: 6px 0;
+}
+.chapterApp summary {
+  cursor: pointer;
+  min-height: 32px;
+}
+.library {
+  display: grid;
+  grid-auto-columns: minmax(155px, 1fr);
+  gap: 16px;
+  overflow: auto;
+  padding: 8px;
+  max-height: 1000px;
+}
+.chapterBook {
+  background: #ecdfc4;
+  color: #202831;
+  padding: 16px;
+  border-radius: 8px;
+  min-width: 310px;
+  border: 3px solid #927546;
+}
+.bookHeading {
+  display: flex;
+  gap: 12px;
+  align-items: start;
+  justify-content: space-between;
+}
+.bookHeading h3 {
+  margin: 4px 0;
+}
+.bookmark {
+  background: #9f3f40;
+  color: #fff4e1;
+  padding: 12px 10px 22px;
+  max-width: 140px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 92%, 0 100%);
+  font-size: 14px;
+}
+.chapterApp .earned {
+  max-width: none;
+  clip-path: none;
+}
+.bookPages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.page {
+  border: 1px solid #b4a283;
+  padding: 8px;
+  min-height: 130px;
+}
+.figure,
+.pageSlot {
+  display: block;
+  padding: 8px;
+  margin: 6px 0;
+  border: 2px solid var(--seat, #a79982);
+  border-radius: 5px;
+}
+.figure {
+  background: #fff4df;
+}
+.bonuses {
+  font-size: 14px;
+}
+.chapterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.hand {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hand details {
+  border: 1px solid #bba178;
+  padding: 10px;
+  max-width: 280px;
+}
+.collected {
+  display: inline-block;
+  padding: 8px;
+  border: 1px solid #bba178;
+  margin: 4px;
+}
+.chapterApp nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chapterApp [role='alert'] {
+  color: #ffb0b0;
+}
+@media (max-width: 800px) {
+  .chapterApp {
+    padding: 10px;
+  }
+  .library {
+    display: flex;
+    flex-direction: column;
+    max-height: none;
+  }
+  .chapterBook {
+    min-width: 0;
+  }
+  .chapterPlayers {
+    grid-template-columns: 1fr;
+  }
+  .chapterActions button {
+    width: 100%;
+  }
+}
