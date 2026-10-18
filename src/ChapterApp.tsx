@@ -268,6 +268,12 @@ export default function ChapterApp() {
             </div>
             <section>
               <h2>The library</h2>
+              <details>
+                <summary>Base rules</summary>
+                {content.baseRules.map((rule) => (
+                  <p key={rule}>{rule}</p>
+                ))}
+              </details>
               <p>
                 {view.stackCount} books remain in the stack. First conflict awards the bookmark;
                 second conflict claims the book.

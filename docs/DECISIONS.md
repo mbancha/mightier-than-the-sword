@@ -1,5 +1,7 @@
 # Chapters redesign — 2026-10-16
 
+2026-10-18 designer clarification: Whenever an Inkling is moved from one space to another, it doesn't trigger the rewards of the new space. This is a base rule; individual movement abilities omit that reminder. Fresh placements retain their normal rewards and Subplot checks. Existing transfer handlers already follow this behavior.
+
 Latest explicit designer rules override the historical rulings below. The current complete specification is CHAPTER_SPEC.md. Chapters replaces memories, point scoring, reserves, separate decks, old characters and shared Acts. Start with seven ink. End chapter consumes the turn. Characters are dealt. Bookmark power boosts affect only the protagonist. On an empty-stack split, the winner closes the gap so every book touches at least two others, keeping the nearest practical orientation. The expected three-book endpoint was a miscalculation, not a rule.
 
 The approved plan supplies all proposed playtest content and defaults. No claim of balance is made. Print remains the old edition.

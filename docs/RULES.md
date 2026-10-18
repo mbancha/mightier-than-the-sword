@@ -4,6 +4,10 @@ Digital playtest content. PnP remains on its previous edition.
 
 See CHAPTER_SPEC.md for confirmed rules and proposed operational defaults.
 
+## Base rules
+
+Whenever an Inkling is moved from one space to another, it doesn't trigger the rewards of the new space.
+
 ## Characters
 
 ### Captain Nemo (Voyages)
@@ -28,7 +32,7 @@ Power 1. A Plan Within a Plan: Once per conflict here, after you play a combat c
 
 ### Aeneas (Epics)
 
-Power 2. Carry Them Home: After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn; transfers grant no rewards.
+Power 2. Carry Them Home: After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn.
 
 ### Dracula (Gothic Horror)
 
@@ -206,7 +210,7 @@ Or immediate: Draw 3 cards.
 
 ### 20,000 Leagues Under the Sea
 
-Special space / submarine: Mark #2 Diving Hatch. After placing here, you may move 1 of your Inklings from any other book's overflow to this book's overflow. Free; transfer, not placement.
+Special space / submarine: Mark #2 Diving Hatch. After placing here, you may move 1 of your Inklings from any other book's overflow to this book's overflow. Free.
 
 Middle spaces: #2: pay 1 ink, draw 2 cards
 

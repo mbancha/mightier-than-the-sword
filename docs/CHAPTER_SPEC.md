@@ -23,6 +23,8 @@ The designer's rules below supersede the old digital rules. New names, powers, c
 
 ### Turns and chapters
 
+- Whenever an Inkling is moved from one space to another, it doesn't trigger the rewards of the new space.
+
 - At the start of a player's turn, zero ink forces them to end their chapter. At three ink or fewer, they may voluntarily end it. Above three they cannot voluntarily end it.
 - Ending a chapter consumes the turn: refill ink and place a new book if available. Ink reaching zero mid-turn or mid-conflict does not interrupt anything.
 - If taking a turn with no available Inklings, choose a book with your Inklings and resolve a conflict there, as before.
@@ -97,7 +99,7 @@ Abilities belong to the named character, whether protagonist or secondary. 'Here
 | Voyages | Ichthyosaur | 3 | **From the Depths:** In a conflict here, if you have at least 2 overflow Inklings here, Ichthyosaur has +2 power. The figure occupies one page like other characters. |
 | Epics | Achilles | 3 | **Worthy Opponent:** Achilles has +2 power in a conflict here if an opponent has a character here. |
 | Epics | Odysseus | 1 | **A Plan Within a Plan:** Once per conflict here, after you play a combat card, draw 1 card. |
-| Epics | Aeneas | 2 | **Carry Them Home:** After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn; transfers grant no rewards. |
+| Epics | Aeneas | 2 | **Carry Them Home:** After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn. |
 | Gothic Horror | Dracula | 2 | **Guests for Dinner:** Dracula has +1 power for each opposing player participating in this book's conflict. |
 | Gothic Horror | Frankenstein's Creature | 1 | **Built from Scraps:** Once per turn, after a normal placement from the Creature, you may pay 1 ink to place 2 Inklings from supply into this book's overflow. This does not use your paid extra-placement allowance. |
 | Gothic Horror | Dr. Jekyll / Mr. Hyde | 1 | **The Other Self:** At the start of a conflict here, you may pay 1 ink to give this character +3 power for this conflict. |
@@ -128,7 +130,7 @@ Every book has exactly one category badge and one thematic effect. Three books u
 
 | Book | Category / icon | Proposed effect |
 | --- | --- | --- |
-| 20,000 Leagues Under the Sea | Special space / submarine | Mark #2 **Diving Hatch**. After placing here, you may move 1 of your Inklings from any other book's overflow to this book's overflow. Free; transfer, not placement. |
+| 20,000 Leagues Under the Sea | Special space / submarine | Mark #2 **Diving Hatch**. After placing here, you may move 1 of your Inklings from any other book's overflow to this book's overflow. Free. |
 | Around the World in 80 Days | Movement end / footsteps | **Express Connection:** After a character finishes normal movement here from a different book, its owner may move 1 of their other characters 1 space. Once per player turn. This bonus movement triggers no arrival effect. |
 | Journey to the Center of the Earth | Conflict / crossed swords | **Hidden Depths:** Overflow Inklings here have +1 power each during conflict. This adds to other power bonuses. |
 | The Odyssey | Movement end / footsteps | **Stories from Afar:** After a character finishes normal movement here from a different book, its owner may discard 1 card to draw 1 card. Once per player turn. |

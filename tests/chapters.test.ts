@@ -36,6 +36,21 @@ function settle(s: State) {
   return s;
 }
 describe('Chapter edition', () => {
+  it('moving an existing Inkling does not grant destination rewards or placement Subplots', () => {
+    let s = ready();
+    const from = s.books[0],
+      to = s.books[1];
+    from.slots[0] = 0;
+    s.players[0].supply--;
+    s.jobs = [{ type: 'transfer', p: 0, to: to.id, mode: 'page', n: 1 }];
+    const ink = s.players[0].ink,
+      hand = structuredClone(s.players[0].hand);
+    s = choose(s, `transfer:${from.id}:0`);
+    expect(s.players[0].ink).toBe(ink);
+    expect(s.players[0].hand).toEqual(hand);
+    expect(s.books.find((b) => b.id === to.id)!.overflow[0]).toBe(1);
+    expect(s.jobs.some((j) => ['bonus', 'subplot'].includes(j.type))).toBe(false);
+  });
   it('power bookmarks apply per Inkling, but +5 applies only once to the protagonist', () => {
     const s = ready();
     const b = s.books[0],
@@ -209,7 +224,7 @@ describe('Chapter edition', () => {
     s = settle(s);
     expect(s.winner).toBe(0);
     expect(s.players[0].books).toHaveLength(3);
-    expect(s.books.some(x=>x.id===b.id)).toBe(false);
+    expect(s.books.some((x) => x.id === b.id)).toBe(false);
   });
   it('refills every player at turn end', () => {
     let s = ready();
