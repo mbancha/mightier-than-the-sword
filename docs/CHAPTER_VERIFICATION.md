@@ -19,3 +19,15 @@ The new app runs ChapterApp, chapters.ts, and chapterBot.ts. Previous engine/UI 
 Chapter specification labels defaults including 12 initially available Inklings, base capacity seven, all-player minimum-hand replenishment, duplicate ongoing handling and a secondary-character replacement fallback. These were supplied in the approved implementation plan and remain playtest tuning decisions.
 
 No print output regenerated. No public-site deployment, remote push, PR, or merge performed. Human playtesting is still needed to assess pacing, clarity and balance, especially stacking overflow bonuses and cheap Twists.
+
+## Local card revision verification — 2026-10-18
+
+142 tests pass, including all five conflict Subplots for losing participants, extra paid-action availability, capacity, and existing private-view regressions. Production build passes. Extended browser smoke checks card art above text, both hand card types, graphical reserves and opponent hand counts, collapsed Library reference, automatic turns/bots, and hotseat privacy. Desktop/tablet screenshots: artifacts/cards-desktop.png and artifacts/cards-tablet.png. Removed the former action-panel height limit after inspecting screenshots. Balance values remain provisional for human testing. No push or deployment.
+
+## Browser verification completed (2026-10-19)
+
+The pending graphical publication journey now passes: legal book-shaped map
+locations are displayed and clicking one adds exactly one new book. Inspected
+artifacts/book-placement.png; targets are visually distinct and aligned with the
+map, with pan/scroll available for the expanded layout. Existing turn/bot/privacy
+smoke checks also pass. This supersedes the earlier approval-capacity blockage.

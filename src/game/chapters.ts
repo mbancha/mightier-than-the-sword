@@ -106,7 +106,7 @@ const pages = (b: Book, p: number) => b.slots.flatMap((v, k) => (v === p ? [k] :
 const allCount = (s: State, p: number) => s.books.filter((b) => count(b, p) > 0).length;
 const consecutive = (b: Book, p: number) => b.slots.some((v, k) => v === p && b.slots[k + 1] === p);
 export const capacity = (p: Player) =>
-  7 + (has(p, 2) ? 5 : 0) + (owns(p, 2) ? 2 : 0) + (owns(p, 13) ? 2 : 0);
+  7 + (has(p, 2) ? 5 : 0) + (owns(p, 2) ? 3 : 0) + (owns(p, 13) ? 3 : 0);
 export const minimum = (p: Player) =>
   (has(p, 1) ? 5 : 1) + [1, 8, 12].filter((n) => owns(p, n)).length;
 const gain = (p: Player, n: number) => (p.ink = Math.min(capacity(p), p.ink + n));
@@ -266,7 +266,6 @@ function subplotCandidates(
   event: string,
   id: number,
   k: number | null = null,
-  winner = -1,
 ) {
   const b = book(s, id);
   if (!b) return [];
@@ -276,8 +275,8 @@ function subplotCandidates(
   const start = s.battle?.start;
   const sb = start ? book(start, id) : b;
   const participating = !!s.battle?.participants.includes(p);
-  const primary = pl.figures.find((f) => f.primary)!;
-  const enemyFigure = s.players.some(
+  const primary = (start?.players[p] ?? pl).figures.find((f) => f.primary)!;
+  const enemyFigure = (start?.players ?? s.players).some(
     (x, i) => i !== p && x.figures.some((f) => bid(f.page) === id),
   );
   const yes = [
@@ -302,10 +301,10 @@ function subplotCandidates(
     event === 'place' && g === 'Epics' && count(b, p) >= 3 && pg.length > 0 && b.overflow[p] > 0,
     event === 'conflict' &&
       g === 'Epics' &&
-      winner === p &&
+      participating &&
       bid(primary.page) === id &&
       enemyFigure,
-    event === 'conflict' && g === 'Epics' && winner === p && sb.contested,
+    event === 'conflict' && g === 'Epics' && participating && sb.mark === null,
     event === 'place' &&
       g === 'Gothic Horror' &&
       k !== null &&
@@ -326,7 +325,7 @@ function subplotCandidates(
       participating &&
       sb.overflow[p] >= 2 &&
       s.players.some((_, i) => i !== p && pages(sb, i).length >= 2),
-    event === 'conflict' && g === 'Gothic Horror' && winner === p && pl.ink <= 2,
+    event === 'conflict' && g === 'Gothic Horror' && participating && pl.ink <= 2,
   ];
   return pl.hand
     .filter(
@@ -352,15 +351,7 @@ export function power(s: State, p: number, id: number) {
     )
       n += 2;
     if (f.id === 6) n += s.battle?.participants.filter((i) => i !== p).length ?? 0;
-    if (f.primary) {
-      if (owns(pl, 4) && b.overflow[p]) n++;
-      if (owns(pl, 6)) n++;
-      if (
-        owns(pl, 10) &&
-        s.players.some((x, i) => i !== p && x.figures.some((y) => bid(y.page) === id))
-      )
-        n++;
-    }
+    if (f.primary) n += [4, 6, 9, 10].filter((id) => owns(pl, id)).length;
   }
   return n + (s.battle?.book === id ? s.battle.bonus[p] : 0);
 }
@@ -452,7 +443,7 @@ function normalize(s: State) {
         `${s.players[winner].name} wins ${source.books[b.id].title} with ${power(s, winner, b.id)} power.`,
       );
       const js: Job[] = bt.participants.flatMap((p) => {
-        const eligible = subplotCandidates(s, p, 'conflict', b.id, null, winner);
+        const eligible = subplotCandidates(s, p, 'conflict', b.id, null);
         return eligible.length ? [{ type: 'subplot', p, eligible }] : [];
       });
       js.push({ type: 'cleanup', p: winner, book: b.id });
@@ -545,19 +536,13 @@ export function legalActions(s: State): Action[] {
   if (j.type === 'movement') {
     for (const f of pl.figures) {
       const first = !s.moving.includes(f.id),
-        paid = s.extraMove < 1 + (owns(pl, 3) ? 1 : 0) + (owns(pl, 14) ? 1 : 0) && pl.ink > 0;
+        paid = s.extraMove < 1 + [0, 3, 14].filter((id) => owns(pl, id)).length && pl.ink > 0;
       if (!first) continue;
-      const range = first
-        ? f.primary
-          ? (has(pl, 9) ? 4 : 1) + (owns(pl, 0) ? 1 : 0)
-          : 1
-        : f.id === 1
-          ? 2
-          : 1;
+      const range = first ? (f.primary ? (has(pl, 9) ? 4 : 1) : 1) : f.id === 1 ? 2 : 1;
       for (const dest of reachable(s, f.page, range))
         add(
           `move:${f.id}:${dest}`,
-          `${first ? 'Move' : 'Pay 1 ink to move'} ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
+          `${first ? 'Move' : '1 ink: move'} ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
           (st) => {
             const figure = st.players[p].figures.find((x) => x.id === f.id)!,
               old = figure.page;
@@ -581,12 +566,12 @@ export function legalActions(s: State): Action[] {
   }
   if (j.type === 'route') {
     const f = pl.figures.find((x) => x.id === j.char)!;
-    const max = 1 + (owns(pl, 3) ? 1 : 0) + (owns(pl, 14) ? 1 : 0);
+    const max = 1 + [0, 3, 14].filter((id) => owns(pl, id)).length;
     if (pl.ink && s.extraMove < max)
       for (const dest of reachable(s, f.page, f.id === 1 ? 2 : 1))
         add(
           `step:${dest}`,
-          `Pay 1 ink: move ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
+          `1 ink: move ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
           (st) => {
             st.players[p].ink--;
             st.extraMove++;
@@ -612,14 +597,10 @@ export function legalActions(s: State): Action[] {
             ? [k]
             : [],
         );
-        for (const k of j.overflow
-          ? [null]
-          : ks.length
-            ? [...ks, ...(paid && owns(pl, 7) ? [null] : [])]
-            : [null])
+        for (const k of j.overflow ? [null] : ks.length ? ks : [null])
           add(
             `place:${k}`,
-            `${paid ? 'Pay 1 ink: ' : ''}Place ${k === null ? 'in overflow' : `in space ${k + 1}`} of ${source.books[target.id].title}`,
+            `${paid ? '1 ink: ' : ''}Place ${k === null ? 'in overflow' : `in space ${k + 1}`} of ${source.books[target.id].title}`,
             (st) => {
               done(st);
               const dest = book(st, target.id);
@@ -642,7 +623,7 @@ export function legalActions(s: State): Action[] {
   }
   if (j.type === 'afterPlace') {
     if (j.first && j.char === 7 && pl.ink && pl.supply >= 2)
-      add('creature', 'Pay 1 ink: add 2 overflow Inklings', (st) => {
+      add('creature', '1 ink: add 2 overflow Inklings', (st) => {
         done(st);
         st.players[p].ink--;
         push(
@@ -656,9 +637,9 @@ export function legalActions(s: State): Action[] {
           { type: 'afterPlace', p, char: j.char, first: false },
         );
       });
-    const max = 1 + (owns(pl, 5) ? 1 : 0) + (owns(pl, 11) ? 1 : 0);
+    const max = 1 + [5, 7, 11].filter((id) => owns(pl, id)).length;
     if (pl.ink && pl.supply && s.extraPlace < max)
-      add('extra', 'Buy an additional placement (1 ink)', (st) => {
+      add('extra', '1 ink: place an extra Inkling', (st) => {
         done(st);
         push(st, { type: 'place', p, char: j.char, normal: true, first: false });
       });
@@ -672,7 +653,7 @@ export function legalActions(s: State): Action[] {
     if (reward && pl.ink >= reward[0] && (reward[1] !== 'overflow' || pl.supply >= reward[2]))
       add(
         'buy',
-        `Pay ${reward[0]} ink: ${reward[1] === 'draw' ? 'draw' : reward[1] === 'ink' ? 'gain' : 'place in overflow'} ${reward[2]} ${reward[1] === 'draw' ? 'cards' : reward[1] === 'ink' ? 'ink' : 'Inklings'}`,
+        `${reward[0]} ink: ${reward[1] === 'draw' ? 'draw' : reward[1] === 'ink' ? 'gain' : 'place in overflow'} ${reward[2]} ${reward[1] === 'draw' ? 'cards' : reward[1] === 'ink' ? 'ink' : 'Inklings'}`,
         (st) => {
           done(st);
           st.players[p].ink -= reward[0];
@@ -729,7 +710,7 @@ export function legalActions(s: State): Action[] {
         if (pl.ink < cost) continue;
         add(
           `card:${c.id}`,
-          `Pay ${cost} ink: ${c.kind === 'twist' ? content.twists[c.design].name : `${content.subplots[c.design].name} (+${has(pl, 4) ? 2 : 1} power)`}`,
+          `${cost} ink: ${c.kind === 'twist' ? content.twists[c.design].name : `${content.subplots[c.design].name} (+${has(pl, 4) ? 2 : 1} power)`}`,
           (st) => {
             const player = st.players[p],
               battle = st.battle!,
@@ -765,14 +746,6 @@ export function legalActions(s: State): Action[] {
               draw(st, p, 1);
               battle.ignored.push(p);
             }
-            if (
-              owns(player, 9) &&
-              !battle.ignored.includes(p + 10) &&
-              player.figures.some((f) => f.primary && bid(f.page) === bk.id)
-            ) {
-              battle.ignored.push(p + 10);
-              push(st, { type: 'exchange', p });
-            }
           },
         );
       }
@@ -781,7 +754,7 @@ export function legalActions(s: State): Action[] {
   }
   if (j.type === 'hyde') {
     if (pl.ink)
-      add('hyde', 'Pay 1 ink: Hyde gains +3 power', (st) => {
+      add('hyde', '1 ink: Hyde gains +3 power', (st) => {
         done(st);
         st.players[p].ink--;
         st.battle!.bonus[p] += 3;
@@ -819,7 +792,7 @@ export function legalActions(s: State): Action[] {
   }
   if (j.type === 'aeneas') {
     if (pl.ink)
-      add('pay', 'Pay 1 ink: gather up to 2 page Inklings', (st) => {
+      add('pay', '1 ink: gather up to 2 page Inklings', (st) => {
         done(st);
         st.players[p].ink--;
         push(st, { type: 'transfer', p, to: j.to, mode: 'page', n: 2 });

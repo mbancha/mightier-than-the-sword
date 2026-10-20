@@ -17,6 +17,8 @@ import './chapters.css';
 import { settleFlow, flowView, applyFlow } from './game/chapterFlow';
 import TabletopBook, { Meeple, Glyph } from './TabletopBook';
 import './tabletop.css';
+import GameCard, { RulesText } from './GameCard';
+import './cards.css';
 export default function ChapterApp() {
   const [game, setGame] = useState<State | null>(null),
     [history, setHistory] = useState<State[]>([]),
@@ -32,6 +34,15 @@ export default function ChapterApp() {
     pan = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
   const actor = game ? actingPlayer(game) : 0;
   const view = game ? flowView(game, actor) : null;
+  const sites = (view?.actions ?? [])
+    .filter((a) => a.key.startsWith('publish:'))
+    .map((a) => {
+      const [, q, r] = a.key.split(':');
+      return { q: Number(q), r: Number(r), action: a };
+    });
+  const positions = [...(view?.books ?? []), ...sites];
+  const minX = Math.min(...positions.map((b) => 2 * b.q + b.r));
+  const minR = Math.min(...positions.map((b) => b.r));
   const showHand =
     !!game &&
     !game.players[actor].bot &&
@@ -229,20 +240,38 @@ export default function ChapterApp() {
                     <Glyph kind="ink" /> {p.ink} / {capacity(p)}{' '}
                     <meter min={0} max={capacity(p)} value={p.ink} />
                   </label>
-                  <p>
-                    Chapter {p.chapter} · {p.supply} Inklings available · Minimum hand {minimum(p)}{' '}
-                    · {p.handCount} cards
-                  </p>
-                  {p.figures.map((f) => (
-                    <details key={f.id}>
-                      <summary>
-                        {f.primary ? '★ Protagonist: ' : 'Companion: '}
-                        {content.characters[f.id].name} · {content.characters[f.id].power} base
-                        power
-                      </summary>
-                      {content.characters[f.id].ability}
-                    </details>
-                  ))}
+                  <small>
+                    Chapter {p.chapter} · Minimum hand {minimum(p)}
+                  </small>
+                  <div
+                    className="playerReserve"
+                    aria-label={`${p.name}: ${p.supply} Inklings available`}
+                  >
+                    <span>Available · {p.supply}</span>
+                    <div>
+                      {Array.from({ length: p.supply }, (_, n) => (
+                        <Meeple key={n} owner={i} small />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="handCount" aria-label={`${p.name}: ${p.handCount} cards in hand`}>
+                    <div className="cardBacks">
+                      {Array.from({ length: Math.min(p.handCount, 12) }, (_, n) => (
+                        <span className="cardBack" key={n}>
+                          <Glyph kind="book" />
+                        </span>
+                      ))}
+                    </div>
+                    <span>{p.handCount} cards</span>
+                  </div>
+                  <div className="characterCards">
+                    {p.figures.map((f) => (
+                      <div key={f.id}>
+                        <small>{f.primary ? '★ Protagonist' : 'Companion'}</small>
+                        <GameCard kind="character" design={f.id} />
+                      </div>
+                    ))}
+                  </div>
                   <p>
                     <Glyph kind="book" /> {p.books.length} / {view.players.length === 2 ? 3 : 2}
                   </p>
@@ -254,30 +283,32 @@ export default function ChapterApp() {
                   {p.marks.map((m, k) => (
                     <details className="bookmark earned" key={k}>
                       <summary>{bookmarkNames[m]}</summary>
-                      {bookmarkText[m]}
+                      <RulesText text={bookmarkText[m]} />
                     </details>
                   ))}
                   {p.ongoing.map((n) => (
                     <details key={n}>
                       <summary>{content.subplots[n].name}</summary>
-                      {content.subplots[n].ongoing}
+                      <RulesText text={content.subplots[n].ongoing} />
                     </details>
                   ))}
                 </section>
               ))}
             </div>
-            <section>
-              <h2>The library</h2>
-              <details>
-                <summary>Base rules</summary>
-                {content.baseRules.map((rule) => (
-                  <p key={rule}>{rule}</p>
-                ))}
+            <section className="boardSection">
+              <details className="libraryReference">
+                <summary>Library · {view.stackCount} books remaining</summary>
+                <details>
+                  <summary>Base rules</summary>
+                  {content.baseRules.map((rule) => (
+                    <p key={rule}>{rule}</p>
+                  ))}
+                </details>
+                <p>
+                  {view.stackCount} books remain in the stack. First conflict awards the bookmark;
+                  second conflict claims the book.
+                </p>
               </details>
-              <p>
-                {view.stackCount} books remain in the stack. First conflict awards the bookmark;
-                second conflict claims the book.
-              </p>
               <div className="tableTools">
                 <button
                   onClick={() => setZoom((z) => Math.max(0.4, z - 0.1))}
@@ -344,16 +375,32 @@ export default function ChapterApp() {
                   className="tableCanvas"
                   style={{
                     zoom,
-                    gridTemplateColumns: `repeat(${Math.max(...view.books.map((b) => 2 * b.q + b.r)) - Math.min(...view.books.map((b) => 2 * b.q + b.r)) + 2},240px)`,
+                    gridTemplateColumns: `repeat(${Math.max(...positions.map((b) => 2 * b.q + b.r)) - minX + 2},240px)`,
                   }}
                 >
+                  {showHand &&
+                    sites.map((site) => (
+                      <button
+                        className="publishSite"
+                        key={site.action.key}
+                        style={{
+                          gridColumn: `${2 * site.q + site.r - minX + 1} / span 2`,
+                          gridRow: site.r - minR + 1,
+                        }}
+                        aria-label={site.action.label}
+                        onClick={() => act(site.action.key)}
+                      >
+                        <Glyph kind="book" />
+                        <span>Place new book here</span>
+                      </button>
+                    ))}
                   {view.books.map((b) => (
                     <div
                       className="bookPosition"
                       key={b.id}
                       style={{
-                        gridColumn: `${2 * b.q + b.r - Math.min(...view.books.map((x) => 2 * x.q + x.r)) + 1} / span 2`,
-                        gridRow: b.r - Math.min(...view.books.map((x) => x.r)) + 1,
+                        gridColumn: `${2 * b.q + b.r - minX + 1} / span 2`,
+                        gridRow: b.r - minR + 1,
                       }}
                     >
                       <TabletopBook
@@ -390,35 +437,41 @@ export default function ChapterApp() {
                   <>
                     <div className="hand">
                       {view.players[actor].hand.map((c) => (
-                        <details key={c.id}>
-                          <summary>
-                            {c.kind === 'twist' ? 'Twist' : 'Subplot'}:{' '}
-                            {c.kind === 'twist'
-                              ? content.twists[c.design].name
-                              : content.subplots[c.design].name}
-                          </summary>
-                          {c.kind === 'twist' ? (
-                            <p>
-                              {content.twists[c.design].cost} ink ·{' '}
-                              {content.twists[c.design].effect}
-                            </p>
-                          ) : (
-                            <>
-                              <p>{content.subplots[c.design].condition}</p>
-                              <p>Ongoing: {content.subplots[c.design].ongoing}</p>
-                              <p>Immediate: {content.subplots[c.design].instant}</p>
-                              <p>Or play for 1 ink and +1 power.</p>
-                            </>
-                          )}
-                        </details>
+                        <GameCard
+                          key={c.id}
+                          kind={c.kind}
+                          design={c.design}
+                          cost={
+                            c.kind === 'twist' && view.players[actor].marks.includes(3)
+                              ? 1
+                              : undefined
+                          }
+                          boost={view.players[actor].marks.includes(4) ? 2 : 1}
+                          actions={view.actions
+                            .filter(
+                              (a) =>
+                                a.key === `card:${c.id}` || a.key.startsWith(`subplot:${c.id}:`),
+                            )
+                            .map((a) => ({
+                              key: a.key,
+                              label: a.key.startsWith('subplot:')
+                                ? a.key.endsWith('true')
+                                  ? 'Keep bonus'
+                                  : 'Take reward'
+                                : 'Play',
+                              run: () => act(a.key),
+                            }))}
+                        />
                       ))}
                     </div>
                     <div className="chapterActions">
                       {view.actions
-                        .filter((a) => !/^(move|step|setup|place):/.test(a.key))
+                        .filter(
+                          (a) => !/^(move|step|setup|place|card|subplot|publish):/.test(a.key),
+                        )
                         .map((a) => (
                           <button key={a.key} onClick={() => act(a.key)}>
-                            {a.label}
+                            <RulesText text={a.label} />
                           </button>
                         ))}
                     </div>
@@ -427,7 +480,7 @@ export default function ChapterApp() {
                       <div className="chapterActions">
                         {view.actions.map((a) => (
                           <button key={a.key} onClick={() => act(a.key)}>
-                            {a.label}
+                            <RulesText text={a.label} />
                           </button>
                         ))}
                       </div>

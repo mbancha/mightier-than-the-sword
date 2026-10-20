@@ -98,3 +98,5 @@ Reviewed source branch f2039f8 against main 232391a and integrated its rules ove
 ## One memory per book (2026-10-07)
 
 Updated stable Subplot ID 10, placement predicate and legal upgrade choices for the one-owned-memory-per-book limit. Catalog/rules edition advances to 0.7.1; print master is synced.
+
+2026-10-18: Updated only active Chapters content and UI from designer instructions: participation-based conflict Subplots, simplified ongoing rewards, concise costs, graphical cards/reserves, compact Library reference. Legacy print catalog and synced sources are unchanged. Canonical text remains content.json.redesign; generated RULES.md synchronized.

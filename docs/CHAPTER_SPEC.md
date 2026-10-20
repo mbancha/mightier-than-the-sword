@@ -16,7 +16,7 @@ The designer's rules below supersede the old digital rules. New names, powers, c
 - Shuffle selected sets' characters together and deal each player one. This first character is their primary character, their protagonist. Additional characters are separate moving figures.
 - Combine all selected sets' Twists and Subplots into one draw deck.
 - Players start at seven ink. Remove player boards, memories, upgrade rows, reserves, shared Acts, and numeric victory points.
-- First conflict at a book: winner permanently gains its bookmark; mark that book with a conflict token. Second conflict: winner takes that book into their tableau. These winners need not match. The second winner gets no extra bookmark.
+- First conflict at a book: winner permanently gains its bookmark; Its missing bookmark shows the next conflict winner can collect the book. Second conflict: winner takes that book into their tableau. These winners need not match. The second winner gets no extra bookmark.
 - First to three books in two-player, or two books in three-/four-player, wins immediately.
 - A claimed book leaves the map. In turn order starting with the current player, affected players move their characters off it, making one movement to the nearest book.
 - If removal would disconnect the map and a book remains in the stack, the next book must replace the claimed book. When the stack is empty, place no replacement and no connector tile. If removal splits the map, the conflict winner closes the gap by rearranging the remaining books so every book touches at least two others, preserving the former orientation as closely as possible.
@@ -94,15 +94,15 @@ Abilities belong to the named character, whether protagonist or secondary. 'Here
 
 | Set | Character | Power | Ability |
 | --- | --- | ---: | --- |
-| Voyages | Captain Nemo | 2 | **Hidden Passage:** After Nemo finishes normal movement, move up to 2 of your overflow Inklings from other books into this book's overflow. Free; once per turn. |
-| Voyages | Phileas Fogg | 1 | **Right on Time:** When you buy extra movement for Fogg, that purchase moves him up to 2 spaces instead of 1. |
-| Voyages | Ichthyosaur | 3 | **From the Depths:** In a conflict here, if you have at least 2 overflow Inklings here, Ichthyosaur has +2 power. The figure occupies one page like other characters. |
-| Epics | Achilles | 3 | **Worthy Opponent:** Achilles has +2 power in a conflict here if an opponent has a character here. |
-| Epics | Odysseus | 1 | **A Plan Within a Plan:** Once per conflict here, after you play a combat card, draw 1 card. |
-| Epics | Aeneas | 2 | **Carry Them Home:** After Aeneas finishes normal movement, you may pay 1 ink to move up to 2 of your page-space Inklings from other books into this book's overflow. Once per turn. |
-| Gothic Horror | Dracula | 2 | **Guests for Dinner:** Dracula has +1 power for each opposing player participating in this book's conflict. |
-| Gothic Horror | Frankenstein's Creature | 1 | **Built from Scraps:** Once per turn, after a normal placement from the Creature, you may pay 1 ink to place 2 Inklings from supply into this book's overflow. This does not use your paid extra-placement allowance. |
-| Gothic Horror | Dr. Jekyll / Mr. Hyde | 1 | **The Other Self:** At the start of a conflict here, you may pay 1 ink to give this character +3 power for this conflict. |
+| Voyages | Captain Nemo | 2 | After normal movement, once per turn: move up to 2 of your overflow Inklings from other books into this overflow. |
+| Voyages | Phileas Fogg | 1 | Extra movement: 1 ink: move up to 2 spaces instead of 1. |
+| Voyages | Ichthyosaur | 3 | +2 power with 2 of your overflow Inklings here. |
+| Epics | Achilles | 3 | +2 power with an enemy character here. |
+| Epics | Odysseus | 1 | Once per conflict here, after playing a combat card: draw 1 card. |
+| Epics | Aeneas | 2 | After normal movement, once per turn: 1 ink: move up to 2 of your page Inklings from other books into this overflow. |
+| Gothic Horror | Dracula | 2 | +1 power per opposing player in this conflict. |
+| Gothic Horror | Frankenstein's Creature | 1 | After your normal placement, once per turn: 1 ink: place 2 Inklings in this overflow. Uses no extra-placement allowance. |
+| Gothic Horror | Dr. Jekyll / Mr. Hyde | 1 | At conflict start here: 1 ink: +3 power this conflict. |
 
 This keeps the existing Nemo/Fogg/Ichthyosaur trio, simplifies the Gothic trio, and uses Aeneas alongside Achilles and Odysseus to represent all three Epic books. Retire Agamemnon and the Trojan Horse from the new playable roster; archive old identities without reusing their stable IDs for new characters.
 
@@ -152,29 +152,29 @@ All ongoing rewards are modest compared with bookmarks. A copied ongoing card ca
 
 | Subplot | Trigger and objective | Ongoing reward | Immediate reward |
 | --- | --- | --- | --- |
-| Across the Map | Place in a Voyages book while you have Inklings on at least 3 different books, including this one. | **Long Strides:** Your protagonist gets +1 normal movement allowance. | Draw 3 cards. |
-| A Foot on Each Shore | Place in a Voyages page space so you occupy at least one space on each of this book's two pages. | **Well Prepared:** Minimum hand size +1. | Gain 2 ink. |
-| Below the Surface | Place in a Voyages book's overflow so you have at least 3 overflow Inklings here and at least 1 page-space Inkling here. | **Deep Reserves:** Ink capacity +2. | Draw 3 cards. |
-| A Connected Journey | Place in a Voyages book while you have Inklings in it and in a different, edge-adjacent Voyages book. | **Another Step:** Increase paid extra-movement purchases per turn by 1. | Gain 2 ink. |
-| Out of Your Depth | Participate in a Voyages conflict with at least 2 overflow Inklings here at conflict start. Winning is not required. | **Seasoned Crew:** Your protagonist has +1 power when you have overflow Inklings at its conflict book. | Draw 2 cards. |
+| Across the Map | Place in Voyages with your Inklings on 3 different books. | Each turn: 1 ink: move 1 extra space, one additional time. | Draw 3 cards. |
+| A Foot on Each Shore | Place on a Voyages page space with your Inklings on both pages. | Minimum hand +1. | Gain 2 ink. |
+| Below the Surface | Place in Voyages overflow with 3 of your Inklings in overflow and 1 on a page here. | Ink capacity +3. | Draw 4 cards. |
+| A Connected Journey | Place in Voyages with your Inklings on this book and an adjacent Voyages book. | Each turn: 1 ink: move 1 extra space, one additional time. | Gain 3 ink. |
+| Out of Your Depth | Join a Voyages conflict with 2 of your Inklings in overflow at its start. | Protagonist +1 power. | Draw 2 cards. |
 
-### Epics — occupy the line, contest heroes, and earn victories
+### Epics — occupy the line, contest heroes, and join conflicts
 
 | Subplot | Trigger and objective | Ongoing reward | Immediate reward |
-| Hold the Line | Place in an Epics page space so you occupy at least 2 consecutive spaces in this book's left-to-right track. The sequence may cross the fold. | **Reinforcements:** Increase paid extra-placement allowance per turn by 1. | Draw 2 cards. |
-| The First and Last Word | Place in an Epics book's first or last space while you also occupy its other endpoint. | **Heroic Stature:** Your protagonist has +1 power. | Gain 2 ink. |
-| Muster the Host | Place in an Epics book so you have at least 3 Inklings here, including at least 1 in a page space and 1 in overflow. | **A Second Wave:** Once per turn when buying an extra normal placement, you may put that purchased Inkling in the same book's overflow even if a page space is available. | Draw 3 cards. |
-| A Worthy Rival | Win an Epics conflict where your protagonist and an enemy character were both present at conflict start. | **Tactical Reserve:** Minimum hand size +1. | Gain 2 ink. |
-| A Deed Remembered | Win a conflict in an Epics book that already had a conflict token at conflict start. | **Veteran Commander:** Once per conflict at your protagonist's book, after playing a combat card, you may discard 1 card to draw 1. | Draw 4 cards. |
+| Hold the Line | Place on an Epics page space with 2 of your Inklings on consecutive spaces here. | Each turn: 1 ink: place 1 extra Inkling, one additional time. | Draw 2 cards. |
+| The First and Last Word | Place on an Epics endpoint while your Inkling occupies the other endpoint. | Protagonist +1 power. | Gain 2 ink. |
+| Muster the Host | Place in Epics with 3 of your Inklings here, including a page space and overflow. | Each turn: 1 ink: place 1 extra Inkling, one additional time. | Draw 3 cards. |
+| A Worthy Rival | Join an Epics conflict with your protagonist and an enemy character here at its start. | Minimum hand +1. | Gain 2 ink. |
+| A Deed Remembered | Join an Epics conflict on a book whose bookmark has already been claimed. | Protagonist +1 power. | Draw 2 cards. |
 
 ### Gothic Horror — uneasy arrangements and strength at a cost
 
 | Subplot | Trigger and objective | Ongoing reward | Immediate reward |
-| An Unwelcome Guest | Place in a Gothic Horror page space so one of your spaces is immediately next to an enemy-occupied space in the same book's track. | **Unsettling Presence:** Your protagonist has +1 power when an opposing character is at its conflict book. | Draw 2 cards. |
-| In the Margins | Place in a Gothic Horror book so you have at least 1 page-space Inkling and at least 2 overflow Inklings here. | **Working in Secret:** Increase paid extra-placement allowance per turn by 1. | Gain 2 ink. |
-| A House Divided | Place in a Gothic Horror page space so you occupy 2 nonconsecutive spaces here with an enemy-occupied space somewhere between them. | **Forbidden Reading:** Minimum hand size +1. | Draw 3 cards. |
-| Something in the Cellar | Participate in a Gothic Horror conflict where you have at least 2 overflow Inklings and an opponent has at least 2 page-space Inklings at conflict start. | **A Larger Vessel:** Ink capacity +2. | Gain 2 ink. |
-| The Last Candle | Win a Gothic Horror conflict with 2 ink or fewer when the result is determined. | **Dangerous Experiment:** Increase paid extra-movement purchases per turn by 1. | Draw 3 cards. |
+| An Unwelcome Guest | Place on a Gothic Horror page space with one of your Inklings next to an enemy Inkling here. | Protagonist +1 power. | Draw 2 cards. |
+| In the Margins | Place in Gothic Horror with 1 of your Inklings on a page and 2 in overflow here. | Each turn: 1 ink: place 1 extra Inkling, one additional time. | Gain 2 ink. |
+| A House Divided | Place on a Gothic Horror page space with an enemy Inkling between two of yours here. | Minimum hand +1. | Draw 3 cards. |
+| Something in the Cellar | Join a Gothic Horror conflict with 2 of your overflow Inklings and one opponent’s 2 page Inklings here at its start. | Ink capacity +3. | Gain 3 ink. |
+| The Last Candle | Join a Gothic Horror conflict and finish it with 2 ink or less. | Each turn: 1 ink: move 1 extra space, one additional time. | Draw 2 cards. |
 
 Difficulty intent: each set has accessible positioning goals, a goal requiring earlier setup, and conflict goals. A Connected Journey intentionally waits for a second Voyages book; A Deed Remembered waits for a second conflict. Neither is dead in hand because any Subplot remains a one-ink combat card. Completion rewards do not create new characters or unlimited recurring ink.
 
@@ -184,15 +184,15 @@ Five copies of each. All are played during your normal Twist opportunity and las
 
 | Set | Twist | Ink | Effect |
 | --- | --- | ---: | --- |
-| Voyages | Travelling Light | 1 | Gain +4 power if you have exactly 1 Inkling here; otherwise +2. |
-| Voyages | All Hands on Deck | 2 | Gain +2 power, plus +1 for each of your overflow Inklings here, to a maximum of +5 total. |
-| Voyages | The Long Way Round | 3 | Gain +6 power if you have Inklings on at least 3 different books; otherwise +4. |
-| Epics | A Hero Provoked | 1 | Gain +3 power if your protagonist is here; otherwise +2. |
-| Epics | Hold Fast | 2 | Gain +5 power if you occupy at least 2 consecutive page spaces here; otherwise +3. |
-| Epics | Against All Odds | 3 | Gain +7 power if any one opponent has more Inklings here than you; otherwise +4. |
-| Gothic Horror | A Shadow at the Door | 1 | Gain +3 power if an opponent has a character here; otherwise +2. |
-| Gothic Horror | It Was Alive | 2 | Gain +5 power if you have both page-space and overflow Inklings here; otherwise +3. |
-| Gothic Horror | The Final Transformation | 3 | Gain +6 power; gain +8 instead if paying this card's cost left you at zero ink. |
+| Voyages | Travelling Light | 1 | +4 if you have exactly 1 Inkling here; otherwise +2. |
+| Voyages | All Hands on Deck | 2 | +2; +1 per own overflow Inkling here (max +5). |
+| Voyages | The Long Way Round | 3 | +6 if you have Inklings on 3 books; otherwise +4. |
+| Epics | A Hero Provoked | 1 | +3 if your protagonist is here; otherwise +2. |
+| Epics | Hold Fast | 2 | +5 if you occupy 2 consecutive page spaces here; otherwise +3. |
+| Epics | Against All Odds | 3 | +7 if any one opponent has more Inklings here than you; otherwise +4. |
+| Gothic Horror | A Shadow at the Door | 1 | +3 if an opponent has a character here; otherwise +2. |
+| Gothic Horror | It Was Alive | 2 | +5 if you have both page-space and overflow Inklings here; otherwise +3. |
+| Gothic Horror | The Final Transformation | 3 | +6; +8 instead if this cost leaves you at 0 ink. |
 
 These deliberately simple first-pass Twists reward the sets' positions without introducing erasure, additional nested conflicts, or elaborate reaction windows. Direct combat interaction still comes from competition for spaces, the castle, and the bumping bookmark. Test whether numerical Twists provide sufficient drama before adding more complicated effects.
 
@@ -233,7 +233,7 @@ Implement the nine character abilities, thirteen bookmarks, book bonus tables, n
 
 ### E. Interface
 
-Replace player boards with compact ink tracks and character/upgrade/book tableaux. Label the protagonist distinctly. Show costs, movement/placement allowances, hand minimum, and chapter-ending eligibility. Show bookmark silhouettes at each book's upper right and a clear first-conflict marker. Match special-space symbols to their book effect; use crossed swords for conflict effects and footsteps for movement-end effects. Show free endpoint spaces without reward icons. Support private handoff, accessible text labels, desktop/tablet controls, clear completion choices, and a readable action log.
+Replace player boards with compact ink tracks and character/upgrade/book tableaux. Label the protagonist distinctly. Show costs, movement/placement allowances, hand minimum, and chapter-ending eligibility. Show bookmark silhouettes at each book's upper right and a clear bookmark-claimed status. Match special-space symbols to their book effect; use crossed swords for conflict effects and footsteps for movement-end effects. Show free endpoint spaces without reward icons. Support private handoff, accessible text labels, desktop/tablet controls, clear completion choices, and a readable action log.
 
 ### F. Verification and documentation
 

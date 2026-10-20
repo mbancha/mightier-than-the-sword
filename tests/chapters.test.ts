@@ -36,6 +36,52 @@ function settle(s: State) {
   return s;
 }
 describe('Chapter edition', () => {
+  it.each([4, 8, 9, 13, 14])('conflict Subplot %s completes for a losing participant', (design) => {
+    const s = ready();
+    const b = s.books.find(
+      (b) => Math.floor(b.id / 3) === (design === 4 ? 0 : design < 10 ? 1 : 2),
+    )!;
+    b.slots.fill(null);
+    b.slots[0] = 1;
+    b.slots[1] = 1;
+    b.overflow[0] = 2;
+    b.contested = true;
+    b.mark = null;
+    s.players[0].ink = 2;
+    s.players[0].figures = [{ id: 1, primary: true, page: b.id * 2 }];
+    s.players[1].figures = [{ id: 3, primary: true, page: b.id * 2 }];
+    s.players[0].hand = [{ id: 500, kind: 'subplot', design }];
+    s.players[1].hand = [];
+    s.battle = {
+      book: b.id,
+      participants: [0, 1],
+      start: structuredClone(s),
+      bonus: [0, 100],
+      played: [],
+      ignored: [],
+    };
+    s.jobs = [{ type: 'result', p: 0 }];
+    const actions = legalActions(s);
+    expect(s.log.at(-1)).toContain('P1 wins');
+    expect(actions.some((a) => a.key === 'subplot:500:true')).toBe(true);
+    expect(actions.some((a) => a.key === 'subplot:500:false')).toBe(true);
+  });
+  it('extra purchases cost ink and do not add free movement or allow premature overflow', () => {
+    const s = ready();
+    const p = s.players[0];
+    p.ongoing = [0, 7];
+    s.extraMove = 1;
+    s.extraPlace = 1;
+    s.jobs = [{ type: 'route', p: 0, char: p.figures[0].id }];
+    expect(legalActions(s).some((a) => a.key.startsWith('step:'))).toBe(true);
+    s.jobs = [{ type: 'afterPlace', p: 0, char: p.figures[0].id }];
+    expect(legalActions(s).some((a) => a.key === 'extra')).toBe(true);
+    p.ink = 0;
+    expect(legalActions(s).some((a) => a.key === 'extra')).toBe(false);
+    p.ongoing = [2, 13];
+    expect(capacity(p)).toBe(13);
+    expect(p.ink).toBe(0);
+  });
   it('moving an existing Inkling does not grant destination rewards or placement Subplots', () => {
     let s = ready();
     const from = s.books[0],
@@ -194,7 +240,7 @@ describe('Chapter edition', () => {
     const p = ready().players[0];
     p.marks = [1, 2];
     p.ongoing = [1, 8, 12, 2];
-    expect(capacity(p)).toBe(14);
+    expect(capacity(p)).toBe(15);
     expect(p.ink).toBe(7);
     expect(minimum(p)).toBe(8);
   });
@@ -217,6 +263,7 @@ describe('Chapter edition', () => {
     let s = ready();
     const b = s.books[0];
     b.contested = true;
+    b.mark = null;
     b.slots = b.slots.map(() => 0);
     s.players[0].supply -= b.slots.length;
     s.players[0].books = [8, 7];

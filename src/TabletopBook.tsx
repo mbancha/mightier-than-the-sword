@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { RulesText } from './GameCard';
 import source from './data/content.json';
 import { content, bookmarkNames, bookmarkText, type playerView } from './game/chapters';
 type View = ReturnType<typeof playerView>;
@@ -191,22 +192,15 @@ export default function TabletopBook({
               />
               <span>{bookmarkNames[b.mark]}</span>
             </summary>
-            <p>{bookmarkText[b.mark]}</p>
+            <p>
+              <RulesText text={bookmarkText[b.mark]} />
+            </p>
           </details>
         )}
       </div>
       <div className="bookStatus">
-        {b.contested ? (
-          <span
-            className="conflictDisc"
-            title="First conflict completed. Next winner takes this book."
-            aria-label="Conflict token: next winner claims the book"
-          >
-            <Glyph kind="conflict" />
-          </span>
-        ) : (
-          <span className="uncontested" title="First conflict awards the bookmark" />
-        )}
+        {b.mark === null && <span className="claimReady" aria-label="Bookmark claimed: next conflict winner takes this book">Bookmark claimed · Win to collect</span>}
+
       </div>
       <div className="openBook">
         {[0, 1].map((side) => {
@@ -249,11 +243,13 @@ export default function TabletopBook({
                 <button className="pageDestination" onClick={() => act(a.key)} aria-label={a.label}>
                   <Glyph kind="move" />
                   <span>
-                    {view.phase === 'setup'
-                      ? 'Start here'
-                      : a.key.startsWith('step:')
-                        ? '1 ink · Move'
-                        : 'Move here'}
+                    {view.phase === 'setup' ? (
+                      'Start here'
+                    ) : a.key.startsWith('step:') ? (
+                      <RulesText text="1 ink: move" />
+                    ) : (
+                      'Move here'
+                    )}
                   </span>
                 </button>
               )}
@@ -302,14 +298,18 @@ export default function TabletopBook({
       )}
       {figureInfo && (
         <div className="bookInspector">
-          <p>{figureInfo}</p>
+          <p>
+            <RulesText text={figureInfo} />
+          </p>
           <button onClick={() => setFigureInfo(null)}>Close character details</button>
         </div>
       )}
       {inspect && (
         <div className="bookInspector">
           <strong>{content.bookEffects[b.id].category}</strong>
-          <p>{content.bookEffects[b.id].effect}</p>
+          <p>
+            <RulesText text={content.bookEffects[b.id].effect} />
+          </p>
           <small>
             Page spaces resolve from left to right. Hover or focus a space or character for details.
           </small>
