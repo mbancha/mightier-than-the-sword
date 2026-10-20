@@ -183,3 +183,31 @@ Provisional recovery rulings: a player without supply or owned book Inklings end
 ## One memory per book (2026-10-07)
 
 Designer correction: each player may have at most one of their own memories per book. Different players may each leave one there. A Lasting Impression now requires placing an Inkling on a page containing one owned memory; placement on the memory itself is optional. All ordinary and bonus upgrades enforce the same per-player book limit.
+
+## Local card and Subplot revision (2026-10-18)
+
+All conflict Subplots now require participation, never victory. Conditions use the conflict-start arrangement except The Last Candle, which checks ink at resolution. One completion per event and holding the card before conflict remain unchanged. Ongoing rewards use only +1 paid movement purchase, +1 paid placement purchase, +1 minimum hand, +1 protagonist power, or +3 ink capacity. Capacity does not refill ink when acquired. Bonuses from different Subplot designs stack; duplicate designs do not.
+
+Provisional balance: two-piece arrangements and common conflict conditions give 2 cards or 2 ink immediately. Three-book, mixed-three-piece, and enemy-between arrangements give 3 cards; four-piece overflow setup gives 4 cards. Adjacent same-genre books and the cellar's four-piece opposing arrangement give 3 ink. These are playtest values, not a balance guarantee.
+
+Cards reserve an art area above their rules; costs share compact ink notation. Opponents expose card backs/counts only, and each player has an individual meeple reserve. Library reference text is collapsed. Local testing only; no push or deployment authorized for this revision. Existing saved ongoing design IDs adopt the revised effects; start a new story to test the new balance.
+
+## Optional effects without dismissal prompts (2026-10-18)
+
+The human flow adapter exposes optional Aeneas, transfer, exchange, express,
+page-bonus, Subplot and Laboratory actions alongside subsequent legal choices.
+Selecting a later action atomically declines unused preceding offers. Costs and
+targets remain explicit; conflict responses and mandatory decisions keep their
+normal timing. Engine order is preserved. 149 tests and build pass; local browser
+smoke passes. Changes remain local pending designer testing.
+
+## Book placement and bookmark status (2026-10-18)
+
+New books are placed by clicking highlighted book-shaped legal locations on the
+map. The standard action list omits coordinate placement buttons; advanced actions
+remain available. No Conflict Token component exists in Chapters: an absent
+bookmark indicates that the next conflict winner collects the book. A Deed
+Remembered now checks the conflict-start bookmark absence. Legacy print catalogs
+are historical and unchanged. 149 tests and build pass. The extended browser
+placement check was added but could not run because automatic approval review
+failed twice due to model capacity; no browser verification claimed for this edit.

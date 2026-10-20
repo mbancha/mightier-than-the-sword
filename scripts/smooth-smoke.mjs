@@ -75,6 +75,44 @@ try {
   await page.screenshot({ path: 'artifacts/smooth-tablet.png', fullPage: true });
   await page.getByRole('button', { name: 'Save locally', exact: true }).click();
   await page.getByRole('button', { name: 'New story', exact: true }).click();
+  // Local save fixture: render both card types without exposing an opponent's hand.
+  await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem('mtts-chapters-1'));
+    const p = saved.game.players[0];
+    for (const kind of ['twist', 'subplot']) {
+      const index = saved.game.deck.findIndex(c => c.kind === kind);
+      p.hand.push(...saved.game.deck.splice(index, 1));
+    }
+    localStorage.setItem('mtts-chapters-1', JSON.stringify(saved));
+  });
+  await page.getByRole('button', {name:'Load local story', exact:true}).click();
+  assert.ok(await page.locator('.hand .card-twist').count());
+  assert.ok(await page.locator('.hand .card-subplot').count());
+  assert.equal(await page.locator('.playerReserve').count(), 2);
+  assert.equal(await page.locator('.handCount').count(), 2);
+  assert.equal(await page.locator('.libraryReference').getAttribute('open'), null);
+  for (const card of await page.locator('.hand .gameCard').all()) {
+    const art = await card.locator('.cardArt').boundingBox();
+    const text = await card.locator('.cardBody').boundingBox();
+    assert.ok(text.y >= art.y + art.height - 1);
+  }
+  await page.screenshot({path:'artifacts/cards-tablet.png', fullPage:true});
+  await page.setViewportSize({width:1500,height:1100});
+  await page.screenshot({path:'artifacts/cards-desktop.png', fullPage:true});
+  await page.getByRole('button', {name:'New story', exact:true}).click();
+  await page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem('mtts-chapters-1'));
+    saved.game.jobs = [{type:'publish',p:0},{type:'finish',p:0}];
+    saved.game.active = 0;
+    localStorage.setItem('mtts-chapters-1',JSON.stringify(saved));
+  });
+  await page.getByRole('button',{name:'Load local story',exact:true}).click();
+  assert.ok(await page.locator('.publishSite').count());
+  await page.screenshot({path:'artifacts/book-placement.png',fullPage:true});
+  const beforeBooks = await page.locator('.visualBook').count();
+  await page.locator('.publishSite').first().click();
+  assert.equal(await page.locator('.visualBook').count(),beforeBooks+1);
+  await page.getByRole('button',{name:'New story',exact:true}).click();
   await page.getByLabel('Player 2 controller').selectOption('human');
   await page.getByRole('button', { name: 'Begin story', exact: true }).click();
   await page.getByRole('button', { name: /Pass to Player 1/ }).click();

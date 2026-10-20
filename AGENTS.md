@@ -1,5 +1,13 @@
 # Mightier than the Sword
 
+## Required session startup
+
+Before planning or editing, read [docs/HANDOFF.md](docs/HANDOFF.md). Verify its
+branch, working-tree and verification claims against current files; handoff notes
+may become stale. Preserve intentional local changes. At the end of substantial
+work, update that handoff with current scope, decisions, checks and remaining work.
+Do not publish merely because a handoff mentions an earlier publication.
+
 This repository belongs to both designers. Work must be understandable to a new
 human or assistant without chat history. Start with README.md, docs/ARCHITECTURE.md,
 and docs/DECISIONS.md. Read only relevant files; do not scan old conversations or

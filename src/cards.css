@@ -1,0 +1,208 @@
+.inkNotation {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+.inkNotation .glyph,
+.cardCost .glyph {
+  width: 15px;
+  height: 18px;
+}
+.gameCard {
+  width: 220px;
+  min-width: 220px;
+  border: 2px solid #af9162;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f5ead2;
+  color: #202a32;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 10px #0004;
+  text-align: left;
+}
+.cardArt {
+  height: 78px;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, #a8babb, #d6dfd0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid #b7a68a;
+}
+.genre1 .cardArt {
+  background: linear-gradient(145deg, #c7a46c, #e5d3a8);
+}
+.genre2 .cardArt {
+  background: linear-gradient(145deg, #a69db7, #d5c9d7);
+}
+.cardArt > .glyph {
+  width: 40px;
+  height: 40px;
+  opacity: 0.4;
+}
+.cardArt small {
+  position: absolute;
+  bottom: 4px;
+  left: 10px;
+  font: 11px/1.4 system-ui;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.cardBody {
+  padding: 12px;
+  flex: 1;
+}
+.cardType {
+  text-transform: uppercase;
+  font: 10px system-ui;
+  letter-spacing: 1.5px;
+  color: #60513a;
+}
+.chapterApp .gameCard h3 {
+  font-size: 18px;
+  line-height: 1.15;
+  margin: 4px 0 10px;
+}
+.chapterApp .gameCard p {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 8px 0;
+}
+.cardPower {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 24px;
+}
+.subplotRewards {
+  border-top: 1px solid #cbbc9f;
+  margin-top: 12px;
+  padding-top: 5px;
+}
+.subplotRewards b {
+  display: block;
+  text-transform: uppercase;
+  font: 10px system-ui;
+  letter-spacing: 1px;
+  color: #665237;
+  margin-bottom: 3px;
+}
+.rewardOr {
+  display: block;
+  font-size: 12px;
+  color: #756a59;
+  text-align: center;
+}
+.cardCost {
+  padding: 8px 12px;
+  border-top: 1px solid #cbbc9f;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: bold;
+  background: #eaddc2;
+}
+.chapterApp .gameCard .twistEffect {
+  font-size: 17px;
+  line-height: 1.5;
+}
+.twistEffect strong {
+  font-size: 29px;
+}
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 4px;
+}
+.chapterApp .cardActions button {
+  flex: 1;
+  font-size: 13px;
+  padding: 6px;
+  margin: 2px;
+}
+.characterCards {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 5px 0 10px;
+}
+.characterCards .gameCard {
+  width: 210px;
+  min-width: 210px;
+}
+.characterCards .cardArt {
+  height: 55px;
+}
+.playerReserve {
+  margin-top: 8px;
+}
+.playerReserve > span {
+  font-size: 12px;
+}
+.playerReserve > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-height: 25px;
+}
+.playerReserve .meeple.small {
+  width: 20px;
+  height: 25px;
+}
+.handCount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+}
+.cardBacks {
+  display: flex;
+  padding-right: 10px;
+}
+.cardBack {
+  width: 22px;
+  height: 30px;
+  margin-right: -7px;
+  border: 1px solid #d5bd8a;
+  border-radius: 3px;
+  background: #334f60;
+  display: grid;
+  place-items: center;
+}
+.cardBack .glyph {
+  width: 13px;
+  height: 13px;
+}
+.chapterApp .boardSection {
+  padding: 10px;
+}
+.libraryReference {
+  font-size: 13px;
+}
+.libraryReference > summary {
+  min-height: 24px;
+  color: #c6b695;
+}
+.libraryReference p {
+  margin: 5px;
+}
+.chapterApp .hand {
+  gap: 14px;
+  align-items: stretch;
+  padding: 10px 0;
+}
+@media (max-width: 600px) {
+  .chapterApp .hand {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+.chapterApp .choices { max-height:none; overflow:visible; }
+.chapterApp .seat > small { display:block; margin:4px 0; }
+.chapterApp .publishSite { min-height:260px; margin:0; border:3px dashed #e4c078; background:#284740; color:#f7e4bb; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+.publishSite .glyph { width:50px; height:50px; }
+.claimReady { font-size:12px; color:#62451e; }

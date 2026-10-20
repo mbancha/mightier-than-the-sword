@@ -46,7 +46,7 @@ export function flowChoices(input: State): FlowChoice[] {
       const next = settleFlow(applyAction(s, key));
       if (actingPlayer(next) !== j.p || next.winner !== null) continue;
       const children = flowChoices(next);
-      // Arrival abilities can interrupt movement. Show their actual choice, with arrival bundled.
+      // Bundle arrival bookkeeping with the next real action.
       for (const child of children) {
         const p = next.jobs[0];
         const figure =
@@ -63,7 +63,33 @@ export function flowChoices(input: State): FlowChoice[] {
         });
       }
     }
-  return direct;
+  // Optional effects stay available beside the continuation. Choosing a later
+  // action declines earlier offers atomically, without a separate dismissal.
+  const optional = ['aeneas', 'transfer', 'exchange', 'express', 'bonus', 'subplot', 'laboratory'];
+  if (optional.includes(j.type) && a.some((x) => x.key === 'skip')) {
+    const next = applyAction(s, 'skip');
+    if (next.winner === null && actingPlayer(next) === j.p) {
+      const children = flowChoices(next);
+      if (children.length) {
+        const index = direct.findIndex((x) => x.key === 'skip');
+        if (index >= 0) direct.splice(index, 1);
+        for (const child of children) {
+          const job = next.jobs[0];
+          const figure =
+            job?.type === 'place'
+              ? next.players[job.p].figures.find((f) => f.id === job.char)
+              : undefined;
+          direct.push({
+            ...child,
+            path: ['skip', ...child.path],
+            ...(child.page !== undefined ? {} : figure ? { page: figure.page } : {}),
+          });
+        }
+      }
+    }
+  }
+  // Earlier effects own identical keys; repeated transfers still resolve in order.
+  return direct.filter((choice, index) => direct.findIndex((x) => x.key === choice.key) === index);
 }
 function administrativePath(input: State) {
   let s = structuredClone(input);

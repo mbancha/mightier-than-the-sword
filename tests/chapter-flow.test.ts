@@ -1,9 +1,32 @@
 import { it, expect } from 'vitest';
 import { newGame, applyAction, legalActions, actingPlayer } from '../src/game/chapters';
 import { settleFlow, flowChoices, applyFlow } from '../src/game/chapterFlow';
-import {playerView} from '../src/game/chapters';
-import {chooseChapterAction} from '../src/game/chapterBot';
-it('finishes a mixed human-flow and automatic-bot game without administrative clicks',()=>{let s=settleFlow(newGame(['Human','Bot'],17,[false,true]));for(let i=0;i<4000&&s.winner===null;i++){const actor=actingPlayer(s);if(s.players[actor].bot){const key=chooseChapterAction(playerView(s,actor));expect(key).toBeTruthy();s=settleFlow(applyAction(s,key!))}else{const a=flowChoices(s);expect(a.length,`phase ${s.jobs[0]?.type}`).toBeGreaterThan(0);const preferred=a.find(x=>x.key==='accept-layout')??a.find(x=>x.key==='extra')??a.find(x=>x.key.startsWith('place:'))??a.find(x=>x.key.startsWith('move:'))??a.find(x=>x.key.startsWith('card:'))??a.find(x=>x.key==='end')??a[0];s=applyFlow(s,preferred.key)}}expect(s.winner).not.toBe(null)});
+import { playerView } from '../src/game/chapters';
+import { chooseChapterAction } from '../src/game/chapterBot';
+it('finishes a mixed human-flow and automatic-bot game without administrative clicks', () => {
+  let s = settleFlow(newGame(['Human', 'Bot'], 17, [false, true]));
+  for (let i = 0; i < 4000 && s.winner === null; i++) {
+    const actor = actingPlayer(s);
+    if (s.players[actor].bot) {
+      const key = chooseChapterAction(playerView(s, actor));
+      expect(key).toBeTruthy();
+      s = settleFlow(applyAction(s, key!));
+    } else {
+      const a = flowChoices(s);
+      expect(a.length, `phase ${s.jobs[0]?.type}`).toBeGreaterThan(0);
+      const preferred =
+        a.find((x) => x.key === 'accept-layout') ??
+        a.find((x) => x.key === 'extra') ??
+        a.find((x) => x.key.startsWith('place:')) ??
+        a.find((x) => x.key.startsWith('move:')) ??
+        a.find((x) => x.key.startsWith('card:')) ??
+        a.find((x) => x.key === 'end') ??
+        a[0];
+      s = applyFlow(s, preferred.key);
+    }
+  }
+  expect(s.winner).not.toBe(null);
+});
 it('choosing a placement can select its character after both have moved', () => {
   let s = ready();
   const p = s.players[0];
@@ -74,3 +97,40 @@ it('leaves all bot decisions for the automatic bot runner', () => {
   const next = settleFlow(s);
   expect(next.jobs[0].type).toBe('start');
 });
+
+it('offers Aeneas alongside placement without a continue prompt or an automatic spend', () => {
+  let s = ready();
+  const page = s.players[0].figures[0].page;
+  s.players[0].figures[0].id = 5;
+  const other = s.books.find((b) => b.id !== Math.floor(page / 2))!;
+  other.slots[0] = 0;
+  s.players[0].supply--;
+  s.jobs = [
+    { type: 'aeneas', p: 0, to: Math.floor(page / 2) },
+    { type: 'place', p: 0, char: 5, normal: true, first: true },
+  ];
+  const a = flowChoices(s);
+  expect(a.some((x) => x.key === 'pay')).toBe(true);
+  expect(a.some((x) => x.key === 'skip')).toBe(false);
+  const place = a.find((x) => x.key.startsWith('place:'))!;
+  expect(place).toBeTruthy();
+  const ink = s.players[0].ink;
+  s = applyFlow(s, place.key);
+  expect(s.players[0].ink).toBe(ink);
+  expect(s.books.find((b) => b.id === other.id)!.slots[0]).toBe(0);
+});
+it.each(['transfer', 'exchange', 'express', 'bonus', 'subplot', 'laboratory'])(
+  'optional %s exposes the next action without dismissal',
+  (type) => {
+    const s = ready();
+    s.players[0].figures[0].id = 1;
+    const b = s.books[0];
+    s.jobs = [
+      { type, p: 0, to: b.id, book: b.id, k: 1, mode: 'overflow', n: 1, eligible: [], char: 1 },
+      { type: 'afterPlace', p: 0, char: 1, first: false },
+    ];
+    const choices = flowChoices(s);
+    expect(choices.some((x) => x.key === 'end')).toBe(true);
+    expect(choices.some((x) => x.key === 'skip')).toBe(false);
+  },
+);
