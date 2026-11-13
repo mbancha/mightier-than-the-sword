@@ -1,13 +1,12 @@
-# Mightier than the Sword — Chapters edition
+# Mightier than the Sword · Chapters
 
-Digital redesign 1.0.0, ready for implementation verification and designer playtesting. Run npm ci, npm run dev.
+Run `npm ci` and `npm run dev`. The table fits the current book layout. Hover or tap the edge controls for your hand, tableau, opponent details, and story controls. Hot-seat players reveal their own hand at handoff.
 
-The current entrypoint is src/ChapterApp.tsx; rules are in src/game/chapters.ts, public-view bot choices in src/game/chapterBot.ts, and content in src/data/content.json under redesign. Older engine/UI modules and tests are retained as legacy regression references; they do not drive the current app. Stable legacy component IDs remain intact.
+The live [spreadsheet](https://docs.google.com/spreadsheets/d/1BTtI27_6SqO6YJhufK1WaawX9lgafQbZwg-X9Dz1pJY/edit) supplies component text and quantities. `src/data/chapters-content.json` is its checked-in snapshot. The Chapters rules engine is in `src/game/chapters.ts`.
 
-See docs/CHAPTER_SPEC.md for the complete confirmed rules and provisional playtest defaults; docs/RULES.md is generated using npm run docs.
+- Run `npm run docs` to regenerate the rules reference and the five Component Studio 3 CSV files.
+- Import each CSV into its corresponding dataset. Keep the `name` and `quantity` headers and preview the full replacement before importing.
+- Run `python print/build_chapters.py` with ReportLab and pypdf installed to produce the letter-size playtest kit.
+- Run `npm test` and `npm run build` to verify changes.
 
-Players race for three books at two players or two books at three/four players. Spend scarce ink, finish personal chapters, gain bookmarks at first conflicts and books at second conflicts. The deck has 45 Twists and 30 Subplots.
-
-Use npm test, npm run build, npm run smoke. The smoke journey generates desktop/tablet screenshots in artifacts. Saves are private and edition-specific. Undo cannot undo knowledge. The bot accepts only an allowlisted player view.
-
-Print files remain the prior edition pending a separate print-sync request. No deployment is implied by this local implementation.
+Current rules and provisional rulings are in [docs/RULES.md](docs/RULES.md).

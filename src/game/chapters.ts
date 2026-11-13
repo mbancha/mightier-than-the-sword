@@ -1,33 +1,22 @@
 import source from '../data/content.json';
 import { makeRng, shuffled, type RngState } from '../kernel/rng';
 import { adjacentBooks, publicationSites, initialHexes } from './topology';
-export const content = source.redesign;
-export const bookmarkNames = [
-  'Larger Than Life',
-  'Well Read',
-  'Deep Inkwell',
-  'Effortless Twists',
-  'Hidden Strength',
-  'An Unlikely Companion',
-  'Strength in the Margins',
-  'Command the Page',
-  'Double Take',
-  'A Wider World',
-  'Make Room',
-];
-export const bookmarkText = [
-  'Protagonist +5 power',
-  'Base minimum hand 5',
-  'Ink capacity +5',
-  'Twists cost 1 ink',
-  'Subplots as Twists give +2',
-  'Draw a secondary character',
-  'Overflow Inklings +3 power each',
-  'Page Inklings +2 power each',
-  'Up to two cards per Twist opportunity',
-  'Protagonist moves up to four spaces',
-  'Bump enemy page Inklings to overflow',
-];
+import catalog from '../data/chapters-content.json';
+export const content = {
+  ...catalog,
+  bookEffects: catalog.books,
+  baseRules: [
+    'Place a fresh Inkling to resolve its printed space. Moving an existing Inkling gives no reward.',
+    '⚔ indicates a combat effect. [special ◇] resolves the book’s special effect.',
+    'End a chapter at turn start if you have no ink. You may also end it at 1–3 ink.',
+    'The first conflict awards the bookmark. The next conflict awards the book.',
+  ],
+};
+export const edition = 'chapters-sheet-1';
+export const bookmarkNames = catalog.bookmarks.map((mark) => mark.name);
+export const bookmarkText = catalog.bookmarks.map((mark) => mark.effect);
+export const bookSlots = (id: number) => content.books[id].spaces.length;
+export const leftSlots = (id: number) => Math.ceil(bookSlots(id) / 2);
 export interface Card {
   id: number;
   kind: 'twist' | 'subplot';
@@ -49,6 +38,7 @@ export interface Player {
   ongoing: number[];
   books: number[];
   chapter: number;
+  hyde?: boolean;
 }
 export interface Book {
   id: number;
@@ -86,7 +76,7 @@ export interface State {
     start: State | null;
     bonus: number[];
     played: Card[];
-    ignored: number[];
+    haunting: number[];
   };
 }
 export interface Action {
@@ -97,7 +87,7 @@ export interface Action {
 const genre = (id: number) => source.books[id].genre;
 const book = (s: State, id: number) => s.books.find((b) => b.id === id)!;
 const bid = (page: number) => Math.floor(page / 2);
-const pageSide = (b: Book, k: number) => (k < source.books[b.id].page_slots[0] ? 0 : 1);
+const pageSide = (b: Book, k: number) => (k < leftSlots(b.id) ? 0 : 1);
 export const pageOf = (b: Book, k: number) => b.id * 2 + pageSide(b, k);
 const has = (p: Player, n: number) => p.marks.includes(n);
 const owns = (p: Player, n: number) => p.ongoing.includes(n);
@@ -105,16 +95,20 @@ const count = (b: Book, p: number) => b.slots.filter((x) => x === p).length + b.
 const pages = (b: Book, p: number) => b.slots.flatMap((v, k) => (v === p ? [k] : []));
 const allCount = (s: State, p: number) => s.books.filter((b) => count(b, p) > 0).length;
 const consecutive = (b: Book, p: number) => b.slots.some((v, k) => v === p && b.slots[k + 1] === p);
-export const capacity = (p: Player) =>
-  7 + (has(p, 2) ? 5 : 0) + (owns(p, 2) ? 3 : 0) + (owns(p, 13) ? 3 : 0);
-export const minimum = (p: Player) =>
-  (has(p, 1) ? 5 : 1) + [1, 8, 12].filter((n) => owns(p, n)).length;
-const gain = (p: Player, n: number) => (p.ink = Math.min(capacity(p), p.ink + n));
+export const capacity = (_p: Pick<Player, 'marks'>) => 7;
+export const minimum = (p: Player) => 1 + Number(owns(p, 0));
+export const cardCost = (p: Pick<Player, 'marks'>, c: Card) =>
+  c.kind === 'subplot' ? 1 : Math.max(0, content.twists[c.design].cost - Number(p.marks.includes(3)));
+export const subplotPower = (p: Pick<Player, 'marks'>, design: number) =>
+  content.subplots[design].power + (p.marks.includes(4) ? 2 : 0);
+const gain = (p: Player, n: number) =>
+  (p.ink = Math.min(capacity(p), p.ink + n + (n > 0 && has(p, 2) ? 2 : 0)));
 const note = (s: State, t: string) => {
   s.log.push(t);
   if (s.log.length > 100) s.log.shift();
 };
 function draw(s: State, p: number, n: number) {
+  if (n > 0 && has(s.players[p], 1)) n++;
   while (n-- > 0) {
     if (!s.deck.length) {
       s.deck = shuffled(s.rng, s.discard);
@@ -153,7 +147,7 @@ function newBook(s: State, id: number, q: number, r: number) {
     id,
     q,
     r,
-    slots: Array(source.books[id].slots).fill(null),
+    slots: Array(bookSlots(id)).fill(null),
     overflow: s.players.map(() => 0),
     contested: false,
     mark: s.marks.pop() ?? null,
@@ -177,14 +171,15 @@ export function newGame(names: string[], seed = 1, bots: boolean[] = []): State 
   const rng = makeRng(seed);
   const ids = shuffled(rng, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
   const initial = [0, 1, 2].map((g) => shuffled(rng, [g * 3, g * 3 + 1, g * 3 + 2])[0]);
+  if (names.length >= 4) initial.push(shuffled(rng, ids.filter((id) => !initial.includes(id)))[0]);
   const cards: Card[] = [];
   let serial = 0;
-  for (let d = 0; d < 9; d++)
-    for (let k = 0; k < 5; k++) cards.push({ id: serial++, kind: 'twist', design: d });
-  for (let d = 0; d < 15; d++)
-    for (let k = 0; k < 2; k++) cards.push({ id: serial++, kind: 'subplot', design: d });
+  for (const [kind, designs] of [['twist', content.twists], ['subplot', content.subplots]] as const)
+    designs.forEach(({ quantity }, design) => {
+      for (let k = 0; k < quantity; k++) cards.push({ id: serial++, kind, design });
+    });
   const s: State = {
-    edition: 'chapters-1',
+    edition,
     rng,
     players: names.map((name, i) => ({
       name,
@@ -197,13 +192,14 @@ export function newGame(names: string[], seed = 1, bots: boolean[] = []): State 
       ongoing: [],
       books: [],
       chapter: 1,
+      hyde: undefined,
     })),
     books: [],
     stack: shuffled(
       rng,
       [0, 1, 2, 3, 4, 5, 6, 7, 8].filter((i) => !initial.includes(i)),
     ),
-    marks: shuffled(rng, [0, 1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 10]),
+    marks: shuffled(rng, content.bookmarks.flatMap(({ quantity }, id) => Array<number>(quantity).fill(id))),
     characters: ids,
     deck: shuffled(rng, cards),
     discard: [],
@@ -219,140 +215,76 @@ export function newGame(names: string[], seed = 1, bots: boolean[] = []): State 
     used: [],
     battle: null,
   };
-  initial.forEach((id, i) => newBook(s, id, initialHexes[i].q, initialHexes[i].r));
+  const sites = [...initialHexes, { q: 1, r: 1 }];
+  initial.forEach((id, i) => newBook(s, id, sites[i].q, sites[i].r));
+  for (const p of s.players) if (p.figures[0].id === 8) p.hyde = shuffled(s.rng, [false, true])[0];
   s.players.forEach((_, p) => draw(s, p, 1));
   s.jobs.push({ type: 'start', p: 0 });
   return s;
 }
 function moveEffects(s: State, p: number, f: Figure, old: number) {
   const b = book(s, bid(f.page));
-  const js: Job[] = [];
-  if (bid(old) !== b.id && !s.used.includes(`arrival:${b.id}`)) {
-    s.used.push(`arrival:${b.id}`);
-    if (b.id === 1 && s.players[p].figures.length > 1) js.push({ type: 'express', p, char: f.id });
-    if (b.id === 3 && s.players[p].hand.length) js.push({ type: 'exchange', p });
-    if (b.id === 5) js.push({ type: 'transfer', p, to: b.id, mode: 'overflow', n: 1 });
-  }
-  if (f.id === 0 && !s.used.includes('nemo')) {
-    s.used.push('nemo');
-    js.push({ type: 'transfer', p, to: b.id, mode: 'overflow', n: 2 });
-  }
-  if (f.id === 5 && s.players[p].ink && !s.used.includes('aeneas')) {
-    s.used.push('aeneas');
-    js.push({ type: 'aeneas', p, to: b.id });
-  }
-  push(s, ...js);
+  const from = book(s, bid(old));
+  const jobs: Job[] = [];
+  if (f.id === 0 && from.id !== b.id && from.overflow[p])
+    jobs.push({ type: 'transfer', p, from: from.id, to: b.id, n: from.overflow[p] });
+  const eligible = subplotCandidates(s, p, 'move', b.id, null, f.page);
+  if (eligible.length) jobs.push({ type: 'subplot', p, eligible });
+  push(s, ...jobs);
 }
-function placed(s: State, p: number, b: Book, k: number | null) {
+function placeOverflow(s: State, p: number, b: Book, n: number) {
+  const count = Math.min(n, s.players[p].supply);
+  b.overflow[p] += count;
+  s.players[p].supply -= count;
+}
+function placed(s: State, p: number, b: Book, k: number | null, repeats = 1) {
   if (k === null) b.overflow[p]++;
   else b.slots[k] = p;
   s.players[p].supply--;
   note(s, `${s.players[p].name} places an Inkling in ${source.books[b.id].title}.`);
   const eligible = subplotCandidates(s, p, 'place', b.id, k);
-  push(
-    s,
-    ...(eligible.length ? [{ type: 'subplot', p, eligible }] : []),
-    ...(k !== null ? [{ type: 'bonus', p, book: b.id, k }] : []),
-    ...(k !== null && b.id === 0 && k === 1
-      ? [{ type: 'transfer', p, to: b.id, mode: 'overflow', n: 1 }]
-      : []),
-    ...(k !== null && b.id === 8 && k === 1 ? [{ type: 'laboratory', p, book: b.id }] : []),
+  push(s,
+    ...(eligible.length ? [{ type: 'subplot', p, eligible, book: b.id }] : []),
+    ...(k === null ? [] : Array.from({ length: repeats }, () => ({ type: 'reward', p, book: b.id, k }))),
+    ...(k === b.slots.length - 1 && owns(s.players[p], 2) ? [{ type: 'lastInk', p }] : []),
     { type: 'check', p, book: b.id },
   );
 }
-function subplotCandidates(
-  s: State,
-  p: number,
-  event: string,
-  id: number,
-  k: number | null = null,
-) {
+function subplotCandidates(s: State, p: number, event: string, id: number, k: number | null, page?: number) {
   const b = book(s, id);
-  if (!b) return [];
   const pl = s.players[p];
-  const g = genre(id);
-  const pg = pages(b, p);
   const start = s.battle?.start;
-  const sb = start ? book(start, id) : b;
-  const participating = !!s.battle?.participants.includes(p);
-  const primary = (start?.players[p] ?? pl).figures.find((f) => f.primary)!;
-  const enemyFigure = (start?.players ?? s.players).some(
-    (x, i) => i !== p && x.figures.some((f) => bid(f.page) === id),
-  );
-  const yes = [
-    event === 'place' && g === 'Voyages' && allCount(s, p) >= 3,
-    event === 'place' &&
-      g === 'Voyages' &&
-      pg.some((x) => pageSide(b, x) === 0) &&
-      pg.some((x) => pageSide(b, x) === 1),
-    event === 'place' && g === 'Voyages' && k === null && b.overflow[p] >= 3 && pg.length > 0,
-    event === 'place' &&
-      g === 'Voyages' &&
-      s.books.some(
-        (x) => x.id !== id && genre(x.id) === 'Voyages' && count(x, p) > 0 && adjacentBooks(b, x),
-      ),
-    event === 'conflict' && g === 'Voyages' && participating && sb.overflow[p] >= 2,
-    event === 'place' && g === 'Epics' && k !== null && consecutive(b, p),
-    event === 'place' &&
-      g === 'Epics' &&
-      (k === 0 || k === b.slots.length - 1) &&
-      b.slots[0] === p &&
-      b.slots.at(-1) === p,
-    event === 'place' && g === 'Epics' && count(b, p) >= 3 && pg.length > 0 && b.overflow[p] > 0,
-    event === 'conflict' &&
-      g === 'Epics' &&
-      participating &&
-      bid(primary.page) === id &&
-      enemyFigure,
-    event === 'conflict' && g === 'Epics' && participating && sb.mark === null,
-    event === 'place' &&
-      g === 'Gothic Horror' &&
-      k !== null &&
-      b.slots.some(
-        (v, i) =>
-          v === p &&
-          [b.slots[i - 1], b.slots[i + 1]].some((x) => x !== undefined && x !== null && x !== p),
-      ),
-    event === 'place' && g === 'Gothic Horror' && pg.length > 0 && b.overflow[p] >= 2,
-    event === 'place' &&
-      g === 'Gothic Horror' &&
-      k !== null &&
-      pg.some((a) =>
-        pg.some((z) => z > a + 1 && b.slots.slice(a + 1, z).some((v) => v !== null && v !== p)),
-      ),
-    event === 'conflict' &&
-      g === 'Gothic Horror' &&
-      participating &&
-      sb.overflow[p] >= 2 &&
-      s.players.some((_, i) => i !== p && pages(sb, i).length >= 2),
-    event === 'conflict' && g === 'Gothic Horror' && participating && pl.ink <= 2,
+  const adjacent = s.books.filter((other) => adjacentBooks(other, b));
+  const around = page === undefined ? [] : neighbors(s, page);
+  const eligible = [
+    event === 'move' && around.length >= 2 && around.every((dest) =>
+      pages(book(s, bid(dest)), p).some((slot) => pageOf(book(s, bid(dest)), slot) === dest)),
+    event === 'place' && k !== null && neighbors(s, pageOf(b, k)).some((dest) =>
+      pages(book(s, bid(dest)), p).some((slot) => pageOf(book(s, bid(dest)), slot) === dest))
+      && pl.hand.some((c) => c.kind === 'twist'),
+    event === 'place' && adjacent.filter((other) => count(other, p) > 0).length >= 2,
+    event === 'conflict' && (start ? book(start, id) : b).overflow[p] === 0,
+    event === 'place' && k === b.slots.length - 1 && pl.hand.length >= 3 && pl.ink >= 3,
   ];
-  return pl.hand
-    .filter(
-      (c) =>
-        c.kind === 'subplot' &&
-        yes[c.design] &&
-        (!start || start.players[p].hand.some((x) => x.id === c.id)),
-    )
-    .map((c) => c.id);
+  return pl.hand.filter((c) => c.kind === 'subplot' && eligible[c.design] &&
+    (!start || start.players[p].hand.some((x) => x.id === c.id))).map((c) => c.id);
 }
 export function power(s: State, p: number, id: number) {
   const b = book(s, id),
     pl = s.players[p];
   let n =
     pages(b, p).length * (has(pl, 7) ? 3 : 1) +
-    b.overflow[p] * (1 + (has(pl, 6) ? 3 : 0) + (id === 2 ? 1 : 0));
+    b.overflow[p] * (1 + (has(pl, 6) ? 2 : 0) + (id === 2 ? 1 : 0));
   for (const f of pl.figures.filter((f) => bid(f.page) === id)) {
-    n += content.characters[f.id].power + (id === 4 ? 1 : 0) + (f.primary && has(pl, 0) ? 5 : 0);
-    if (f.id === 2 && b.overflow[p] >= 2) n += 2;
+    n += content.characters[f.id].power + (id === 4 ? 1 : 0) + (f.primary && has(pl, 0) ? 4 : 0) + Number(owns(pl, 3)) + (f.id === 8 && pl.hyde ? 3 : 0);
     if (
       f.id === 3 &&
       s.players.some((x, i) => i !== p && x.figures.some((y) => bid(y.page) === id))
     )
       n += 2;
-    if (f.id === 6) n += s.battle?.participants.filter((i) => i !== p).length ?? 0;
-    if (f.primary) n += [4, 6, 9, 10].filter((id) => owns(pl, id)).length;
+
   }
+  if (owns(pl, 4) && s.books.every((other) => other.overflow[p] > 0)) n += 2;
   return n + (s.battle?.book === id ? s.battle.bonus[p] : 0);
 }
 function beginConflict(s: State, id: number) {
@@ -369,13 +301,15 @@ function beginConflict(s: State, id: number) {
     start: snapshot,
     bonus: s.players.map(() => 0),
     played: [],
-    ignored: [],
+    haunting: [],
   };
   const js: Job[] = [];
   if (id === 6 && b.slots[0] !== null) js.push({ type: 'castle', p: b.slots[0], book: id });
-  for (const p of ps)
-    if (s.players[p].figures.some((f) => f.id === 8 && bid(f.page) === id) && s.players[p].ink)
-      js.push({ type: 'hyde', p });
+  for (const p of ps) {
+    const creature = s.players[p].figures.find((f) => f.id === 7 && bid(f.page) === id);
+    if (creature && pages(b, p).some((k) => pageOf(b, k) === creature.page))
+      js.push({ type: 'creaturePower', p });
+  }
   b.slots.forEach((p, k) => {
     if (p !== null) js.push({ type: 'twist', p, k, left: has(s.players[p], 8) ? 2 : 1 });
   });
@@ -415,8 +349,9 @@ function claim(s: State, p: number, id: number) {
   if (disconnected(s) && s.stack.length) {
     const next = s.stack.pop()!;
     newBook(s, next, b.q, b.r);
-  } else if (disconnected(s))
-    jobs.push({ type: 'compact', p, old: s.books.map((x) => ({ id: x.id, q: x.q, r: x.r })) });
+  }
+  if (disconnected(s))
+    jobs.push({ type: 'compact', p: s.active, old: s.books.map((x) => ({ id: x.id, q: x.q, r: x.r })) });
   push(s, ...jobs);
 }
 function normalize(s: State) {
@@ -426,7 +361,7 @@ function normalize(s: State) {
     if (j.type === 'check') {
       s.jobs.shift();
       const b = book(s, j.book);
-      if (b && b.slots.every((x) => x !== null)) beginConflict(s, b.id);
+      if (b && !s.battle && b.slots.every((x) => x !== null)) beginConflict(s, b.id);
     } else if (j.type === 'result') {
       s.jobs.shift();
       const bt = s.battle!,
@@ -444,8 +379,14 @@ function normalize(s: State) {
       );
       const js: Job[] = bt.participants.flatMap((p) => {
         const eligible = subplotCandidates(s, p, 'conflict', b.id, null);
-        return eligible.length ? [{ type: 'subplot', p, eligible }] : [];
+        return eligible.length ? [{ type: 'subplot', p, eligible, book: b.id }] : [];
       });
+      for (const p of bt.participants) {
+        if (p !== winner && has(s.players[p], 11)) gain(s.players[p], count(b, p) * 2);
+      }
+      for (const p of bt.haunting)
+        for (const other of s.books.filter((other) => other.id !== b.id))
+          js.push({ type: 'haunt', p, book: other.id });
       js.push({ type: 'cleanup', p: winner, book: b.id });
       push(s, ...js);
     } else if (j.type === 'cleanup') {
@@ -465,6 +406,9 @@ function normalize(s: State) {
       });
       s.discard.push(...s.battle!.played);
       s.battle = null;
+      const flights: Job[] = s.players.flatMap((pl, p) =>
+        pl.figures.some((f) => f.id === 5 && bid(f.page) === b.id)
+          ? [{ type: 'flight', p, from: b.id, q: b.q, r: b.r }] : []);
       if (second) claim(s, j.p, b.id);
       else {
         b.contested = true;
@@ -473,6 +417,32 @@ function normalize(s: State) {
           s.players[j.p].marks.push(m);
           b.mark = null;
           if (m === 5) push(s, { type: 'character', p: j.p });
+        }
+      }
+      if (s.winner === null) push(s, ...flights);
+    } else if (j.type === 'lastInk') {
+      s.jobs.shift();
+      gain(s.players[j.p], 2);
+    } else if (j.type === 'reward') {
+      s.jobs.shift();
+      const b = book(s, j.book);
+      if (b) for (const part of content.books[b.id].spaces[j.k].split(' + ')) {
+        const n = Number(part.match(/\d+/)?.[0] ?? 0);
+        if (part.endsWith(' ink]')) gain(s.players[j.p], n);
+        else if (part.endsWith(' cards]')) draw(s, j.p, n);
+        else if (part.endsWith(' overflow inklings]')) placeOverflow(s, j.p, b, n);
+        else if (part === 'place book' && s.stack.length) push(s, { type: 'publish', p: j.p });
+        else if (part === '[special ◇]') {
+          if (b.id === 0) push(s, { type: 'transfer', p: j.p, to: b.id, n: 2 });
+          if (b.id === 1) push(s, { type: 'express', p: j.p });
+          if (b.id === 3) {
+            draw(s, j.p, 1);
+            push(s, { type: 'exchange', p: j.p });
+          }
+          if (b.id === 5)
+            for (const other of s.books.filter((other) => adjacentBooks(b, other)))
+              placeOverflow(s, j.p, other, 1);
+          if (b.id === 8) push(s, { type: 'laboratory', p: j.p, book: b.id });
         }
       }
     } else if (j.type === 'finish') {
@@ -492,7 +462,107 @@ function chapter(s: State, p: number) {
   note(s, `${pl.name} begins chapter ${pl.chapter}.`);
   s.jobs = [...(s.stack.length ? [{ type: 'publish', p }] : []), { type: 'finish', p }];
 }
-const bonusTable = content.spaceBonuses as [number, string, number][][];
+function inklingTargets(b: Book) {
+  return [
+    ...b.slots.flatMap((owner, k) => owner === null ? [] : [{ key: `page:${k}`, label: `space ${k + 1}` }]),
+    ...b.overflow.flatMap((n, p) => n ? [{ key: `overflow:${p}`, label: `Player ${p + 1}'s overflow Inkling` }] : []),
+  ];
+}
+function erase(s: State, b: Book, key: string) {
+  const [kind, raw] = key.split(':');
+  const k = Number(raw);
+  if (kind === 'overflow') {
+    b.overflow[k]--;
+    s.players[k].supply++;
+  } else {
+    s.players[b.slots[k]!].supply++;
+    b.slots[k] = null;
+  }
+}
+function removeFromHand(s: State, p: number, id: number) {
+  const hand = s.players[p].hand;
+  s.discard.push(hand.splice(hand.findIndex((c) => c.id === id), 1)[0]);
+}
+function finishSubplot(s: State, p: number, c: Card, ongoing: boolean) {
+  const pl = s.players[p];
+  const d = content.subplots[c.design];
+  if (ongoing) {
+    pl.ongoing.push(c.design);
+    pl.hand = pl.hand.filter((card) => card.id !== c.id);
+  } else {
+    removeFromHand(s, p, c.id);
+    const n = Number(d.instant.match(/\d+/)?.[0] ?? 0);
+    if (c.design === 4) for (const b of s.books) placeOverflow(s, p, b, 1);
+    else if (d.instant.includes('ink')) gain(pl, n);
+    else draw(s, p, n);
+  }
+}
+function subplotCosts(s: State, p: number, job: Job, c: Card): Action[] {
+  const pl = s.players[p];
+  const d = content.subplots[c.design];
+  const finish = (st: State, ongoing: boolean) => {
+    st.jobs.shift();
+    finishSubplot(st, p, c, ongoing);
+    note(st, `${pl.name} completes ${d.name}.`);
+  };
+  const options = (key: string, cost: string, pay: (st: State) => void) =>
+    [false, true].filter((ongoing) => !ongoing || !owns(pl, c.design)).map((ongoing) => ({
+      key: `subplot:${c.id}:${key}:${ongoing}`,
+      label: `${d.name} · ${cost} · ${ongoing ? d.ongoing : d.instant}`,
+      run: (st: State) => { pay(st); finish(st, ongoing); },
+    }));
+  if (c.design === 1)
+    return pl.hand.filter((card) => card.kind === 'twist').flatMap((card) =>
+      options(String(card.id), `Discard ${content.twists[card.design].name}`, (st) => removeFromHand(st, p, card.id)));
+  const near = s.books.filter((other) => adjacentBooks(other, book(s, job.book)) && count(other, p));
+  const own = (b: Book) => [...pages(b, p).map((k) => `page:${k}`), ...(b.overflow[p] ? [`overflow:${p}`] : [])];
+  return near.flatMap((a, i) => near.slice(i + 1).flatMap((b) =>
+    own(a).flatMap((x) => own(b).flatMap((y) => options(
+      `${a.id}:${x}:${b.id}:${y}`,
+      `Erase one of your Inklings on ${source.books[a.id].title} and ${source.books[b.id].title} (${x}, ${y})`,
+      (st) => { erase(st, book(st, a.id), x); erase(st, book(st, b.id), y); },
+    )))));
+}
+function characterActions(s: State, p: number, add: (key: string, label: string, run: Action['run']) => void) {
+  const pl = s.players[p];
+  for (const f of pl.figures) {
+    const cost = content.characters[f.id].cost;
+    const token = `ability:${f.id}`;
+    if (cost === null || pl.ink < cost || s.used.includes(token)) continue;
+    const b = book(s, bid(f.page));
+    const use = (st: State) => {
+      st.players[p].ink -= cost;
+      st.used.push(token);
+    };
+    if (f.id === 1 && pl.supply)
+      for (const dest of s.books.filter((other) => !count(other, p)))
+        dest.slots.forEach((v, k) => {
+          if (v !== null) return;
+          add(`ability:1:${dest.id}:${k}`, `${cost} ink · Fogg: place on ${source.books[dest.id].title}, space ${k + 1}`, (st) => {
+            use(st);
+            st.players[p].figures.find((figure) => figure.id === 1)!.page = pageOf(dest, k);
+            if (!st.moving.includes(1)) st.moving.push(1);
+            placed(st, p, book(st, dest.id), k, 2);
+          });
+        });
+    if (f.id === 4 && s.players.filter((_, owner) => count(b, owner)).length >= 2)
+      add('ability:4', `${cost} ink · Odysseus: start a conflict`, (st) => { use(st); beginConflict(st, b.id); });
+    if (f.id === 6 && pl.supply) {
+      const occupied = b.slots.flatMap((v, k) => v !== null && pageOf(b, k) === f.page ? [k] : []);
+      if (occupied.length === 1)
+        add('ability:6', `${cost} ink · Dracula: replace the Inkling on this page`, (st) => {
+          use(st);
+          const target = book(st, b.id);
+          erase(st, target, `page:${occupied[0]}`);
+          target.slots[occupied[0]] = p;
+          st.players[p].supply--;
+          const eligible = subplotCandidates(st, p, 'place', target.id, occupied[0]);
+          push(st, ...(eligible.length ? [{ type: 'subplot', p, book: target.id, eligible }] : []),
+            { type: 'check', p, book: target.id });
+        });
+    }
+  }
+}
 export function legalActions(s: State): Action[] {
   normalize(s);
   if (s.winner !== null) return [];
@@ -534,29 +604,25 @@ export function legalActions(s: State): Action[] {
       });
   }
   if (j.type === 'movement') {
+    characterActions(s, p, add);
     for (const f of pl.figures) {
-      const first = !s.moving.includes(f.id),
-        paid = s.extraMove < 1 + [0, 3, 14].filter((id) => owns(pl, id)).length && pl.ink > 0;
-      if (!first) continue;
-      const range = first ? (f.primary ? (has(pl, 9) ? 4 : 1) : 1) : f.id === 1 ? 2 : 1;
+      if (s.moving.includes(f.id)) continue;
+      const range = 1 + (has(pl, 9) ? 3 : 0) + Number(owns(pl, 1)) +
+        (f.id === 2 ? 2 : 0) + (f.id === 8 && pl.hyde === false ? 1 : 0);
       for (const dest of reachable(s, f.page, range))
         add(
           `move:${f.id}:${dest}`,
-          `${first ? 'Move' : '1 ink: move'} ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
+          `Move ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
           (st) => {
             const figure = st.players[p].figures.find((x) => x.id === f.id)!,
               old = figure.page;
             figure.page = dest;
-            if (first) st.moving.push(f.id);
-            else {
-              st.extraMove++;
-              st.players[p].ink--;
-            }
+            st.moving.push(f.id);
             push(st, { type: 'route', p, char: f.id, origin: old });
           },
         );
     }
-    if (pl.figures.every((f) => s.moving.includes(f.id)))
+    if (pl.figures.every((f) => s.moving.includes(f.id) || !neighbors(s, f.page).length))
       for (const f of pl.figures)
         add(`source:${f.id}`, `Place from ${content.characters[f.id].name}`, (st) => {
           done(st);
@@ -566,9 +632,9 @@ export function legalActions(s: State): Action[] {
   }
   if (j.type === 'route') {
     const f = pl.figures.find((x) => x.id === j.char)!;
-    const max = 1 + [0, 3, 14].filter((id) => owns(pl, id)).length;
+    const max = 1;
     if (pl.ink && s.extraMove < max)
-      for (const dest of reachable(s, f.page, f.id === 1 ? 2 : 1))
+      for (const dest of reachable(s, f.page, 1))
         add(
           `step:${dest}`,
           `1 ink: move ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'}`,
@@ -622,22 +688,7 @@ export function legalActions(s: State): Action[] {
     } else skip();
   }
   if (j.type === 'afterPlace') {
-    if (j.first && j.char === 7 && pl.ink && pl.supply >= 2)
-      add('creature', '1 ink: add 2 overflow Inklings', (st) => {
-        done(st);
-        st.players[p].ink--;
-        push(
-          st,
-          ...Array.from({ length: 2 }, () => ({
-            type: 'place',
-            p,
-            book: bid(st.players[p].figures.find((x) => x.id === j.char)!.page),
-            overflow: true,
-          })),
-          { type: 'afterPlace', p, char: j.char, first: false },
-        );
-      });
-    const max = 1 + [5, 7, 11].filter((id) => owns(pl, id)).length;
+    const max = 1;
     if (pl.ink && pl.supply && s.extraPlace < max)
       add('extra', '1 ink: place an extra Inkling', (st) => {
         done(st);
@@ -648,57 +699,27 @@ export function legalActions(s: State): Action[] {
       push(st, { type: 'finish', p });
     });
   }
-  if (j.type === 'bonus' && b) {
-    const reward = bonusTable[b.id][j.k - 1];
-    if (reward && pl.ink >= reward[0] && (reward[1] !== 'overflow' || pl.supply >= reward[2]))
-      add(
-        'buy',
-        `${reward[0]} ink: ${reward[1] === 'draw' ? 'draw' : reward[1] === 'ink' ? 'gain' : 'place in overflow'} ${reward[2]} ${reward[1] === 'draw' ? 'cards' : reward[1] === 'ink' ? 'ink' : 'Inklings'}`,
-        (st) => {
-          done(st);
-          st.players[p].ink -= reward[0];
-          if (reward[1] === 'draw') draw(st, p, reward[2]);
-          else if (reward[1] === 'ink') gain(st.players[p], reward[2]);
-          else
-            push(
-              st,
-              ...Array.from({ length: reward[2] }, () => ({
-                type: 'place',
-                p,
-                book: b.id,
-                overflow: true,
-              })),
-            );
-        },
-      );
-    skip();
-  }
   if (j.type === 'subplot') {
     for (const id of j.eligible) {
       const c = pl.hand.find((x) => x.id === id);
       if (!c) continue;
       const d = content.subplots[c.design];
+      if (c.design === 1 || c.design === 2) {
+        for (const action of subplotCosts(s, p, j, c)) out.push(action);
+        continue;
+      }
       for (const ongoing of [false, true]) {
         if (ongoing && owns(pl, c.design)) continue;
         add(`subplot:${id}:${ongoing}`, `${d.name}: ${ongoing ? d.ongoing : d.instant}`, (st) => {
           done(st);
-          const card = st.players[p].hand.splice(
-            st.players[p].hand.findIndex((x) => x.id === id),
-            1,
-          )[0];
-          if (ongoing) st.players[p].ongoing.push(card.design);
-          else {
-            st.discard.push(card);
-            const n = Number(d.instant.match(/\d+/)?.[0] ?? 0);
-            if (d.instant.includes('ink')) gain(st.players[p], n);
-            else draw(st, p, n);
-          }
+          finishSubplot(st, p, c, ongoing);
           note(st, `${pl.name} completes ${d.name}.`);
         });
       }
     }
     skip();
   }
+  if (j.type === 'twist' && !s.battle) add('empty', 'Continue after conflict', done);
   if (j.type === 'twist' && s.battle) {
     const bt = s.battle,
       bk = book(s, bt.book);
@@ -706,11 +727,11 @@ export function legalActions(s: State): Action[] {
       add('empty', 'Space no longer occupied: continue', done);
     } else {
       for (const c of pl.hand) {
-        const cost = c.kind === 'subplot' ? 1 : has(pl, 3) ? 1 : content.twists[c.design].cost;
+        const cost = cardCost(pl, c);
         if (pl.ink < cost) continue;
         add(
           `card:${c.id}`,
-          `${cost} ink: ${c.kind === 'twist' ? content.twists[c.design].name : `${content.subplots[c.design].name} (+${has(pl, 4) ? 2 : 1} power)`}`,
+          `${cost} ink: ${c.kind === 'twist' ? content.twists[c.design].name : `${content.subplots[c.design].name} (+${subplotPower(pl, c.design)} power)`}`,
           (st) => {
             const player = st.players[p],
               battle = st.battle!,
@@ -718,48 +739,66 @@ export function legalActions(s: State): Action[] {
             player.ink -= cost;
             player.hand = player.hand.filter((x) => x.id !== c.id);
             battle.played.push(c);
-            let n = has(player, 4) ? 2 : 1;
-            if (c.kind === 'twist') {
-              const d = c.design;
-              n = [
-                count(bk, p) === 1 ? 4 : 2,
-                Math.min(5, 2 + bk.overflow[p]),
-                allCount(st, p) >= 3 ? 6 : 4,
-                player.figures.some((f) => f.primary && bid(f.page) === bk.id) ? 3 : 2,
-                consecutive(bk, p) ? 5 : 3,
-                st.players.some((_, i) => i !== p && count(bk, i) > count(bk, p)) ? 7 : 4,
-                st.players.some((x, i) => i !== p && x.figures.some((f) => bid(f.page) === bk.id))
-                  ? 3
-                  : 2,
-                pages(bk, p).length && bk.overflow[p] ? 5 : 3,
-                player.ink === 0 ? 8 : 6,
-              ][d];
+            if (c.kind === 'subplot') battle.bonus[p] += subplotPower(player, c.design);
+            else {
+              const adjacent = st.books.filter((other) => adjacentBooks(other, bk));
+              const points = [
+                0,
+                adjacent.some((other) => count(other, p) >= 2) ? 4 : 2,
+                adjacent.filter((other) => count(other, p) > 0).length >= 2 ? 7 : 3,
+                0,
+                adjacent.every((other) => count(other, p) > 0) ? 4 : 2,
+                player.hand.length >= 3 ? 7 : 5,
+                1,
+                bk.overflow[p] >= 2 ? 4 : 2,
+                3,
+              ][c.design];
+              battle.bonus[p] += points;
+              if (c.design === 0) gain(player, 3);
+              if (c.design === 3 || c.design === 6) draw(st, p, c.design === 3 ? 3 : 1);
+              if (c.design === 8) battle.haunting.push(p);
             }
-            battle.bonus[p] += n;
+            note(st, `${player.name} plays ${c.kind === 'twist' ? content.twists[c.design].name : content.subplots[c.design].name}.`);
             const jj = st.jobs[0];
             jj.left--;
             if (jj.left === 0) done(st);
-            if (
-              !battle.ignored.includes(p) &&
-              player.figures.some((f) => f.id === 4 && bid(f.page) === bk.id)
-            ) {
-              draw(st, p, 1);
-              battle.ignored.push(p);
-            }
           },
         );
       }
+      if (pl.figures.some((f) => f.id === 8))
+        add('flip-hyde', 'Flip the Jekyll / Hyde coin', (st) => {
+          st.players[p].hyde = shuffled(st.rng, [false, true])[0];
+          if (--st.jobs[0].left === 0) done(st);
+        });
       add('pass', 'Pass this Twist opportunity', done);
     }
   }
-  if (j.type === 'hyde') {
-    if (pl.ink)
-      add('hyde', '1 ink: Hyde gains +3 power', (st) => {
-        done(st);
-        st.players[p].ink--;
-        st.battle!.bonus[p] += 3;
-      });
+  if (j.type === 'creaturePower') {
+    const cost = content.characters[7].cost!;
+    if (pl.ink >= cost) add('creature-power', '1 ink: add 4 power', (st) => {
+      done(st);
+      st.players[p].ink -= cost;
+      st.battle!.bonus[p] += 4;
+    });
     skip();
+  }
+  if (j.type === 'haunt' && b) {
+    for (const target of inklingTargets(b))
+      add(`haunt:${b.id}:${target.key}`, `Erase ${target.label} from ${source.books[b.id].title}`, (st) => {
+        erase(st, book(st, b.id), target.key);
+        done(st);
+      });
+    if (!out.length) skip();
+  }
+  if (j.type === 'flight') {
+    for (const target of s.books.filter((other) => adjacentBooks(other, { q: j.q, r: j.r })))
+      for (const side of [0, 1])
+        add(`flight:${target.id}:${side}`, `Move Aeneas to ${source.books[target.id].title}, ${side ? 'right' : 'left'} page`, (st) => {
+          st.players[p].figures.find((f) => f.id === 5)!.page = target.id * 2 + side;
+          placeOverflow(st, p, book(st, target.id), 2);
+          st.jobs = st.jobs.filter((job, index) => index !== 0 && !(job.type === 'evacuate' && job.p === p && job.char === 5));
+        });
+    if (!out.length) skip();
   }
   if (j.type === 'castle' && b) {
     for (const owner of b.slots.flatMap((v, k) => (v !== null && v !== p ? [k] : [])))
@@ -772,11 +811,11 @@ export function legalActions(s: State): Action[] {
     skip();
   }
   if (j.type === 'laboratory' && b) {
-    if (pl.supply)
+    if (pl.supply >= 3)
       for (const c of pl.hand)
         add(
           `discard:${c.id}`,
-          `Discard ${c.kind === 'twist' ? content.twists[c.design].name : content.subplots[c.design].name}: place 1 overflow Inkling`,
+          `Discard ${c.kind === 'twist' ? content.twists[c.design].name : content.subplots[c.design].name}: place 3 overflow Inklings`,
           (st) => {
             done(st);
             st.discard.push(
@@ -785,44 +824,20 @@ export function legalActions(s: State): Action[] {
                 1,
               )[0],
             );
-            push(st, { type: 'place', p, book: b.id, overflow: true });
+            placeOverflow(st, p, book(st, b.id), 3);
           },
         );
-    skip();
-  }
-  if (j.type === 'aeneas') {
-    if (pl.ink)
-      add('pay', '1 ink: gather up to 2 page Inklings', (st) => {
-        done(st);
-        st.players[p].ink--;
-        push(st, { type: 'transfer', p, to: j.to, mode: 'page', n: 2 });
-      });
     skip();
   }
   if (j.type === 'transfer') {
-    for (const bk of s.books.filter((x) => x.id !== j.to)) {
-      if (j.mode === 'overflow' && bk.overflow[p])
-        add(
-          `transfer:${bk.id}`,
-          `Move overflow Inkling from ${source.books[bk.id].title}`,
-          (st) => {
-            book(st, bk.id).overflow[p]--;
-            book(st, j.to).overflow[p]++;
-            if (--st.jobs[0].n === 0) done(st);
-          },
-        );
-      if (j.mode === 'page')
-        for (const k of pages(bk, p))
-          add(
-            `transfer:${bk.id}:${k}`,
-            `Move space ${k + 1} from ${source.books[bk.id].title}`,
-            (st) => {
-              book(st, bk.id).slots[k] = null;
-              book(st, j.to).overflow[p]++;
-              if (--st.jobs[0].n === 0) done(st);
-            },
-          );
-    }
+    const to = book(s, j.to);
+    for (const from of s.books.filter((other) => other.id !== j.to &&
+      (j.from !== undefined ? other.id === j.from : adjacentBooks(other, to)) && other.overflow[p]))
+      add(`transfer:${from.id}`, `Move overflow Inkling from ${source.books[from.id].title}`, (st) => {
+        book(st, from.id).overflow[p]--;
+        book(st, j.to).overflow[p]++;
+        if (--st.jobs[0].n === 0) done(st);
+      });
     skip();
   }
   if (j.type === 'exchange') {
@@ -841,12 +856,12 @@ export function legalActions(s: State): Action[] {
           draw(st, p, 1);
         },
       );
-    skip();
+    if (!out.length) skip();
   }
   if (j.type === 'express') {
-    for (const f of pl.figures.filter((x) => x.id !== j.char))
+    for (const f of pl.figures)
       for (const dest of neighbors(s, f.page))
-        add(`express:${dest}`, `Move ${content.characters[f.id].name} one space`, (st) => {
+        add(`express:${f.id}:${dest}`, `Move ${content.characters[f.id].name} to ${source.books[bid(dest)].title}, ${dest % 2 ? 'right' : 'left'} page`, (st) => {
           st.players[p].figures.find((x) => x.id === f.id)!.page = dest;
           done(st);
         });
@@ -858,6 +873,7 @@ export function legalActions(s: State): Action[] {
       const id = st.characters.pop();
       if (id === undefined) return;
       const player = st.players[p];
+      if (id === 8) player.hyde = shuffled(st.rng, [false, true])[0];
       if (player.figures.length === 2) st.characters.unshift(player.figures.pop()!.id);
       player.figures.push({ id, page: player.figures[0].page, primary: false });
     });
@@ -1031,6 +1047,8 @@ export function playerView(s: State, p: number) {
     actor: actingPlayer(s),
     phase: s.jobs[0]?.type,
     stackCount: s.stack.length,
+    nextBookmark: s.marks.at(-1) ?? null,
+    publicPlays: s.battle?.played ?? [],
     actions:
       p === actingPlayer(s)
         ? legalActions(structuredClone(s)).map(({ key, label }) => ({ key, label }))

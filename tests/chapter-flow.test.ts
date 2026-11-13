@@ -40,7 +40,8 @@ it('choosing a placement can select its character after both have moved', () => 
   const chosen = choices.find((a) => a.page === p.figures[1].page)!;
   s = applyFlow(s, chosen.key);
   expect(s.source).toBe(8);
-  expect(s.players[0].supply).toBe(11);
+  const target = s.books.find((book) => book.id === Math.floor(chosen.page! / 2));
+  expect(target?.slots.some((owner) => owner === 0)).toBe(true);
 });
 function ready() {
   let s = newGame(['A', 'B'], 42, [false, true]);
@@ -75,14 +76,6 @@ it('preserves voluntary chapter ending alongside movement at low ink', () => {
   expect(a.some((x) => x.key === 'chapter')).toBe(true);
   expect(a.some((x) => x.key.startsWith('move:'))).toBe(true);
 });
-it('never auto-buys or declines an optional bonus', () => {
-  let s = ready();
-  s.jobs = [{ type: 'bonus', p: 0, book: s.books[0].id, k: 1 }];
-  const before = structuredClone(s);
-  const next = settleFlow(s);
-  expect(next.players[0].ink).toBe(before.players[0].ink);
-  expect(next.jobs[0].type).toBe('bonus');
-});
 it('ends a turn automatically only if no optional placement remains', () => {
   let s = ready();
   s.players[0].ink = 0;
@@ -98,28 +91,7 @@ it('leaves all bot decisions for the automatic bot runner', () => {
   expect(next.jobs[0].type).toBe('start');
 });
 
-it('offers Aeneas alongside placement without a continue prompt or an automatic spend', () => {
-  let s = ready();
-  const page = s.players[0].figures[0].page;
-  s.players[0].figures[0].id = 5;
-  const other = s.books.find((b) => b.id !== Math.floor(page / 2))!;
-  other.slots[0] = 0;
-  s.players[0].supply--;
-  s.jobs = [
-    { type: 'aeneas', p: 0, to: Math.floor(page / 2) },
-    { type: 'place', p: 0, char: 5, normal: true, first: true },
-  ];
-  const a = flowChoices(s);
-  expect(a.some((x) => x.key === 'pay')).toBe(true);
-  expect(a.some((x) => x.key === 'skip')).toBe(false);
-  const place = a.find((x) => x.key.startsWith('place:'))!;
-  expect(place).toBeTruthy();
-  const ink = s.players[0].ink;
-  s = applyFlow(s, place.key);
-  expect(s.players[0].ink).toBe(ink);
-  expect(s.books.find((b) => b.id === other.id)!.slots[0]).toBe(0);
-});
-it.each(['transfer', 'exchange', 'express', 'bonus', 'subplot', 'laboratory'])(
+it.each(['transfer', 'subplot', 'laboratory'])(
   'optional %s exposes the next action without dismissal',
   (type) => {
     const s = ready();

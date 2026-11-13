@@ -1,0 +1,10 @@
+name,quantity,genre,icon,effect,page_space_1,page_space_2,page_space_3,page_space_4,page_space_5,page_space_6
+"20,000 Leagues Under the Sea","1","Voyages","◇","Move up to 2 of your overflow Inklings from adjacent books into this overflow.","[2 ink] + [1 cards]","[1 ink] + [special ◇]","place book","","",""
+"Around the World in 80 Days","1","Voyages","◇","Move a character one.","[1 ink] + [1 cards]","[1 ink] + [1 cards]","[1 ink] + [special ◇]","place book","",""
+"Journey to the Center of the Earth","1","Voyages","⚔","Overflow Inklings have +1 power.","[2 ink] + [1 cards]","[2 overflow inklings]","[1 ink] + [1 overflow inklings]","[1 ink]","place book",""
+"The Odyssey","1","Epics","◇","Draw 1, then discard 1.","[1 ink] + [2 cards]","[2 ink]","[1 overflow inklings]","[1 ink] + [special ◇]","place book",""
+"The Iliad","1","Epics","⚔","Each character here has +1 power.","[2 overflow inklings]","[1 ink] + [1 overflow inklings]","[1 ink] + [1 cards]","place book","",""
+"The Aeneid","1","Epics","◇","Place an inkling in each adjacent book's overflow.","[1 ink] + [1 overflow inklings]","[1 ink] + [special ◇]","place book","","",""
+"Dracula","1","Gothic Horror","⚔","At conflict start, the occupant of the first page space may move 1 enemy page Inkling here to overflow.","[2 ink] + [1 cards]","[1 overflow inklings]","[1 ink]","place book","",""
+"Frankenstein","1","Gothic Horror","⚔","After the first conflict here, return the overflow Inklings to supply, then move all the page Inklings here to the overflow.","[2 ink] + [1 overflow inklings]","[2 overflow inklings]","[1 ink] + [1 cards]","[1 ink]","place book",""
+"Dr. Jekyll and Mr. Hyde","1","Gothic Horror","◇","Ymay discard 1 card to place 3 Inklings in this book’s overflow.","[2 ink] + [1 cards]","[1 ink] + [special ◇]","place book","","",""
