@@ -36,68 +36,22 @@ function settle(s: State) {
   return s;
 }
 describe('Chapter edition', () => {
-  it.each([4, 8, 9, 13, 14])('conflict Subplot %s completes for a losing participant', (design) => {
-    const s = ready();
-    const b = s.books.find(
-      (b) => Math.floor(b.id / 3) === (design === 4 ? 0 : design < 10 ? 1 : 2),
-    )!;
-    b.slots.fill(null);
-    b.slots[0] = 1;
-    b.slots[1] = 1;
-    b.overflow[0] = 2;
-    b.contested = true;
-    b.mark = null;
-    s.players[0].ink = 2;
-    s.players[0].figures = [{ id: 1, primary: true, page: b.id * 2 }];
-    s.players[1].figures = [{ id: 3, primary: true, page: b.id * 2 }];
-    s.players[0].hand = [{ id: 500, kind: 'subplot', design }];
-    s.players[1].hand = [];
-    s.battle = {
-      book: b.id,
-      participants: [0, 1],
-      start: structuredClone(s),
-      bonus: [0, 100],
-      played: [],
-      ignored: [],
-    };
-    s.jobs = [{ type: 'result', p: 0 }];
-    const actions = legalActions(s);
-    expect(s.log.at(-1)).toContain('P1 wins');
-    expect(actions.some((a) => a.key === 'subplot:500:true')).toBe(true);
-    expect(actions.some((a) => a.key === 'subplot:500:false')).toBe(true);
-  });
-  it('extra purchases cost ink and do not add free movement or allow premature overflow', () => {
-    const s = ready();
-    const p = s.players[0];
-    p.ongoing = [0, 7];
-    s.extraMove = 1;
-    s.extraPlace = 1;
-    s.jobs = [{ type: 'route', p: 0, char: p.figures[0].id }];
-    expect(legalActions(s).some((a) => a.key.startsWith('step:'))).toBe(true);
-    s.jobs = [{ type: 'afterPlace', p: 0, char: p.figures[0].id }];
-    expect(legalActions(s).some((a) => a.key === 'extra')).toBe(true);
-    p.ink = 0;
-    expect(legalActions(s).some((a) => a.key === 'extra')).toBe(false);
-    p.ongoing = [2, 13];
-    expect(capacity(p)).toBe(13);
-    expect(p.ink).toBe(0);
-  });
   it('moving an existing Inkling does not grant destination rewards or placement Subplots', () => {
     let s = ready();
     const from = s.books[0],
       to = s.books[1];
-    from.slots[0] = 0;
+    from.overflow[0] = 1;
     s.players[0].supply--;
-    s.jobs = [{ type: 'transfer', p: 0, to: to.id, mode: 'page', n: 1 }];
+    s.jobs = [{ type: 'transfer', p: 0, to: to.id, from: from.id, n: 1 }];
     const ink = s.players[0].ink,
       hand = structuredClone(s.players[0].hand);
-    s = choose(s, `transfer:${from.id}:0`);
+    s = choose(s, `transfer:${from.id}`);
     expect(s.players[0].ink).toBe(ink);
     expect(s.players[0].hand).toEqual(hand);
     expect(s.books.find((b) => b.id === to.id)!.overflow[0]).toBe(1);
     expect(s.jobs.some((j) => ['bonus', 'subplot'].includes(j.type))).toBe(false);
   });
-  it('power bookmarks apply per Inkling, but +5 applies only once to the protagonist', () => {
+  it('power bookmarks apply per Inkling, but +4 applies only once to the protagonist', () => {
     const s = ready();
     const b = s.books[0],
       p = s.players[0];
@@ -107,13 +61,13 @@ describe('Chapter edition', () => {
     ];
     const base = power(s, 0, b.id);
     p.marks = [0];
-    expect(power(s, 0, b.id) - base).toBe(5);
+    expect(power(s, 0, b.id) - base).toBe(4);
     p.marks = [];
     b.overflow[0] = 2;
     p.supply -= 2;
     const over = power(s, 0, b.id);
     p.marks = [6];
-    expect(power(s, 0, b.id) - over).toBe(6);
+    expect(power(s, 0, b.id) - over).toBe(4);
     p.marks = [];
     b.slots[0] = 0;
     p.supply--;
@@ -121,46 +75,7 @@ describe('Chapter edition', () => {
     p.marks = [7];
     expect(power(s, 0, b.id) - page).toBe(2);
   });
-  it('Creature overflow placements resolve before further normal-placement choices', () => {
-    let s = ready();
-    const b = s.books[0];
-    s.players[0].figures = [{ id: 7, page: b.id * 2, primary: true }];
-    s.jobs = [{ type: 'afterPlace', p: 0, char: 7, first: true }];
-    s = choose(s, 'creature');
-    expect(s.jobs[0].type).toBe('place');
-    s = settle(s);
-    expect(s.books[0].overflow[0]).toBe(2);
-    expect(s.players[0].ink).toBe(6);
-    expect(s.jobs[0].type).toBe('afterPlace');
-  });
-  it('arrival effects wait until paid movement is finished', () => {
-    let s = ready();
-    s.players[0].figures = [{ id: 0, page: s.books[0].id * 2, primary: true }];
-    s = choose(s, 'turn');
-    s = choose(s, legalActions(s).find((a) => a.key.startsWith('move:'))!.key);
-    expect(s.jobs[0].type).toBe('route');
-    expect(s.used).not.toContain('nemo');
-    s = choose(s, 'arrive');
-    expect(s.used).toContain('nemo');
-  });
-  it('a bought bonus costs ink, but free placement does not', () => {
-    let s = ready();
-    const b = s.books.find((b) => b.id !== 6) ?? s.books[0];
-    s.players[0].figures = [
-      { id: 1, page: b.id * 2 + (1 < [1, 2, 2, 3, 2, 1, 2, 2, 1][b.id] ? 0 : 1), primary: true },
-    ];
-    s.jobs = [{ type: 'place', p: 0, char: 1, normal: true, first: true }];
-    s = choose(s, 'place:1');
-    expect(s.players[0].ink).toBe(7);
-    expect(s.players[0].supply).toBe(11);
-    const actions = legalActions(s);
-    if (s.jobs[0].type === 'subplot') s = choose(s, 'skip');
-    if (legalActions(s).some((a) => a.key === 'buy')) {
-      s = choose(s, 'buy');
-      expect(s.players[0].ink).toBeLessThanOrEqual(7);
-    }
-  });
-  it('winner closes an empty-stack gap and must approve a valid layout', () => {
+  it('the designated player closes an empty-stack gap and must approve a valid layout', () => {
     let s = ready();
     s.stack = [];
     s.books = [0, 1, 2, 3, 4].map((id, i) => ({
@@ -201,9 +116,9 @@ describe('Chapter edition', () => {
     expect(s).toEqual(newGame(['A', 'B'], 42));
     expect(new Set(s.books.map((b) => Math.floor(b.id / 3))).size).toBe(3);
     const all = [...s.deck, ...s.players.flatMap((p) => p.hand)];
-    expect(all).toHaveLength(75);
-    expect(all.filter((c) => c.kind === 'twist')).toHaveLength(45);
-    expect(new Set(all.map((c) => c.id)).size).toBe(75);
+    expect(all).toHaveLength(32);
+    expect(all.filter((c) => c.kind === 'twist')).toHaveLength(27);
+    expect(new Set(all.map((c) => c.id)).size).toBe(32);
     expect(s.players.every((p) => p.ink === 7 && p.supply === 12)).toBe(true);
   });
   it('ends a chapter at start and spends the whole turn', () => {
@@ -236,13 +151,13 @@ describe('Chapter edition', () => {
     expect(() => choose(s, 'invalid')).toThrow();
     expect(s).toEqual(copy);
   });
-  it('capacity does not fill ink and minimum bonuses stack on bookmark base', () => {
+  it('ink stays capped at seven and an ongoing Subplot can increase the minimum', () => {
     const p = ready().players[0];
     p.marks = [1, 2];
-    p.ongoing = [1, 8, 12, 2];
-    expect(capacity(p)).toBe(15);
+    p.ongoing = [0];
+    expect(capacity(p)).toBe(7);
     expect(p.ink).toBe(7);
-    expect(minimum(p)).toBe(8);
+    expect(minimum(p)).toBe(2);
   });
   it('first conflict gives a permanent bookmark and cleans up', () => {
     let s = ready();

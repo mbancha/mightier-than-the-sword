@@ -1,3 +1,7 @@
+## November playtest sync
+
+The current spreadsheet supplies the active component catalog, including quantities. The Chapters snapshot is in `src/data/chapters-content.json`. The earlier catalog remains for historical engine compatibility. Generate current rules and Component Studio CSVs with `npm run docs`. Read `PLAYTEST_RULES.md` for the current timing rules and provisional rulings.
+
 # Chapters redesign — 2026-10-16
 
 2026-10-18 designer clarification: Whenever an Inkling is moved from one space to another, it doesn't trigger the rewards of the new space. This is a base rule; individual movement abilities omit that reminder. Fresh placements retain their normal rewards and Subplot checks. Existing transfer handlers already follow this behavior.

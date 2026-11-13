@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { RulesText } from './GameCard';
 import source from './data/content.json';
-import { content, bookmarkNames, bookmarkText, type playerView } from './game/chapters';
+import { content, leftSlots, bookmarkNames, bookmarkText, type playerView } from './game/chapters';
 type View = ReturnType<typeof playerView>;
 export function Meeple({
   owner = 0,
@@ -59,39 +59,8 @@ export function Glyph({ kind }: { kind: string }) {
     </svg>
   );
 }
-export function Reward({ reward }: { reward: (string | number)[] }) {
-  const [cost, kind, n] = reward;
-  return (
-    <span
-      className="reward"
-      aria-label={`${cost} ink: ${kind === 'draw' ? 'draw' : kind === 'ink' ? 'gain' : 'place in overflow'} ${n} ${kind === 'draw' ? 'cards' : kind === 'ink' ? 'ink' : 'Inklings'}`}
-    >
-      <span className="cost">
-        {cost}
-        <Glyph kind="ink" />
-      </span>
-      <span className="rewardArrow">→</span>
-      <span>
-        {n}
-        <Glyph kind={String(kind)} />
-      </span>
-    </span>
-  );
-}
-function Badge({ id }: { id: number }) {
-  return (
-    <span className="themeBadge" aria-hidden="true">
-      {id === 0 ? (
-        '⚓'
-      ) : id === 6 ? (
-        '♜'
-      ) : id === 8 ? (
-        '◐'
-      ) : (
-        <Glyph kind={[2, 4, 7].includes(id) ? 'conflict' : 'move'} />
-      )}
-    </span>
-  );
+export function Badge({ id }: { id: number }) {
+  return <span className="themeBadge" aria-hidden="true">{content.books[id].category === 'combat' ? '⚔' : '◇'}</span>;
 }
 export default function TabletopBook({
   b,
@@ -131,11 +100,10 @@ export default function TabletopBook({
             (a as { page?: number }).page !== undefined &&
             Math.floor((a as { page?: number }).page! / 2) === b.id,
         );
-  const split = source.books[b.id].page_slots[0];
+  const split = leftSlots(b.id);
   const slot = (k: number) => {
     const owner = b.slots[k],
-      a = placement(k),
-      special = (b.id === 0 && k === 1) || (b.id === 6 && k === 0) || (b.id === 8 && k === 1);
+      a = placement(k);
     return (
       <div className="trackCell" key={k}>
         <button
@@ -148,13 +116,8 @@ export default function TabletopBook({
           }
         >
           {owner !== null ? <Meeple owner={owner} /> : <span className="emptySocket" />}
-          {special && <Badge id={b.id} />}
         </button>
-        {k > 0 && k < b.slots.length - 1 ? (
-          <Reward reward={content.spaceBonuses[b.id][k - 1]} />
-        ) : (
-          <span className="noReward" />
-        )}
+        <span className="spaceRewardText">{content.books[b.id].spaces[k]}</span>
       </div>
     );
   };

@@ -55,6 +55,7 @@ export default function GameCard({
               <Glyph kind="conflict" />
             </strong>
             <p>
+              <b>{content.characters[design].abilityName}</b>{' '}
               <RulesText text={content.characters[design].ability} />
             </p>
           </>
@@ -85,12 +86,12 @@ export default function GameCard({
           </>
         )}
       </div>
-      {kind !== 'character' && (
+      {(kind !== 'character' || content.characters[design].cost !== null) && (
         <footer
           className="cardCost"
-          aria-label={`${cost ?? (kind === 'twist' ? content.twists[design].cost : 1)} ink${kind === 'subplot' ? `: +${boost} power` : ''}`}
+          aria-label={`${cost ?? (kind === 'twist' ? content.twists[design].cost : kind === 'character' ? content.characters[design].cost : 1)} ink${kind === 'subplot' ? `: +${boost} power` : ''}`}
         >
-          {cost ?? (kind === 'twist' ? content.twists[design].cost : 1)}
+          {cost ?? (kind === 'twist' ? content.twists[design].cost : kind === 'character' ? content.characters[design].cost : 1)}
           <Glyph kind="ink" />
           {kind === 'subplot' && <>: +{boost}</>}
         </footer>

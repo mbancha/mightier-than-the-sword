@@ -8,7 +8,7 @@ export function chooseChapterAction(v: View): string | undefined {
   if (!a.length) return;
   const exact = (key: string) => a.find((x) => x.key === key)?.key;
   if (v.phase === 'compact') return exact('accept-layout') ?? exact('compact');
-  if (v.phase === 'route') return exact('arrive');
+  if (v.phase === 'route') return exact('arrive') ?? a[0].key;
   if (v.phase === 'afterPlace') return exact('extra') ?? exact('creature') ?? exact('end');
   if (v.phase === 'start')
     return (p.ink <= 1 ? exact('chapter') : undefined) ?? exact('turn') ?? a[0].key;
@@ -28,7 +28,7 @@ export function chooseChapterAction(v: View): string | undefined {
     });
     return moves[0]?.key ?? a[0].key;
   }
-  if (v.phase === 'twist') return a.find((x) => x.key.startsWith('card:'))?.key ?? exact('pass');
+  if (v.phase === 'twist') return a.find((x) => x.key.startsWith('card:'))?.key ?? exact('flip-hyde') ?? exact('pass') ?? a[0].key;
   if (v.phase === 'subplot')
     return a.find((x) => x.key.endsWith(p.ink <= 2 ? ':false' : ':true'))?.key ?? exact('skip');
   return a.find((x) => !['skip', 'pass'].includes(x.key))?.key ?? a[0].key;

@@ -10,6 +10,9 @@ import {
   bookmarkNames,
   bookmarkText,
   capacity,
+  edition,
+  cardCost,
+  subplotPower,
   minimum,
   type State,
 } from './game/chapters';
@@ -19,19 +22,38 @@ import TabletopBook, { Meeple, Glyph } from './TabletopBook';
 import './tabletop.css';
 import GameCard, { RulesText } from './GameCard';
 import './cards.css';
+import EdgePanel from './EdgePanel';
+import './edge-panels.css';
 export default function ChapterApp() {
   const [game, setGame] = useState<State | null>(null),
     [history, setHistory] = useState<State[]>([]),
     [seats, setSeats] = useState(2),
     [seed, setSeed] = useState('42'),
-    [bots, setBots] = useState<boolean[]>([false, true, false, false]),
+    [bots, setBots] = useState<boolean[]>([false, true, false, false, false]),
     [revealed, setRevealed] = useState<number | null>(null),
     [error, setError] = useState(''),
     [auto, setAuto] = useState(true);
   const [selected, setSelected] = useState<number | null>(null),
-    [zoom, setZoom] = useState(0.85);
+    [zoom, setZoom] = useState<number | null>(null),
+    [fitZoom, setFitZoom] = useState(1);
   const table = useRef<HTMLDivElement>(null),
     pan = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
+  const canvas = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const viewport = table.current, grid = canvas.current;
+    if (!viewport || !grid) return;
+    const fit = () => {
+      setFitZoom(Math.min(
+        (viewport.clientWidth - 32) / Math.max(1, grid.offsetWidth),
+        (viewport.clientHeight - 24) / Math.max(1, grid.offsetHeight),
+      ));
+    };
+    const observer = new ResizeObserver(fit);
+    observer.observe(viewport);
+    observer.observe(grid);
+    fit();
+    return () => observer.disconnect();
+  }, [!!game]);
   const actor = game ? actingPlayer(game) : 0;
   const view = game ? flowView(game, actor) : null;
   const sites = (view?.actions ?? [])
@@ -55,6 +77,7 @@ export default function ChapterApp() {
         : applyFlow(game, key);
       if (!game.players[actor].bot) setHistory((h) => [...h, game]);
       setGame(next);
+      if (actingPlayer(next) !== actor) setRevealed(null);
       setSelected(null);
       setError('');
     } catch (e) {
@@ -72,12 +95,12 @@ export default function ChapterApp() {
     return () => clearTimeout(t);
   }, [game, auto, actor]);
   const save = () => {
-    if (game) localStorage.setItem('mtts-chapters-1', JSON.stringify({ game, history }));
+    if (game) localStorage.setItem(edition, JSON.stringify({ game, history }));
   };
   const load = (text: string) => {
     try {
       const data = JSON.parse(text);
-      if (data.game?.edition !== 'chapters-1')
+      if (data.game?.edition !== edition)
         throw Error('This save belongs to another rules edition.');
       playerView(data.game, actingPlayer(data.game));
       setGame(settleFlow(data.game));
@@ -100,12 +123,12 @@ export default function ChapterApp() {
     URL.revokeObjectURL(url);
   };
   return (
-    <main className="chapterApp">
-      <header>
+    <main className={`chapterApp${game ? ' tableMode' : ''}`}>
+      {!game && <header>
         <h1>Mightier than the Sword</h1>
         <p>Characters, ink, and the books worth fighting for.</p>
         <span>Digital playtest · Chapters edition</span>
-      </header>
+      </header>}
       {error && <p role="alert">{error}</p>}
       {!game ? (
         <section>
@@ -113,7 +136,7 @@ export default function ChapterApp() {
           <label>
             Players{' '}
             <select value={seats} onChange={(e) => setSeats(Number(e.target.value))}>
-              {[2, 3, 4].map((n) => (
+              {[2, 3, 4, 5].map((n) => (
                 <option key={n}>{n}</option>
               ))}
             </select>
@@ -148,19 +171,21 @@ export default function ChapterApp() {
                 ),
               );
               setHistory([]);
+              setZoom(null);
               setAuto(true);
               setRevealed(null);
             }}
           >
             Begin story
           </button>
-          <button onClick={() => load(localStorage.getItem('mtts-chapters-1') ?? '{}')}>
+          <button onClick={() => load(localStorage.getItem(edition) ?? '{}')}>
             Load local story
           </button>
         </section>
       ) : (
         view && (
           <>
+            <EdgePanel edge="top" label="Story">
             <nav aria-label="Story controls">
               <button
                 disabled={!history.length}
@@ -195,6 +220,17 @@ export default function ChapterApp() {
                 New story
               </button>
             </nav>
+            <div className="tableTools">
+              <button aria-label="Zoom out" onClick={() => setZoom(Math.max(0.1, (zoom ?? fitZoom) - 0.1))}>−</button>
+              <button aria-label="Zoom in" onClick={() => setZoom((zoom ?? fitZoom) + 0.1)}>＋</button>
+              <button onClick={() => { setZoom(null); table.current?.scrollTo(0, 0); }}>Fit table</button>
+            </div>
+            <p>{view.stackCount} books in the library.</p>
+            {view.nextBookmark !== null && <p>Next bookmark · {bookmarkNames[view.nextBookmark]} · {bookmarkText[view.nextBookmark]}</p>}
+            <details><summary>Base rules</summary>{content.baseRules.map((rule) => <p key={rule}>{rule}</p>)}</details>
+            <details><summary>Story log</summary>{view.log.map((line, i) => <p key={i}>{line}</p>)}</details>
+            </EdgePanel>
+            <div className="turnStrip">
             {view.winner !== null ? (
               <h2 role="status">
                 {view.players[view.winner].name} wins with {view.players[view.winner].books.length}{' '}
@@ -230,8 +266,12 @@ export default function ChapterApp() {
                 · Turn {view.turn}
               </h2>
             )}
+            {view.nextBookmark !== null && <span title={bookmarkText[view.nextBookmark]}>Next · {bookmarkNames[view.nextBookmark]}</span>}
+            </div>
+            {(['left', 'right'] as const).map((edge) => (
+            <EdgePanel key={edge} edge={edge} label={edge === 'left' ? 'Your tableau' : 'Other players'}>
             <div className="chapterPlayers">
-              {view.players.map((p, i) => (
+              {view.players.map((p, i) => ({p, i})).filter(({i}) => (edge === 'left') === (i === (game.players.filter((player) => !player.bot).length === 1 ? game.players.findIndex((player) => !player.bot) : actor))).map(({p, i}) => (
                 <section className={`seat seat${i}`} key={i}>
                   <h3>
                     {p.name} {i === actor ? '• choosing' : ''}
@@ -295,55 +335,9 @@ export default function ChapterApp() {
                 </section>
               ))}
             </div>
-            <section className="boardSection">
-              <details className="libraryReference">
-                <summary>Library · {view.stackCount} books remaining</summary>
-                <details>
-                  <summary>Base rules</summary>
-                  {content.baseRules.map((rule) => (
-                    <p key={rule}>{rule}</p>
-                  ))}
-                </details>
-                <p>
-                  {view.stackCount} books remain in the stack. First conflict awards the bookmark;
-                  second conflict claims the book.
-                </p>
-              </details>
-              <div className="tableTools">
-                <button
-                  onClick={() => setZoom((z) => Math.max(0.4, z - 0.1))}
-                  aria-label="Zoom out"
-                >
-                  −
-                </button>
-                <button onClick={() => setZoom((z) => Math.min(1.5, z + 0.1))} aria-label="Zoom in">
-                  ＋
-                </button>
-                <button
-                  onClick={() => {
-                    const el = table.current;
-                    if (el) {
-                      const canvas = el.firstElementChild as HTMLElement;
-                      setZoom(
-                        Math.max(
-                          0.3,
-                          Math.min(
-                            1,
-                            (el.clientWidth - 40) / (canvas.offsetWidth || 1000),
-                            (el.clientHeight - 40) / (canvas.offsetHeight || 700),
-                          ),
-                        ),
-                      );
-                      el.scrollTo(0, 0);
-                    }
-                  }}
-                >
-                  Fit table
-                </button>
-                <span>
-                  Drag the table to pan · Tap a character, then a highlighted page or space
-                </span>
-              </div>
+            </EdgePanel>
+            ))}
+            <section className="boardSection" aria-label="Book table">
               <div
                 className="visualTable"
                 ref={table}
@@ -373,8 +367,9 @@ export default function ChapterApp() {
               >
                 <div
                   className="tableCanvas"
+                  ref={canvas}
                   style={{
-                    zoom,
+                    zoom: zoom ?? fitZoom,
                     gridTemplateColumns: `repeat(${Math.max(...positions.map((b) => 2 * b.q + b.r)) - minX + 2},240px)`,
                   }}
                 >
@@ -424,9 +419,13 @@ export default function ChapterApp() {
                 </div>
               </div>
             </section>
+            {view.battle && view.publicPlays.length > 0 && (
+              <div className="publicPlays" role="status">
+                Played · {view.publicPlays.map((card) => (card.kind === 'twist' ? content.twists : content.subplots)[card.design].name).join(' · ')}
+              </div>
+            )}
             {view.winner === null && (
               <section className="choices">
-                <h2>Choose an action</h2>
                 {game.players[actor].bot ? (
                   <p role="status">{view.players[actor].name} is thinking…</p>
                 ) : !showHand ? (
@@ -435,39 +434,37 @@ export default function ChapterApp() {
                   </button>
                 ) : (
                   <>
+                    <EdgePanel edge="bottom" label={`Hand (${view.players[actor].handCount})`}>
                     <div className="hand">
                       {view.players[actor].hand.map((c) => (
                         <GameCard
                           key={c.id}
                           kind={c.kind}
                           design={c.design}
-                          cost={
-                            c.kind === 'twist' && view.players[actor].marks.includes(3)
-                              ? 1
-                              : undefined
-                          }
-                          boost={view.players[actor].marks.includes(4) ? 2 : 1}
+                          cost={cardCost(view.players[actor], c)}
+                          boost={c.kind === 'subplot' ? subplotPower(view.players[actor], c.design) : undefined}
                           actions={view.actions
                             .filter(
                               (a) =>
-                                a.key === `card:${c.id}` || a.key.startsWith(`subplot:${c.id}:`),
+                                a.key === `card:${c.id}` || a.key.startsWith(`subplot:${c.id}:`) || a.key === `discard:${c.id}` || a.key === `exchange:${c.id}`,
                             )
                             .map((a) => ({
                               key: a.key,
-                              label: a.key.startsWith('subplot:')
+                              label: a.key.split(':').length > 3 ? a.label : a.key.startsWith('subplot:')
                                 ? a.key.endsWith('true')
                                   ? 'Keep bonus'
                                   : 'Take reward'
-                                : 'Play',
+                                : /^(discard|exchange):/.test(a.key) ? 'Discard' : 'Play',
                               run: () => act(a.key),
                             }))}
                         />
                       ))}
                     </div>
+                    </EdgePanel>
                     <div className="chapterActions">
                       {view.actions
                         .filter(
-                          (a) => !/^(move|step|setup|place|card|subplot|publish):/.test(a.key),
+                          (a) => !/^(move|step|setup|place|card|subplot|publish|discard|exchange):/.test(a.key),
                         )
                         .map((a) => (
                           <button key={a.key} onClick={() => act(a.key)}>
@@ -492,12 +489,6 @@ export default function ChapterApp() {
                 )}
               </section>
             )}
-            <details>
-              <summary>Story log</summary>
-              {view.log.map((line, i) => (
-                <p key={i}>{line}</p>
-              ))}
-            </details>
           </>
         )
       )}

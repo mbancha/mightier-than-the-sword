@@ -1,0 +1,12 @@
+name,quantity,genre,power,cost,type,abilityName,ability
+"Captain Nemo","1","Voyages","2","","ongoing","Silent Running","∞ When Nemo finishes a normal move, you may move any overflow Inklings from the book he started at to the book he ended."
+"Phileas Fogg","1","Voyages","1","2","ink","Around the World","Move to a page on a book where you have no Inklings, place an Inkling on an empty page space, and resolve the space twice."
+"Ichthyosaur","1","Voyages","3","","ongoing","Flight","+2 Move."
+"Achilles","1","Epics","2","","ongoing","Wrath of Achilles","⚔ +2 power if an enemy character is here."
+"Odysseus","1","Epics","1","2","ink","Trial of a Hero","If at least 2 players have Inklings on the book where Odysseus is, start a conflict there."
+"Aeneas","1","Epics","2","","ongoing","Flight from Troy","⚔ After a conflict where Aeneas is present, move him to an adjacent book and add 2 overflow Inklings."
+"Dracula","1","Gothic Horror","2","1","ink","Night Stalker","If Dracula's page has only one inkling, erase it, then place yours there (ignore reward). Then take a normal turn."
+"Frankenstein’s Creature","1","Gothic Horror","0","1","ink","Unthinking","If you have an Inkling on the same page as Frankenstein's Monster, it gains +4 power."
+"Dr. Jekyll / Mr. Hyde","1","Gothic Horror","1","","ongoing","Unleash Hyde","(Flip a coin and place it here. If you would play a Twist card, you may instead flip the coin.)
+Heads: +3 power.
+Tails: +1 movement."

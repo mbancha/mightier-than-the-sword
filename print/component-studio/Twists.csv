@@ -1,0 +1,10 @@
+name,quantity,genre,cost,effect
+"A Favorable Wind","3","Voyages","1","Gain 3 ink."
+"Ships in Company","3","Voyages","2","+2 power, or +4 if you have 2 or more Inklings on an adjacent book."
+"Charted Passage","3","Voyages","3","+3 power, or +7 if you have Inklings on 2 adjacent books."
+"The Bard’s Account","3","Epics","1","Draw 3 cards."
+"Rally the Flanks","3","Epics","2","+2 power, or +4 if you have an Inkling on each adjacent book."
+"Call to Arms","3","Epics","4","+5 power, or +7 if you have at least 3 cards in hand."
+"From the Shadows","3","Gothic Horror","1","+1 power. Draw 1 card."
+"Séance","3","Gothic Horror","2","+2 power, or +4 if you have at least 2 Inklings in this book’s overflow."
+"Haunting","3","Gothic Horror","3","+3 power. At the end of this combat, erase an inkling from each other book."

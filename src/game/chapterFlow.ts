@@ -89,6 +89,8 @@ export function flowChoices(input: State): FlowChoice[] {
     }
   }
   // Earlier effects own identical keys; repeated transfers still resolve in order.
+  if (!direct.length && a.length)
+    return a.map(({ key, label }) => ({ key, label, path: [key] }));
   return direct.filter((choice, index) => direct.findIndex((x) => x.key === choice.key) === index);
 }
 function administrativePath(input: State) {

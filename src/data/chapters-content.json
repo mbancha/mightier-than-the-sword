@@ -1,0 +1,388 @@
+{
+  "source": "https://docs.google.com/spreadsheets/d/1BTtI27_6SqO6YJhufK1WaawX9lgafQbZwg-X9Dz1pJY/edit",
+  "books": [
+    {
+      "name": "20,000 Leagues Under the Sea",
+      "quantity": 1,
+      "genre": "Voyages",
+      "category": "special space",
+      "effect": "Move up to 2 of your overflow Inklings from adjacent books into this overflow.",
+      "spaces": [
+        "[2 ink] + [1 cards]",
+        "[1 ink] + [special ◇]",
+        "place book"
+      ]
+    },
+    {
+      "name": "Around the World in 80 Days",
+      "quantity": 1,
+      "genre": "Voyages",
+      "category": "special space",
+      "effect": "Move a character one.",
+      "spaces": [
+        "[1 ink] + [1 cards]",
+        "[1 ink] + [1 cards]",
+        "[1 ink] + [special ◇]",
+        "place book"
+      ]
+    },
+    {
+      "name": "Journey to the Center of the Earth",
+      "quantity": 1,
+      "genre": "Voyages",
+      "category": "combat",
+      "effect": "Overflow Inklings have +1 power.",
+      "spaces": [
+        "[2 ink] + [1 cards]",
+        "[2 overflow inklings]",
+        "[1 ink] + [1 overflow inklings]",
+        "[1 ink]",
+        "place book"
+      ]
+    },
+    {
+      "name": "The Odyssey",
+      "quantity": 1,
+      "genre": "Epics",
+      "category": "special space",
+      "effect": "Draw 1, then discard 1.",
+      "spaces": [
+        "[1 ink] + [2 cards]",
+        "[2 ink]",
+        "[1 overflow inklings]",
+        "[1 ink] + [special ◇]",
+        "place book"
+      ]
+    },
+    {
+      "name": "The Iliad",
+      "quantity": 1,
+      "genre": "Epics",
+      "category": "combat",
+      "effect": "Each character here has +1 power.",
+      "spaces": [
+        "[2 overflow inklings]",
+        "[1 ink] + [1 overflow inklings]",
+        "[1 ink] + [1 cards]",
+        "place book"
+      ]
+    },
+    {
+      "name": "The Aeneid",
+      "quantity": 1,
+      "genre": "Epics",
+      "category": "special space",
+      "effect": "Place an inkling in each adjacent book's overflow.",
+      "spaces": [
+        "[1 ink] + [1 overflow inklings]",
+        "[1 ink] + [special ◇]",
+        "place book"
+      ]
+    },
+    {
+      "name": "Dracula",
+      "quantity": 1,
+      "genre": "Gothic Horror",
+      "category": "combat",
+      "effect": "At conflict start, the occupant of the first page space may move 1 enemy page Inkling here to overflow.",
+      "spaces": [
+        "[2 ink] + [1 cards]",
+        "[1 overflow inklings]",
+        "[1 ink]",
+        "place book"
+      ]
+    },
+    {
+      "name": "Frankenstein",
+      "quantity": 1,
+      "genre": "Gothic Horror",
+      "category": "combat",
+      "effect": "After the first conflict here, return the overflow Inklings to supply, then move all the page Inklings here to the overflow.",
+      "spaces": [
+        "[2 ink] + [1 overflow inklings]",
+        "[2 overflow inklings]",
+        "[1 ink] + [1 cards]",
+        "[1 ink]",
+        "place book"
+      ]
+    },
+    {
+      "name": "Dr. Jekyll and Mr. Hyde",
+      "quantity": 1,
+      "genre": "Gothic Horror",
+      "category": "special space",
+      "effect": "Ymay discard 1 card to place 3 Inklings in this book’s overflow.",
+      "spaces": [
+        "[2 ink] + [1 cards]",
+        "[1 ink] + [special ◇]",
+        "place book"
+      ]
+    }
+  ],
+  "characters": [
+    {
+      "quantity": 1,
+      "name": "Captain Nemo",
+      "power": 2,
+      "cost": null,
+      "type": "ongoing",
+      "abilityName": "Silent Running",
+      "ability": "∞ When Nemo finishes a normal move, you may move any overflow Inklings from the book he started at to the book he ended.",
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 1,
+      "name": "Phileas Fogg",
+      "power": 1,
+      "cost": 2,
+      "type": "ink",
+      "abilityName": "Around the World",
+      "ability": "Move to a page on a book where you have no Inklings, place an Inkling on an empty page space, and resolve the space twice.",
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 1,
+      "name": "Ichthyosaur",
+      "power": 3,
+      "cost": null,
+      "type": "ongoing",
+      "abilityName": "Flight",
+      "ability": "+2 Move.",
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 1,
+      "name": "Achilles",
+      "power": 2,
+      "cost": null,
+      "type": "ongoing",
+      "abilityName": "Wrath of Achilles",
+      "ability": "⚔ +2 power if an enemy character is here.",
+      "genre": "Epics"
+    },
+    {
+      "quantity": 1,
+      "name": "Odysseus",
+      "power": 1,
+      "cost": 2,
+      "type": "ink",
+      "abilityName": "Trial of a Hero",
+      "ability": "If at least 2 players have Inklings on the book where Odysseus is, start a conflict there.",
+      "genre": "Epics"
+    },
+    {
+      "quantity": 1,
+      "name": "Aeneas",
+      "power": 2,
+      "cost": null,
+      "type": "ongoing",
+      "abilityName": "Flight from Troy",
+      "ability": "⚔ After a conflict where Aeneas is present, move him to an adjacent book and add 2 overflow Inklings.",
+      "genre": "Epics"
+    },
+    {
+      "quantity": 1,
+      "name": "Dracula",
+      "power": 2,
+      "cost": 1,
+      "type": "ink",
+      "abilityName": "Night Stalker",
+      "ability": "If Dracula's page has only one inkling, erase it, then place yours there (ignore reward). Then take a normal turn.",
+      "genre": "Gothic Horror"
+    },
+    {
+      "quantity": 1,
+      "name": "Frankenstein’s Creature",
+      "power": 0,
+      "cost": 1,
+      "type": "ink",
+      "abilityName": "Unthinking",
+      "ability": "If you have an Inkling on the same page as Frankenstein's Monster, it gains +4 power.",
+      "genre": "Gothic Horror"
+    },
+    {
+      "quantity": 1,
+      "name": "Dr. Jekyll / Mr. Hyde",
+      "power": 1,
+      "cost": null,
+      "type": "ongoing",
+      "abilityName": "Unleash Hyde",
+      "ability": "(Flip a coin and place it here. If you would play a Twist card, you may instead flip the coin.)\nHeads: +3 power.\nTails: +1 movement.",
+      "genre": "Gothic Horror"
+    }
+  ],
+  "twists": [
+    {
+      "quantity": 3,
+      "name": "A Favorable Wind",
+      "cost": 1,
+      "effect": "Gain 3 ink.",
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 3,
+      "name": "Ships in Company",
+      "cost": 2,
+      "effect": "+2 power, or +4 if you have 2 or more Inklings on an adjacent book.",
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 3,
+      "name": "Charted Passage",
+      "cost": 3,
+      "effect": "+3 power, or +7 if you have Inklings on 2 adjacent books.",
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 3,
+      "name": "The Bard’s Account",
+      "cost": 1,
+      "effect": "Draw 3 cards.",
+      "genre": "Epics"
+    },
+    {
+      "quantity": 3,
+      "name": "Rally the Flanks",
+      "cost": 2,
+      "effect": "+2 power, or +4 if you have an Inkling on each adjacent book.",
+      "genre": "Epics"
+    },
+    {
+      "quantity": 3,
+      "name": "Call to Arms",
+      "cost": 4,
+      "effect": "+5 power, or +7 if you have at least 3 cards in hand.",
+      "genre": "Epics"
+    },
+    {
+      "quantity": 3,
+      "name": "From the Shadows",
+      "cost": 1,
+      "effect": "+1 power. Draw 1 card.",
+      "genre": "Gothic Horror"
+    },
+    {
+      "quantity": 3,
+      "name": "Séance",
+      "cost": 2,
+      "effect": "+2 power, or +4 if you have at least 2 Inklings in this book’s overflow.",
+      "genre": "Gothic Horror"
+    },
+    {
+      "quantity": 3,
+      "name": "Haunting",
+      "cost": 3,
+      "effect": "+3 power. At the end of this combat, erase an inkling from each other book.",
+      "genre": "Gothic Horror"
+    }
+  ],
+  "subplots": [
+    {
+      "quantity": 1,
+      "name": "A Port of Call",
+      "condition": "End your move on a page with one of your inklings on each adjacent page (minimum 2).",
+      "ongoing": "Minimum hand size +1.",
+      "instant": "Gain 3 ink.",
+      "power": 1,
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 1,
+      "name": "In the Ship’s Wake",
+      "condition": "Place an Inkling on a page adjacent to one of your other Inklings, then discard a Twist.",
+      "ongoing": "+1 move.",
+      "instant": "Draw 3 cards.",
+      "power": 1,
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 1,
+      "name": "Walk the Planks",
+      "condition": "Place an inkling, then discard exactly one of you inklings from two adjacent books.",
+      "ongoing": "When you place on last space, gain 2 ink.",
+      "instant": "Gain 4 ink.",
+      "power": 1,
+      "genre": "Voyages"
+    },
+    {
+      "quantity": 1,
+      "name": "The Final Verse",
+      "condition": "Complete a conflict where you have no Inklings in the overflow.",
+      "ongoing": "Characters +1 power.",
+      "instant": "Draw 2 cards.",
+      "power": 1,
+      "genre": "Epics"
+    },
+    {
+      "quantity": 1,
+      "name": "Stand Shoulder to Shoulder",
+      "condition": "Place an inkling on the last space of a book while you have at least 3 cards and 3 ink.",
+      "ongoing": "If you have Inklings in each overflow, +2 power.",
+      "instant": "+Inkling in each overflow.",
+      "power": 1,
+      "genre": "Epics"
+    }
+  ],
+  "bookmarks": [
+    {
+      "quantity": 1,
+      "name": "Larger Than Life",
+      "effect": "Your protagonist has +4 power."
+    },
+    {
+      "quantity": 1,
+      "name": "Well Read",
+      "effect": "When you draw any number of cards, draw 1 more."
+    },
+    {
+      "quantity": 1,
+      "name": "Deep Inkwell",
+      "effect": "Whenever you gain ink, gain 2 more."
+    },
+    {
+      "quantity": 1,
+      "name": "Effortless Twists",
+      "effect": "Each of your Twists costs -1 ink."
+    },
+    {
+      "quantity": 1,
+      "name": "Hidden Strength",
+      "effect": "When played during a conflict, your Subplots give +2 power."
+    },
+    {
+      "quantity": 3,
+      "name": "An Unlikely Companion",
+      "effect": "Gain a new character from the deck."
+    },
+    {
+      "quantity": 1,
+      "name": "Strength in the Margins",
+      "effect": "Each of your overflow Inklings has +2 power."
+    },
+    {
+      "quantity": 1,
+      "name": "Command the Page",
+      "effect": "Each of your Inklings on page spaces has +2 power."
+    },
+    {
+      "quantity": 1,
+      "name": "Double Take",
+      "effect": "During conflict, each inkling allows you to play 2 cards."
+    },
+    {
+      "quantity": 1,
+      "name": "A Wider World",
+      "effect": "Your character can move +3."
+    },
+    {
+      "quantity": 1,
+      "name": "Make Room",
+      "effect": "When placing an inkling onto a page space, you may first move an opponent's inkling from that space to the overflow."
+    },
+    {
+      "quantity": 1,
+      "name": "Ink in the Margins",
+      "effect": "At the end of a conflict, if you lost, gain 2 ink per Inkling you had there."
+    }
+  ]
+}
